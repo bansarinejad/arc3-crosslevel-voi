@@ -1,0 +1,90 @@
+{
+  "config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
+  "elapsed_seconds": 68.68122140000196,
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "fits_vram_gate": true,
+  "git": {
+    "commit": "45155d1e0f3ddfccc4cf25f759854004e5b8aa48",
+    "dirty": false,
+    "repository_root": "D:/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "total_vram_gb": 15.99169921875
+  },
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "output_tokens": 1470,
+  "passes_runtime_gate": null,
+  "passes_throughput_gate": true,
+  "peak_vram_gb": 10.775782108306885,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "program_source_lengths": [
+    2349,
+    436,
+    1447,
+    1079
+  ],
+  "program_source_sha256": [
+    "bacabd85500adc185d21855351de173ffa4bea92ec745e92a00286479f8e7f46",
+    "c14d22699c3cb672df72af11156ffe261c81ee29384f06f514794960ff2b0c8e",
+    "272768ec5a0e59dda29c48d1413eaae298be1e3e511f9f7d3b585952faa073b0",
+    "b60bd8baf5b9408b6f6184566d189ae8a189e015b81dfac231d99baf46338cf6"
+  ],
+  "program_sources": [
+    "def predict(history, action):\n    # Extract the current grid from the latest frame\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    \n    # If this is an ACTION6, it carries coordinates to modify a specific cell\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Modify the cell at the specified coordinate\n        # We invert the value: if it was 0 (white), make it 1 (filled), and vice versa\n        # Or set it to a specific value based on the action.\n        # Given the pattern of filling a bar, we'll set the cell to 1 if it's 0.\n        if grid[row, col] == 0:\n            grid[row, col] = 1\n        # Otherwise, leave it alone or set to 0.\n        # Based on previous frames, the bar fills up.\n        # Let's assume we fill the cell.\n        grid[row, col] = 1\n    else:\n        # For other actions, we infer from history that they might be resetting or doing nothing significant\n        # The pattern shows a bar being filled from top to bottom.\n        # ACTION1 seems to be the \"step\" action that fills the next row of the bar.\n        # Since we don't have explicit coordinates for ACTION1, we can't predict the exact next row\n        # without more context, but we can infer that ACTION1 advances the bar.\n        # However, without knowing the current state of the bar (which row it's on),\n        # we cannot deterministically predict the next row.\n        # A conservative approach is to do nothing (identity) if we can't infer the target.\n        pass\n\n    # Determine game state\n    # If the bar reaches the bottom, it might be a win.\n    # We check if the bottom row is filled.\n    # Assuming the bar is always horizontal and fills rows sequentially.\n    # We look for the highest filled row.\n    filled_rows = np.any(grid == 1, axis=1)\n    if np.all(filled_rows):\n        game_state = \"WIN\"\n    else:\n        game_state = \"NOT_FINISHED\"\n\n    return {\n        \"next_grid\": grid,\n        \"game_state\": game_state,\n        \"level_delta\": 0,\n        \"memory\": {}\n    }\n\ndef goal_value(history):\n    # Goal value is 1.0 if the game is won, otherwise 0.0\n    # We can check the last game_state in history if available\n    if history.game_states:\n        last_state = history.game_states[-1]\n        if last_state == \"WIN\":\n            return 1.0\n    return 0.0",
+    "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Fill the entire row with the current row index\n        grid = np.full(grid.shape, row, dtype=np.int8)\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.0",
+    "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    else:\n        row, col = None, None\n\n    if kind == 1:\n        # ACTION1 fills the next available row from top to bottom\n        current_values = np.unique(grid.ravel())\n        if 0 in current_values:\n            next_val = 1\n        else:\n            next_val = 1\n        \n        # Find the first row that has only 0s and fill it\n        for r in range(grid.shape[0]):\n            row_vals = grid[r, :]\n            if np.all(row_vals == 0):\n                grid[r, :] = next_val\n                break\n    elif kind == 2:\n        # ACTION2 fills the next available column from left to right\n        current_values = np.unique(grid.ravel())\n        if 0 in current_values:\n            next_val = 1\n        else:\n            next_val = 1\n        \n        for c in range(grid.shape[1]):\n            col_vals = grid[:, c]\n            if np.all(col_vals == 0):\n                grid[:, c] = next_val\n                break\n    elif kind == 6:\n        # ACTION6 sets the specific cell\n        grid[row, col] = 1\n\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Goal is to fill the grid with non-zero values\n    last_grid = np.array(history.frames[-1], dtype=np.int8)\n    return 0.0",
+    "def predict(history, action):\n    kind = int(action.kind)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    next_grid = grid.copy()\n    \n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        if 0 <= row < next_grid.shape[0] and 0 <= col < next_grid.shape[1]:\n            next_grid[row, col] = 1\n    elif kind == 1:\n        # ACTION1 fills the grid from top-left\n        next_grid[:] = 1\n    elif kind == 2:\n        # ACTION2 fills the grid from bottom-right\n        next_grid[:] = 1\n    else:\n        # For other actions, maintain current state\n        pass\n    \n    return {\"next_grid\": next_grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Check if the grid is filled with 1s\n    last_frame = history.frames[-1]\n    last_values = history.grid_values[-1]\n    \n    if not last_values:\n        return 0.0\n    \n    # Assuming grid values represent the set of filled cells\n    # If all values are 1, it's a win\n    if all(v == 1 for v in last_values):\n        return 1.0\n    \n    return 0.0"
+  ],
+  "projected_p95_seconds": null,
+  "prompt_contract_sha256": "2850bc72cf42c42e2c813962aa7fb413d74f3ff65789719ac76dd32e26157b96",
+  "prompt_contract_version": "grounded-actions-palette-diverse-v2",
+  "requested_sequences": 4,
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "11",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "runtime_fraction": null,
+  "statically_valid_programs": 2,
+  "syntactically_valid_programs": 2,
+  "tokens_per_second": 21.40323031587726,
+  "truncated_sequences": 0,
+  "validation_failures": {
+    "disallowed_attribute": 3,
+    "disallowed_call": 2
+  }
+}
