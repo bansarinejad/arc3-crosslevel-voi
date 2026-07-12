@@ -17,7 +17,7 @@
     "launch_worktree_clean": true,
     "git_commit_not_embedded_in_run_schema": true,
     "development_matrix": {
-      "path": "artifacts/development_matrix.json",
+      "path": "artifacts/development_matrix_fair_v2.json",
       "bytes": 72723,
       "sha256": "76bcfd53547b4cf4c376bff45fab5511dad4bc30ccf778f2f90e07da88bef495"
     },

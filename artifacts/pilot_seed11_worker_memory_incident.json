@@ -4,7 +4,7 @@
   "started_from_git_commit": "6b62c84e2bd8e29067c1f105176421497185980c",
   "game_id": "bp35-0a0ad940",
   "seed": 11,
-  "matrix_path": "artifacts/development_matrix.json",
+  "matrix_path": "artifacts/development_matrix_fair_v2.json",
   "completed_diagnostic_run": {
     "run_id": "development-bp35-0a0ad940-11-D-2fdf174a",
     "config_sha256": "2fdf174a8b1cda9fbb0b9e0e4a0ea532e972bd71bad907989b3d3f470760de03",
