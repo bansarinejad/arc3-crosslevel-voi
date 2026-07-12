@@ -104,6 +104,15 @@ does not contain code from Duck or other competition entries.
   Both gates fail, so neither backbone authorizes gameplay. See
   `artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_windows.json` and
   `artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_9b_windows.json`.
+- Added a producer-neutral source-batch admission path and tested a deliberately isolated
+  library of four fixed generic visual priors. This is a counterfactual capability
+  diagnostic, not a scene compiler, transition-accuracy result, or model-induction claim.
+  All four priors were sandbox-valid, role-eligible, behaviorally distinct, and plannable,
+  but agreement was 0.84758, maximum EVSI was only 0.00572 actions, maximum cross-level
+  utility was -0.86841, and there was no X-only probe. The runtime-v2 gate therefore
+  blocked exactly as intended. No model, GPU, environment, gameplay, active-matrix,
+  configuration, or paper-claim change resulted. See
+  `artifacts/structured_prior_admission_v1.json`.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its

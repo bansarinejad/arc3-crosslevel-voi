@@ -113,6 +113,18 @@ then rejected both local backbones on grounding: 4B retained two safe distinct p
 but no eligible graded role after repair; serial 9B NF4 passed compute at 14.20 tokens/s
 and 8.58 GiB but retained zero grounded-safe programs. The active matrix remains locked.
 
+After those failures, one isolated offline capability diagnostic evaluated four fixed,
+history-invariant generic visual priors through a newly extracted producer-neutral source
+batch path. This did not amend the active experiment: it used no model, generated tokens,
+GPU, environment calls, gameplay, recorded-transition scoring, or proposal-budget batch.
+All four sources passed sandbox, role, behavioral-distinctness, and planning checks, but
+agreement was 0.84758, maximum EVSI was 0.00572 actions, maximum X utility was -0.86841,
+and no X-only probe existed. Runtime admission therefore remained blocked. The priors are
+not described as learned, scene-compiled, or empirically accurate; palette-tie and scale
+equivariance also remain unverified. The clean-commit report is
+`artifacts/structured_prior_admission_v1.json`. It is excluded from performance aggregates
+and does not unlock or regenerate `development_matrix.json`.
+
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no
 timeouts, but parallel median wall time was 6.53 seconds versus 5.01 seconds serial.

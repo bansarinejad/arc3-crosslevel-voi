@@ -1,0 +1,611 @@
+{
+  "contract": {
+    "admission_rule": "shared runtime-admission-v2 role checks, behavioral deduplication, depth-four planning, and X-only probe opportunity",
+    "agreement_threshold": 0.8,
+    "beam_width": 8,
+    "initial_cross_level_persistence": 0.5,
+    "interpretation": "counterfactual capability diagnostic only; not transition accuracy, gameplay readiness, or evidence of model-generated induction",
+    "material_evsi_threshold_actions": 0.05,
+    "planning_depth": 4
+  },
+  "contract_version": "runtime-admission-v2",
+  "gate": {
+    "passes": false,
+    "reasons": [
+      "no X-only probe opportunity: require one action with low committee agreement, material EVSI, positive cross-level utility, and non-positive myopic utility"
+    ]
+  },
+  "git": {
+    "commit": "902685278980b4b6964236f3c46d2452c6544c5a",
+    "dirty": false,
+    "repository_root": "D:/kaggle competitions/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "inputs": {
+    "candidate_policy": "source-neutral candidates_from_history; no cached points",
+    "candidate_set": [
+      {
+        "col": null,
+        "kind": 3,
+        "row": null
+      },
+      {
+        "col": null,
+        "kind": 4,
+        "row": null
+      },
+      {
+        "col": null,
+        "kind": 7,
+        "row": null
+      },
+      {
+        "col": 33,
+        "kind": 6,
+        "row": 42
+      },
+      {
+        "col": 42,
+        "kind": 6,
+        "row": 5
+      },
+      {
+        "col": 31,
+        "kind": 6,
+        "row": 63
+      },
+      {
+        "col": 15,
+        "kind": 6,
+        "row": 3
+      },
+      {
+        "col": 21,
+        "kind": 6,
+        "row": 3
+      },
+      {
+        "col": 27,
+        "kind": 6,
+        "row": 3
+      },
+      {
+        "col": 33,
+        "kind": 6,
+        "row": 15
+      },
+      {
+        "col": 39,
+        "kind": 6,
+        "row": 15
+      },
+      {
+        "col": 45,
+        "kind": 6,
+        "row": 15
+      }
+    ],
+    "candidate_set_sha256": "e6855e140e16a6611b81542dd6b2c5709d23763e444a66a2de8c8bc9cbf10940",
+    "fixture": "fixtures/grounding/bp35_seed11_initial_history.json",
+    "fixture_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+    "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+    "latest_grid_sha256": "c17580ec4fbde531065cfa0291956c644e7d09884a7a60dd35ed40361094e8f0",
+    "planning_config_sha256": "6e84fd03aea5012a8360410dc9386913d7767dd71377c2d5bdde6e374aa79c0e"
+  },
+  "offline": true,
+  "planner_error": null,
+  "planning": {
+    "actions": [
+      {
+        "action": "ACTION3",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.532723112128147,
+          4.3876953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION4",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.532723112128147,
+          4.3876953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION7",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.532723112128147,
+          4.3876953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION6(42,33)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.94488188976378,
+          4.532723112128147,
+          4.3251953125
+        ],
+        "cross_level_utility": -0.8684056537756977,
+        "evsi": 0.005721493314100101,
+        "myopic_utility": -0.9942785066858999,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "755716ebae944f544caf8a7ccc96df2cca672e14202bbf1a7a0b83a19a88c9d2",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "8ca1c20396919ada80fa811fe04b4a766c5bf79258de566d65f4ecdaffe0d259"
+        ]
+      },
+      {
+        "action": "ACTION6(5,42)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.532723112128147,
+          4.3251953125
+        ],
+        "cross_level_utility": -0.8684056537756977,
+        "evsi": 0.005721493314100101,
+        "myopic_utility": -0.9942785066858999,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "acf7b45b0f88092e5b4f199c42604884344a55c1b04fb889be62d374bd5176f0",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "89b516ec54a476ee4ec2524fd371326be1ee1c3996ec69e3d99f77aa3131ea05"
+        ]
+      },
+      {
+        "action": "ACTION6(63,31)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.3251953125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "37c02acc980d30f4f13775bffdfcb86428e6d73dfee2878be502fda5f6d345e8",
+          "238766c4e423dd68742aee1a6fa8e06e8a813700168db9ab3cab53881c415a07",
+          "108f29a5ac4697f9aa361300f920c83570440b34b9680f6bb8ca580d82129a6d"
+        ]
+      },
+      {
+        "action": "ACTION6(3,15)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.36328125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "d6169161002f9441d60c1305d57ed9b0e8302e7fc09845a5dfdb922f6d7c9c96",
+          "38028daec0e0a62bb26fd44d3cab7fb5e37abd6fe07d78e99e881a08c4588b50",
+          "72da019d956c8f49840dc563cc446307b7d925f3da6fc3f841d081c742901b4e"
+        ]
+      },
+      {
+        "action": "ACTION6(3,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.36328125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4b6121d97293f35afcc35cd2fb2329c9c3d5f992e527caaf17dfac46acdec53e",
+          "2402b0cc12fd321703b48cc1c184b39d794dfc105a75a9e960855b1c4558d81a",
+          "e6aa5fbbd1929643932ac3e3f895da36bcf17af1fe36b77f67797f3fed6b54cf"
+        ]
+      },
+      {
+        "action": "ACTION6(3,27)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.36328125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "fc94ecf5d3e11f2e3375b08a048f528189909947002632d5523d7b16f2d19fcb",
+          "76ace98fba9eafa6f775cb8b62f0fde0b2ba7e406e96c9aee8c3ca384674841b",
+          "04bdf1213c3cc1d04bf33ff84db2e9fc302b000c8ddf93b5a9ff06cddfc622fd"
+        ]
+      },
+      {
+        "action": "ACTION6(15,33)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.36328125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "9e8520abf4040be9553b2d279f4843b34df24acc7fc7bbd57dfb49257645ab37",
+          "b3d0ec2f0cc08f722fd45b247a6c1ee5cbfc0681e2a853c85c209fd87430f1de",
+          "4dbb67e1500e2b211db1e557702d24ede3ed7ca92ce469526f02ef83ba525d12"
+        ]
+      },
+      {
+        "action": "ACTION6(15,39)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.36328125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "0088680917f742aceacb252b45161ceba4989f8c953182c2aed17e97e336a8d2",
+          "8e08c7244bb226c14e48c36ddc9c4f187d42900a51efa2d8503d206aececa275",
+          "d6cb6e0b7af875df9932bbe9da0c5f84088e8230b25306eb1aa7c81b0fc16598"
+        ]
+      },
+      {
+        "action": "ACTION6(15,45)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          5.0078740157480315,
+          4.495185694635488,
+          4.36328125
+        ],
+        "cross_level_utility": -0.8684056537757181,
+        "evsi": 0.005721493314099213,
+        "myopic_utility": -0.9942785066859008,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "c158b126caba74adbc06a1243937a26b5504e861abec5ed4d1552b749d04835e",
+          "cf9e6696ff55b01d9f8ee88d5cd3a6eb3e3aa1f62a98e3326af2c3adb009a9df",
+          "b39d149e7e85c098ec2fa047147425f3ea2cdd84de490568e5334b6eafb51659"
+        ]
+      }
+    ],
+    "agreement": 0.8475789306704709,
+    "cross_level_multiplier": 23.0,
+    "differing_optimal_sets": true,
+    "hypothesis_ids": [
+      "0656e1a1257d030f81e5714ef933798209e2cc899ed12f4cc7deb655b15aa202",
+      "ecb1839f29fde41c896862cb553583966112b6d2a8526dc82fdd9dd19dcc2977",
+      "1b0a1b3d3f4783cd58ab5b25f9a2b500ea0cb7efeaa80a62cf260b19cbeb5793",
+      "6cf637a98aa8bc8d4b5e9b19fe88c6486f1bb5213f36746299cc26704ceeed1d"
+    ],
+    "indifference": 0.5885104403894551,
+    "invalid_hypothesis_ids": [],
+    "maximum_cross_level_utility": -0.8684056537756977,
+    "maximum_evsi": 0.005721493314100101,
+    "maximum_myopic_utility": -0.9942785066858999,
+    "myopic_multiplier": 1.0,
+    "optimal_action_sets": {
+      "0656e1a1257d030f81e5714ef933798209e2cc899ed12f4cc7deb655b15aa202": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(42,33)",
+        "ACTION6(5,42)",
+        "ACTION6(63,31)",
+        "ACTION6(3,15)",
+        "ACTION6(3,21)",
+        "ACTION6(3,27)",
+        "ACTION6(15,33)",
+        "ACTION6(15,39)",
+        "ACTION6(15,45)"
+      ],
+      "1b0a1b3d3f4783cd58ab5b25f9a2b500ea0cb7efeaa80a62cf260b19cbeb5793": [
+        "ACTION6(63,31)",
+        "ACTION6(3,15)",
+        "ACTION6(3,21)",
+        "ACTION6(3,27)",
+        "ACTION6(15,33)",
+        "ACTION6(15,39)",
+        "ACTION6(15,45)"
+      ],
+      "6cf637a98aa8bc8d4b5e9b19fe88c6486f1bb5213f36746299cc26704ceeed1d": [
+        "ACTION6(42,33)",
+        "ACTION6(5,42)",
+        "ACTION6(63,31)"
+      ],
+      "ecb1839f29fde41c896862cb553583966112b6d2a8526dc82fdd9dd19dcc2977": [
+        "ACTION6(42,33)"
+      ]
+    },
+    "per_hypothesis_cost_variation": {
+      "0656e1a1257d030f81e5714ef933798209e2cc899ed12f4cc7deb655b15aa202": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 8.0,
+        "minimum": 8.0,
+        "range": 0.0
+      },
+      "1b0a1b3d3f4783cd58ab5b25f9a2b500ea0cb7efeaa80a62cf260b19cbeb5793": {
+        "action_varying": true,
+        "distinct_costs": 2,
+        "maximum": 4.532723112128147,
+        "minimum": 4.495185694635488,
+        "range": 0.0375374174926586
+      },
+      "6cf637a98aa8bc8d4b5e9b19fe88c6486f1bb5213f36746299cc26704ceeed1d": {
+        "action_varying": true,
+        "distinct_costs": 3,
+        "maximum": 4.3876953125,
+        "minimum": 4.3251953125,
+        "range": 0.0625
+      },
+      "ecb1839f29fde41c896862cb553583966112b6d2a8526dc82fdd9dd19dcc2977": {
+        "action_varying": true,
+        "distinct_costs": 2,
+        "maximum": 5.0078740157480315,
+        "minimum": 4.94488188976378,
+        "range": 0.06299212598425186
+      }
+    },
+    "weights": [
+      0.4746828438608723,
+      0.2041075138909805,
+      0.1524210693295292,
+      0.16878857291861807
+    ],
+    "x_only_probe_actions": []
+  },
+  "producer": {
+    "backbone_used": false,
+    "budget_scope": "offline capability audit; not a live controller run",
+    "generated_tokens": 0,
+    "instantiation_policy": "emit the same four runtime-grounded generic priors for every non-empty 2-D history; embed no observed coordinate, palette value, game ID, or transition-derived binding",
+    "instantiation_policy_sha256": "46c50de8013a94708ec6551f70c38a727281b6d86cee8528516c34f008e86dfd",
+    "instantiation_wall_seconds": 6.100002792663872e-06,
+    "model_calls": 0,
+    "model_id": null,
+    "producer_contract_sha256": "684807a5cc30acc03b083a30ba5d447a9e9b4f9e7173310c80f062c2b6595d97",
+    "producer_id": "arc3_voi.structured_templates",
+    "producer_invocations": 1,
+    "producer_kind": "deterministic_structured_prior_library",
+    "producer_version": "generic-visual-priors-v1",
+    "proposal_batches_charged": 0,
+    "template_library_sha256": "52bd7114d5c36fe7c7a693b6ef58bd27a44e595b2ffe4f92a52c4e7d36f2424d"
+  },
+  "programs": [
+    {
+      "assigned_role": "conservative_no_effect",
+      "ast_nodes": 51,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "candidate_index": 0,
+      "eligibility": {
+        "action_sensitive": false,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": false,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "0656e1a1257d030f81e5714ef933798209e2cc899ed12f4cc7deb655b15aa202",
+      "instantiation_bindings": {},
+      "raw_source_sha256": "4f2c20bdc924af4d775fa83e30b462f027cfd1981ea3a8a1d07b0e13b0250325",
+      "recorded_transition_count": 0,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": false,
+        "goal_conditioning": false
+      },
+      "source_origin": "generic_structured_prior",
+      "template_family": "conservative_no_effect",
+      "template_id": "conservative_no_effect",
+      "template_version": 1
+    },
+    {
+      "assigned_role": "local_action6_contact",
+      "ast_nodes": 473,
+      "behavior_signature": "bd136cc21ddf14e4d68f98542bf3dea8e5ecaa0fac1cf03d8704d6530d23b422",
+      "candidate_index": 1,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "ecb1839f29fde41c896862cb553583966112b6d2a8526dc82fdd9dd19dcc2977",
+      "instantiation_bindings": {},
+      "raw_source_sha256": "7fd89d2688482433efe37ed88af8c112ac15e917319bca80b55592034c3af3a9",
+      "recorded_transition_count": 0,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      },
+      "source_origin": "generic_structured_prior",
+      "template_family": "local_action6_contact",
+      "template_id": "local_action6_contact",
+      "template_version": 1
+    },
+    {
+      "assigned_role": "action6_component_selection",
+      "ast_nodes": 619,
+      "behavior_signature": "ffd902f82ac5429c0ec6293ba239729b54f59fe6bcc95e8f4f903a7f3b3c5647",
+      "candidate_index": 2,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "1b0a1b3d3f4783cd58ab5b25f9a2b500ea0cb7efeaa80a62cf260b19cbeb5793",
+      "instantiation_bindings": {},
+      "raw_source_sha256": "99df71ab0bc9059dea133dd2498f781cc864953354eb1ba165e54fd94aac3fbe",
+      "recorded_transition_count": 0,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      },
+      "source_origin": "generic_structured_prior",
+      "template_family": "action6_component_selection",
+      "template_id": "action6_component_selection",
+      "template_version": 1
+    },
+    {
+      "assigned_role": "action6_component_state",
+      "ast_nodes": 568,
+      "behavior_signature": "37bff2dad9731c7a7cf9048398af55d878a091ec05d06ea837abfc1d63f2fd46",
+      "candidate_index": 3,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "6cf637a98aa8bc8d4b5e9b19fe88c6486f1bb5213f36746299cc26704ceeed1d",
+      "instantiation_bindings": {},
+      "raw_source_sha256": "6c57425b5ec288b3d864ac90016d2828f552cf7b217eb489036dbe733155d158",
+      "recorded_transition_count": 0,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      },
+      "source_origin": "generic_structured_prior",
+      "template_family": "action6_component_state",
+      "template_id": "action6_component_state",
+      "template_version": 1
+    }
+  ],
+  "schema_version": 1,
+  "selection": {
+    "behavioral_deduplicated_ids": [],
+    "distinct_selected_behavior_classes": 4,
+    "eligible_ids": [
+      "0656e1a1257d030f81e5714ef933798209e2cc899ed12f4cc7deb655b15aa202",
+      "ecb1839f29fde41c896862cb553583966112b6d2a8526dc82fdd9dd19dcc2977",
+      "1b0a1b3d3f4783cd58ab5b25f9a2b500ea0cb7efeaa80a62cf260b19cbeb5793",
+      "6cf637a98aa8bc8d4b5e9b19fe88c6486f1bb5213f36746299cc26704ceeed1d"
+    ],
+    "filter_precedes_persistent_worker_construction": true,
+    "ineligible_ids": [],
+    "ineligible_selected_ids": [],
+    "selected_ids": [
+      "0656e1a1257d030f81e5714ef933798209e2cc899ed12f4cc7deb655b15aa202",
+      "ecb1839f29fde41c896862cb553583966112b6d2a8526dc82fdd9dd19dcc2977",
+      "1b0a1b3d3f4783cd58ab5b25f9a2b500ea0cb7efeaa80a62cf260b19cbeb5793",
+      "6cf637a98aa8bc8d4b5e9b19fe88c6486f1bb5213f36746299cc26704ceeed1d"
+    ]
+  },
+  "status": "pilot_blocked",
+  "structured_prior_library": {
+    "admission_contract_version": "runtime-admission-v2",
+    "contract_version": "generic-visual-priors-v1",
+    "coordinate_and_palette_policy": "derive bounds, coordinates, four-connected components, and palette values from sanitized History and ACTION6 inputs",
+    "empirical_transition_grounding_claimed": false,
+    "history_conditioning": "validity check only; emitted source is history-invariant",
+    "known_unverified_properties": [
+      "palette-permutation equivariance under equal-frequency ties",
+      "scale equivariance"
+    ],
+    "offline_only": true,
+    "report_requires_clean_commit": true,
+    "roles": [
+      "conservative_no_effect",
+      "local_action6_contact",
+      "action6_component_selection",
+      "action6_component_state"
+    ],
+    "simple_action_policy": "opaque simple actions preserve the current grid",
+    "source_count": 4,
+    "source_manifest": [
+      {
+        "source_sha256": "4f2c20bdc924af4d775fa83e30b462f027cfd1981ea3a8a1d07b0e13b0250325",
+        "template_id": "conservative_no_effect",
+        "template_version": 1
+      },
+      {
+        "source_sha256": "7fd89d2688482433efe37ed88af8c112ac15e917319bca80b55592034c3af3a9",
+        "template_id": "local_action6_contact",
+        "template_version": 1
+      },
+      {
+        "source_sha256": "99df71ab0bc9059dea133dd2498f781cc864953354eb1ba165e54fd94aac3fbe",
+        "template_id": "action6_component_selection",
+        "template_version": 1
+      },
+      {
+        "source_sha256": "6c57425b5ec288b3d864ac90016d2828f552cf7b217eb489036dbe733155d158",
+        "template_id": "action6_component_state",
+        "template_version": 1
+      }
+    ],
+    "terminal_policy": "preserve current game state and always predict zero level delta"
+  }
+}
