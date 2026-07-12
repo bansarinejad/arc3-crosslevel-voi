@@ -43,23 +43,28 @@ does not contain code from Duck or other competition entries.
   fixture, model revision, and weight manifest match WSL; generated source is not claimed to
   be bit-identical across platforms. See `artifacts/model_gate_live8_windows.json` and
   `artifacts/prompt_grounding_bp35_seed11_windows.json`.
-- The first corrected seed-11 pilot produced a valid but diagnostic-only D run, then exposed
-  the Linux worker-memory defect before S committed an environment action. D was archived so
-  all four variants can be rerun from one post-fix commit; the controlled matrix is again
-  180/180 pending. Exact hashes, reset audit, measurements, and recovery conditions are in
+- Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
+  It is valid negative engineering evidence: every variant exhausted 256 actions without
+  completing a level. The committee retained at least two programs throughout M/X, but its
+  best prequential loss improved only 7.87% over S, below the 15% mechanism gate. All 241
+  M/X planning rows had action-invariant cost vectors, so EVSI was zero and X was exactly
+  equivalent to M after timing and variant labels were removed. The remaining 176 runs stay
+  locked while goal-function invalidation, probe telemetry, and planning cost collapse are
+  corrected. Exact run hashes and audits are in
+  `artifacts/pilot_bp35_seed11_fair_v2.json`; the preceding worker-memory incident remains in
   `artifacts/pilot_seed11_worker_memory_incident.json`.
 - The first D/S/M/X pilot is retained only as a pre-grounding diagnostic. Its renderer
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
   matrix and gate are preserved with `_pre_grounding` suffixes.
-- Not yet completed: all 180 revised development runs, locked confirmation,
+- Not yet completed: the remaining 176 revised development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official
 4B BF16 fallback is the selected local model. There are deliberately no
-corrected-contract controlled gameplay scores or positive cross-level performance claims
-until the controlled matrices are executed.
+development aggregate or positive cross-level performance claim until a corrected pilot
+passes the preregistered scale-up gates and the controlled matrices are executed.
 
 ## Quick start
 

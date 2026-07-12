@@ -6,7 +6,7 @@ import time
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, Sequence
 from dataclasses import dataclass
-from math import fsum, sqrt
+from math import fsum, isclose, sqrt
 from typing import TypeAlias
 
 import numpy as np
@@ -23,6 +23,16 @@ class PlanningError(RuntimeError):
 
 class NoValidHypotheses(PlanningError):
     """Raised when every weighted program fails on the root candidate set."""
+
+    def __init__(
+        self, message: str, *, invalid_hypothesis_ids: Sequence[str] = ()
+    ) -> None:
+        super().__init__(message)
+        self.invalid_hypothesis_ids = tuple(invalid_hypothesis_ids)
+
+
+class _InvalidHypothesis(PlanningError):
+    """Internal signal that a generated program is not total on planner states."""
 
 
 def _state_name(state: GameState | str) -> str:
@@ -112,21 +122,71 @@ def committee_agreement(
     costs: Mapping[Action, Sequence[float]],
     weights: Sequence[float],
 ) -> float:
-    """Posterior mass in the modal per-program winning action."""
+    """Maximum committee mass that regards one action as cost-optimal.
+
+    A hypothesis votes for every exactly or numerically tied optimum. This makes
+    agreement invariant to candidate ordering without misclassifying within-model
+    indifference as between-model disagreement.
+    """
 
     if not actions:
         raise ValueError("at least one action is required")
     normalised = _normalise_weights(weights)
     if any(len(costs[action]) != len(normalised) for action in actions):
         raise ValueError("every cost vector must match the number of weights")
-    votes = [0.0 for _ in actions]
-    for hypothesis_index, weight in enumerate(normalised):
-        winner = min(
-            range(len(actions)),
-            key=lambda action_index: (costs[actions[action_index]][hypothesis_index], action_index),
+    if any(not np.isfinite(cost) for action in actions for cost in costs[action]):
+        raise ValueError("costs must be finite")
+    optimal_mass = []
+    for action in actions:
+        optimal_mass.append(
+            fsum(
+                weight
+                for hypothesis_index, weight in enumerate(normalised)
+                if isclose(
+                    float(costs[action][hypothesis_index]),
+                    min(float(costs[candidate][hypothesis_index]) for candidate in actions),
+                    rel_tol=1e-12,
+                    abs_tol=1e-12,
+                )
+            )
         )
-        votes[winner] += weight
-    return max(votes)
+    return min(1.0, max(0.0, max(optimal_mass)))
+
+
+def committee_indifference(
+    actions: Sequence[Action],
+    costs: Mapping[Action, Sequence[float]],
+    weights: Sequence[float],
+) -> float:
+    """Weighted fraction of extra actions tied for optimum, normalized to [0, 1]."""
+
+    if not actions:
+        raise ValueError("at least one action is required")
+    normalised = _normalise_weights(weights)
+    if any(len(costs[action]) != len(normalised) for action in actions):
+        raise ValueError("every cost vector must match the number of weights")
+    if any(not np.isfinite(cost) for action in actions for cost in costs[action]):
+        raise ValueError("costs must be finite")
+    if len(actions) == 1:
+        return 0.0
+    value = fsum(
+        weight
+        * (
+            sum(
+                isclose(
+                    float(costs[action][hypothesis_index]),
+                    min(float(costs[candidate][hypothesis_index]) for candidate in actions),
+                    rel_tol=1e-12,
+                    abs_tol=1e-12,
+                )
+                for action in actions
+            )
+            - 1
+        )
+        / (len(actions) - 1)
+        for hypothesis_index, weight in enumerate(normalised)
+    )
+    return min(1.0, max(0.0, value))
 
 
 def weighted_evsi(
@@ -311,13 +371,19 @@ class BeamSearchPlanner:
         prediction_rows: dict[Action, list[Prediction | None]] = {action: [] for action in actions}
         cost_rows: dict[Action, list[float]] = {action: [] for action in actions}
 
-        for hypothesis in hypotheses:
+        invalid_indices: set[int] = set()
+        for hypothesis_index, hypothesis in enumerate(hypotheses):
+            local_predictions: dict[Action, Prediction | None] = {}
+            local_costs: dict[Action, float] = {}
             for action in actions:
                 self._check_deadline(deadline)
                 prediction = self._predict(hypothesis, history, action, cache)
-                prediction_rows[action].append(prediction)
-                cost_rows[action].append(
-                    self._completion_cost(
+                local_predictions[action] = prediction
+                if prediction is None:
+                    invalid_indices.add(hypothesis_index)
+                    break
+                try:
+                    local_costs[action] = self._completion_cost(
                         hypothesis,
                         history,
                         action,
@@ -327,7 +393,12 @@ class BeamSearchPlanner:
                         cache,
                         deadline,
                     )
-                )
+                except _InvalidHypothesis:
+                    invalid_indices.add(hypothesis_index)
+                    break
+            for action in actions:
+                prediction_rows[action].append(local_predictions.get(action))
+                cost_rows[action].append(local_costs.get(action, 8.0))
 
         # A generated program that cannot predict every root action is invalid,
         # rather than an extra observable outcome the real environment might
@@ -336,10 +407,16 @@ class BeamSearchPlanner:
         valid_indices = tuple(
             index
             for index in range(len(hypotheses))
-            if all(prediction_rows[action][index] is not None for action in actions)
+            if index not in invalid_indices
+            and all(prediction_rows[action][index] is not None for action in actions)
         )
         if not valid_indices:
-            raise NoValidHypotheses("every hypothesis failed on at least one root action")
+            raise NoValidHypotheses(
+                "every hypothesis failed during planning",
+                invalid_hypothesis_ids=tuple(
+                    hypothesis.hypothesis_id for hypothesis in hypotheses
+                ),
+            )
         filtered_weights = _normalise_weights(tuple(weights[index] for index in valid_indices))
         return PlanningSnapshot(
             actions=tuple(actions),
@@ -432,9 +509,15 @@ class BeamSearchPlanner:
     def _goal_value(hypothesis: Hypothesis, history: History) -> float:
         try:
             value = float(hypothesis.goal_value(history))
-        except Exception:  # generated programs are untrusted and may fail
-            return 0.0
-        return min(max(value, 0.0), 1.0) if np.isfinite(value) else 0.0
+        except Exception as exc:  # generated programs are untrusted and may fail
+            raise _InvalidHypothesis(
+                f"goal_value failed for hypothesis {hypothesis.hypothesis_id}"
+            ) from exc
+        if not np.isfinite(value) or not 0.0 <= value <= 1.0:
+            raise _InvalidHypothesis(
+                f"goal_value left [0, 1] for hypothesis {hypothesis.hypothesis_id}"
+            )
+        return value
 
     def _predict(
         self,
@@ -493,6 +576,7 @@ __all__ = [
     "best_probe",
     "catastrophe_probability",
     "committee_agreement",
+    "committee_indifference",
     "level_multiplier",
     "prediction_signature",
     "probe_utility",

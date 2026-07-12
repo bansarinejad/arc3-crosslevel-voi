@@ -1,0 +1,319 @@
+{
+  "schema_version": 1,
+  "date": "2026-07-13",
+  "status": "valid_negative_engineering_pilot_scaleup_locked",
+  "scope": {
+    "phase": "development",
+    "contract": "fair-v2",
+    "game_id": "bp35",
+    "game_version": "0a0ad940",
+    "seed": 11,
+    "claim_eligible": false,
+    "central_mechanism_exercised": false,
+    "interpretation": "One-game, one-seed engineering pilot; not a development aggregate or generalization result"
+  },
+  "provenance": {
+    "launch_git_commit": "ce17a8398f83a96436988fee15939b2fdd019ae5",
+    "launch_worktree_clean": true,
+    "git_commit_not_embedded_in_run_schema": true,
+    "development_matrix": {
+      "path": "artifacts/development_matrix.json",
+      "bytes": 72723,
+      "sha256": "76bcfd53547b4cf4c376bff45fab5511dad4bc30ccf778f2f90e07da88bef495"
+    },
+    "public_split": {
+      "path": "artifacts/public_split.json",
+      "bytes": 1222,
+      "sha256": "0edf4f937be4ed391eb477343fd4fdee32cf6cd255092ae4f1ea617872ab1614"
+    },
+    "public_snapshot": {
+      "path": "artifacts/public_games.snapshot.json",
+      "bytes": 7049,
+      "sha256": "ce337d4eb9fc4bde9f3dbd13e8e6ee96632bb1874f9b99351e4740729d64c9c0",
+      "metadata_hash": "a72200110a68528ac986c1a20bcbbef2fcf388e53f6432425ccae552234c2fee"
+    },
+    "grounding": {
+      "wsl": {
+        "path": "artifacts/prompt_grounding_bp35_seed11_wsl.json",
+        "bytes": 24096,
+        "sha256": "2565c3a4a7f20f25c1a89db95b912b7145fd16874a410947fa1db45f91cacdea",
+        "schema_version": 3,
+        "passed": true
+      },
+      "windows": {
+        "path": "artifacts/prompt_grounding_bp35_seed11_windows.json",
+        "bytes": 26371,
+        "sha256": "9bdb01e1441fe0f3a0bcd9e12e7b190edd7e7e4c043f9bb76af035fdb3278a46",
+        "schema_version": 3,
+        "passed": true
+      }
+    },
+    "model_profile": "local-bf16-fallback",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "matrix_progress": {
+    "total": 180,
+    "completed": 4,
+    "remaining": 176,
+    "partial_rows": 0,
+    "scaleup_unlocked": false
+  },
+  "runs": {
+    "D": {
+      "run_id": "development-bp35-0a0ad940-11-D-2fdf174a",
+      "config_sha256": "2fdf174a8b1cda9fbb0b9e0e4a0ea532e972bd71bad907989b3d3f470760de03",
+      "summary": {
+        "path": "runs/development/development-bp35-0a0ad940-11-D-2fdf174a.json",
+        "bytes": 1108,
+        "sha256": "88d93502239ebd1c2d7e5f191fb0a53462cf6aa52a0f96cf479b321f2376dc30"
+      },
+      "trace": {
+        "path": "runs/development/development-bp35-0a0ad940-11-D-2fdf174a.jsonl",
+        "bytes": 24197423,
+        "sha256": "69def2e86bab5402fc790e515cdd4aacd979c05bbd78d32898039b7e45ece7ad",
+        "canonical_sha256": "69def2e86bab5402fc790e515cdd4aacd979c05bbd78d32898039b7e45ece7ad"
+      },
+      "metrics": {
+        "rhae": 0.0,
+        "levels_completed": 0,
+        "total_actions": 256,
+        "termination_reason": "budget_exhausted",
+        "generated_tokens": 4044,
+        "wall_seconds": 453.007839029,
+        "peak_vram_gib": 9.323947429656982,
+        "direct_fallbacks": 253
+      },
+      "trace_audit": {
+        "action_counts": {
+          "ACTION3": 42,
+          "ACTION4": 3,
+          "ACTION6": 146,
+          "ACTION7": 62,
+          "RESET": 3
+        },
+        "reset_steps": [65, 130, 195],
+        "preceding_game_over_steps": [64, 129, 194],
+        "all_resets_legal": true
+      }
+    },
+    "S": {
+      "run_id": "development-bp35-0a0ad940-11-S-e9cfb883",
+      "config_sha256": "e9cfb883b32db54b589748668fb3f79889b18d922775a8d5694b0500806f55f3",
+      "summary": {
+        "path": "runs/development/development-bp35-0a0ad940-11-S-e9cfb883.json",
+        "bytes": 1150,
+        "sha256": "0a8911f96e5e4d5f25b96bc23ed6d3895badf3cf73c509fbdea46df15e0851f2"
+      },
+      "trace": {
+        "path": "runs/development/development-bp35-0a0ad940-11-S-e9cfb883.jsonl",
+        "bytes": 24527909,
+        "sha256": "d28a2f37f242a0c43b8d7948ee5cc9844df4d8e8c39fe1a22ce2f57c905a68f1",
+        "canonical_sha256": "d28a2f37f242a0c43b8d7948ee5cc9844df4d8e8c39fe1a22ce2f57c905a68f1"
+      },
+      "metrics": {
+        "rhae": 0.0,
+        "levels_completed": 0,
+        "total_actions": 256,
+        "termination_reason": "budget_exhausted",
+        "generated_tokens": 590,
+        "wall_seconds": 442.384737985,
+        "peak_vram_gib": 8.936538696289062,
+        "direct_fallbacks": 1,
+        "mean_best_hypothesis_transition_loss": 0.09181219362745098,
+        "mean_weighted_transition_loss": 0.09926605224609375,
+        "program_prediction_calls": 590415,
+        "program_goal_calls": 590400,
+        "program_execution_errors": 295201,
+        "program_execution_error_fraction": 0.2499976711000453,
+        "program_timeouts": 0
+      },
+      "trace_audit": {
+        "valid_hypothesis_counts": {
+          "0": 1,
+          "1": 255
+        },
+        "action_counts": {
+          "ACTION3": 240,
+          "ACTION6": 1,
+          "RESET": 15
+        },
+        "reset_steps": [17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255],
+        "all_resets_legal": true,
+        "execution_error_diagnosis": "The surviving generated goal_value returned count(grid == 15) / 100 without clipping. Once the observed count exceeded 100, the required [0,1] contract failed on simulated histories; the planner repeatedly substituted zero instead of invalidating the program."
+      }
+    },
+    "M": {
+      "run_id": "development-bp35-0a0ad940-11-M-6601a031",
+      "config_sha256": "6601a0313657213c5df67a4ccafb43632f22309d6382b1563b04c94a2488f95a",
+      "summary": {
+        "path": "runs/development/development-bp35-0a0ad940-11-M-6601a031.json",
+        "bytes": 1149,
+        "sha256": "9f93c602882b9daa22afa0f25ca63b9fbd09c540010befd12703e42b3aba3ead"
+      },
+      "trace": {
+        "path": "runs/development/development-bp35-0a0ad940-11-M-6601a031.jsonl",
+        "bytes": 25015352,
+        "sha256": "45a090132df6ce3e42fada145474511a8af82c80053afae01a31ac4394808439",
+        "canonical_sha256": "45a090132df6ce3e42fada145474511a8af82c80053afae01a31ac4394808439"
+      },
+      "metrics": {
+        "rhae": 0.0,
+        "levels_completed": 0,
+        "total_actions": 256,
+        "termination_reason": "budget_exhausted",
+        "generated_tokens": 1433,
+        "wall_seconds": 1123.773414959,
+        "peak_vram_gib": 8.84370231628418,
+        "direct_fallbacks": 0,
+        "mean_best_hypothesis_transition_loss": 0.09145450592041016,
+        "mean_weighted_transition_loss": 0.0926787461737299,
+        "program_prediction_calls": 1584277,
+        "program_goal_calls": 1584240,
+        "program_execution_errors": 1,
+        "program_timeouts": 0
+      },
+      "trace_audit": {
+        "valid_hypothesis_counts": {
+          "2": 83,
+          "3": 173
+        },
+        "action_counts": {
+          "ACTION3": 241,
+          "RESET": 15
+        },
+        "reset_steps": [17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255],
+        "all_resets_legal": true
+      }
+    },
+    "X": {
+      "run_id": "development-bp35-0a0ad940-11-X-dac59798",
+      "config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
+      "summary": {
+        "path": "runs/development/development-bp35-0a0ad940-11-X-dac59798.json",
+        "bytes": 1153,
+        "sha256": "4e6c20c38485153533f8e239a972eebe456eb4824191332de2e60dd307a91c53"
+      },
+      "trace": {
+        "path": "runs/development/development-bp35-0a0ad940-11-X-dac59798.jsonl",
+        "bytes": 25015363,
+        "sha256": "fe4dbf244b72c2401c9e0d5435ec5168cd4918bda139214e638814d9179bd265",
+        "canonical_sha256": "fe4dbf244b72c2401c9e0d5435ec5168cd4918bda139214e638814d9179bd265"
+      },
+      "metrics": {
+        "rhae": 0.0,
+        "levels_completed": 0,
+        "total_actions": 256,
+        "termination_reason": "budget_exhausted",
+        "generated_tokens": 1433,
+        "wall_seconds": 1114.2873916470003,
+        "peak_vram_gib": 8.84370231628418,
+        "direct_fallbacks": 0,
+        "mean_best_hypothesis_transition_loss": 0.09145450592041016,
+        "mean_weighted_transition_loss": 0.0926787461737299,
+        "program_prediction_calls": 1584277,
+        "program_goal_calls": 1584240,
+        "program_execution_errors": 1,
+        "program_timeouts": 0
+      },
+      "trace_audit": {
+        "valid_hypothesis_counts": {
+          "2": 83,
+          "3": 173
+        },
+        "action_counts": {
+          "ACTION3": 241,
+          "RESET": 15
+        },
+        "reset_steps": [17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255],
+        "all_resets_legal": true,
+        "probes": 0
+      }
+    }
+  },
+  "comparisons": {
+    "mechanism_M_vs_S": {
+      "passed": false,
+      "decision_points": 256,
+      "two_valid_fraction": 1.0,
+      "timeout_rate": 0.0,
+      "committee_program_calls": 3168517,
+      "committee_best_loss": 0.09145450592041016,
+      "single_program_loss": 0.09926605224609375,
+      "relative_loss_improvement": 0.07869302897548229,
+      "required_relative_improvement": 0.15,
+      "reasons": [
+        "best-committee prequential loss is not 15% below S"
+      ]
+    },
+    "mechanism_X_vs_S": {
+      "passed": false,
+      "decision_points": 256,
+      "two_valid_fraction": 1.0,
+      "timeout_rate": 0.0,
+      "committee_program_calls": 3168517,
+      "committee_best_loss": 0.09145450592041016,
+      "single_program_loss": 0.09926605224609375,
+      "relative_loss_improvement": 0.07869302897548229,
+      "required_relative_improvement": 0.15,
+      "reasons": [
+        "best-committee prequential loss is not 15% below S"
+      ]
+    },
+    "score_gate_single_cell_proxy": {
+      "formal_development_gate": false,
+      "rhae_delta": 0.0,
+      "level_delta": 0,
+      "action_delta": 0,
+      "positive_game_fraction": 0.0,
+      "runtime_condition_passed": true,
+      "reasons": [
+        "neither +0.5 RHAE points nor an action-neutral extra level",
+        "positive on fewer than 60% of development games"
+      ]
+    },
+    "runtime_ratios": {
+      "X_over_M": 0.9915587758299604,
+      "X_over_M_formal_1_5x_condition_passed": true,
+      "M_over_S": 2.5402626231583603,
+      "X_over_S": 2.518819696905508,
+      "M_over_S_is_diagnostic_not_a_preregistered_gate": true
+    },
+    "M_X_semantic_equivalence": {
+      "rows": 256,
+      "equal_after_removing_elapsed_seconds_and_nested_variant": true,
+      "raw_elapsed_seconds_differences": 256,
+      "raw_decision_diagnostics_differences": 241,
+      "other_field_differences": 0,
+      "actions_histories_observations_costs_predictions_weights_validity_losses_scores_and_persistence_equal": true
+    },
+    "flat_cost_diagnostic": {
+      "planning_rows": 241,
+      "rows_with_action_invariant_per_hypothesis_costs": 241,
+      "rows_with_some_prediction_signature_disagreement": 241,
+      "agreement_exactly_1_rows": 240,
+      "agreement_above_1_by_roundoff_rows": 1,
+      "recorded_probe_utilities": 0,
+      "probes": 0,
+      "deduction": "Every action had the same cost vector, so EVSI was exactly zero. Cross-level multiplication cannot separate X from M, and changing tie handling alone cannot make a probe worthwhile."
+    }
+  },
+  "decision": {
+    "remaining_runs_locked": true,
+    "reasons": [
+      "all four variants completed zero levels",
+      "the 15% mechanism-loss gate failed at 7.87%",
+      "X and M were semantically identical",
+      "cross-level probing was never exercised because action costs collapsed",
+      "S repeated 295201 invalid goal evaluations instead of retiring the program"
+    ],
+    "next_engineering_actions": [
+      "invalidate a hypothesis when goal_value fails on a planner state",
+      "record counterfactual EVSI and an explicit probe-gate reason on every M/X planning decision",
+      "make committee agreement bounded and order-invariant under tied costs",
+      "revise and re-ground the program prompt so goal values are total, normalized, graded, and action-sensitive over the four-step planning horizon",
+      "address planner call complexity before another controlled pilot"
+    ]
+  },
+  "known_provenance_limitation": "Run summaries do not embed the launch Git commit. This artifact binds the clean launch commit to the run files and their exact hashes."
+}

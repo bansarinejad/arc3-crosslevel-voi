@@ -14,9 +14,11 @@ from arc3_voi.candidates import Point, candidates_from_history
 from arc3_voi.hypothesis import CrossLevelPersistence, HypothesisPool, RecordedTransition
 from arc3_voi.planner import (
     BeamSearchPlanner,
+    NoValidHypotheses,
     PlanningError,
     best_probe,
     committee_agreement,
+    committee_indifference,
     robust_exploitation,
 )
 from arc3_voi.types import (
@@ -261,6 +263,23 @@ class Controller:
                 win_levels=observation.win_levels,
                 deadline=deadline,
             )
+        except NoValidHypotheses as exc:
+            if self.pool is not None and exc.invalid_hypothesis_ids:
+                self.pool = self.pool.invalidate(
+                    exc.invalid_hypothesis_ids,
+                    reason="planner_evaluation_failed",
+                )
+                invalid_programs += len(exc.invalid_hypothesis_ids)
+            return self._direct(
+                candidates,
+                budget,
+                reason="planner_invalidated_hypotheses",
+                already_generated_tokens=refresh_tokens,
+                already_invalid_programs=invalid_programs,
+                prior_peak_vram_gb=peak_vram_gb,
+                generated_sources=generated_sources,
+                deadline=deadline,
+            )
         except PlanningError:
             return self._direct(
                 candidates,
@@ -276,7 +295,7 @@ class Controller:
             assert self.pool is not None
             self.pool = self.pool.invalidate(
                 snapshot.invalid_hypothesis_ids,
-                reason="root_prediction_failed",
+                reason="planner_evaluation_failed",
             )
             invalid_programs += len(snapshot.invalid_hypothesis_ids)
         if len(snapshot.weights) < required_hypotheses:
@@ -297,6 +316,9 @@ class Controller:
             standard_deviation_coefficient=self.config.robust_std_coefficient,
         )
         agreement = committee_agreement(snapshot.actions, snapshot.costs, snapshot.weights)
+        indifference = committee_indifference(
+            snapshot.actions, snapshot.costs, snapshot.weights
+        )
 
         selected_action = exploit.action
         selected_score = exploit.score
@@ -304,6 +326,7 @@ class Controller:
         diagnostics: dict[str, str | int | float | bool | None] = {
             "variant": self.config.variant.value,
             "agreement": agreement,
+            "committee_indifference": indifference,
             "mean_cost": exploit.mean_cost,
             "cost_std": exploit.standard_deviation,
             "generated_tokens": refresh_tokens,
@@ -352,11 +375,7 @@ class Controller:
         }
 
         probe_count = self._probes_by_level.get(observation.level, 0)
-        if (
-            self.config.variant in (Variant.MYOPIC, Variant.CROSS_LEVEL)
-            and agreement < self.config.agreement_threshold
-            and probe_count < self.config.max_probes_per_level
-        ):
+        if self.config.variant in (Variant.MYOPIC, Variant.CROSS_LEVEL):
             multiplier = (
                 1.0
                 if self.config.variant is Variant.MYOPIC
@@ -376,13 +395,34 @@ class Controller:
                     "probe_evsi": probe.evsi,
                     "probe_catastrophe_probability": probe.catastrophe_probability,
                     "probe_utility": probe.utility,
+                    "probe_candidate_action": self._action_key(probe.action),
+                    "probe_count_before": probe_count,
+                    "probe_cap": self.config.max_probes_per_level,
+                    "agreement_threshold": self.config.agreement_threshold,
                 }
             )
-            if probe.utility > 0:
+            agreement_passed = agreement < self.config.agreement_threshold
+            cap_passed = probe_count < self.config.max_probes_per_level
+            utility_passed = probe.utility > 0
+            if not agreement_passed:
+                gate_reason = "agreement_at_or_above_threshold"
+            elif not cap_passed:
+                gate_reason = "level_probe_cap_reached"
+            elif not utility_passed:
+                gate_reason = "nonpositive_utility"
+            else:
+                gate_reason = "selected"
+            probe_selected = agreement_passed and cap_passed and utility_passed
+            diagnostics["probe_gate_reason"] = gate_reason
+            diagnostics["probe_selected"] = probe_selected
+            if probe_selected:
                 selected_action = probe.action
                 selected_score = probe.utility
                 strategy_mode = DecisionMode.PROBE
                 self._probes_by_level[observation.level] = probe_count + 1
+            diagnostics["probe_count_after"] = self._probes_by_level.get(
+                observation.level, 0
+            )
 
         decision_mode = DecisionMode.REFRESH if refreshed else strategy_mode
         if refreshed:

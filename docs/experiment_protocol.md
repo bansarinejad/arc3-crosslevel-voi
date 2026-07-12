@@ -54,6 +54,17 @@ fail rather than compare variants with missing or asymmetric seed cells.
 Failed gates must remain in the results and force claim downgrades documented in the
 paper outline.
 
+### Current scale-up state — 13 July 2026
+
+The corrected fair-v2 seed-11 D/S/M/X cell is complete and retained as valid negative
+engineering evidence. All variants completed zero levels. M/X kept at least two programs
+at every decision and had no timeout, but improved best-committee prequential loss only
+7.87% over S rather than the required 15%. Their 241 non-reset planning rows had identical
+cost vectors across actions, making EVSI zero and X behaviorally identical to M. The formal
+X/M runtime condition passed at 0.992×; the 2.54× M/S ratio is an efficiency diagnostic,
+not a preregistered gate. The remaining 176 rows are locked pending the corrections recorded
+in `artifacts/pilot_bp35_seed11_fair_v2.json`.
+
 `evaluate_mechanism_gate`, `evaluate_development_score_gate`, and
 `evaluate_confirmation_gate` consume the immutable run records and implement these
 thresholds directly. The mechanism check fails closed if exact worker-call timeout

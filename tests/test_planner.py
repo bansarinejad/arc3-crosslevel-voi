@@ -7,7 +7,9 @@ import pytest
 
 from arc3_voi.planner import (
     BeamSearchPlanner,
+    NoValidHypotheses,
     committee_agreement,
+    committee_indifference,
     level_multiplier,
     prediction_signature,
     robust_exploitation,
@@ -67,6 +69,26 @@ def test_robust_exploitation_and_agreement() -> None:
     assert committee_agreement((action_1, action_2), costs, (0.5, 0.5)) == 0.5
 
 
+def test_agreement_is_bounded_and_order_invariant_under_ties() -> None:
+    action_1 = Action(ActionKind.ACTION1)
+    action_2 = Action(ActionKind.ACTION2)
+    costs = {action_1: (1.0, 2.0), action_2: (1.0, 3.0)}
+    weights = (0.4, 0.6)
+
+    assert committee_agreement((action_1, action_2), costs, weights) == 1.0
+    assert committee_agreement((action_2, action_1), costs, weights) == 1.0
+    assert committee_indifference((action_1, action_2), costs, weights) == pytest.approx(0.4)
+
+
+def test_all_actions_tied_is_indifference_not_disagreement() -> None:
+    action_1 = Action(ActionKind.ACTION1)
+    action_2 = Action(ActionKind.ACTION2)
+    costs = {action_1: (2.0, 4.0), action_2: (2.0, 4.0)}
+
+    assert committee_agreement((action_1, action_2), costs, (0.5, 0.5)) == 1.0
+    assert committee_indifference((action_1, action_2), costs, (0.5, 0.5)) == 1.0
+
+
 @dataclass
 class _OneStepHypothesis:
     hypothesis_id: str = "one-step"
@@ -89,6 +111,15 @@ class _RootFailureHypothesis(_OneStepHypothesis):
         if action.kind is ActionKind.ACTION2:
             raise RuntimeError("invalid generated program")
         return super().predict(history, action)
+
+
+@dataclass
+class _GoalFailureHypothesis(_OneStepHypothesis):
+    hypothesis_id: str = "goal-failure"
+
+    def goal_value(self, history: History) -> float:
+        del history
+        raise RuntimeError("goal function is not total")
 
 
 def test_beam_planner_assigns_one_to_immediate_completion() -> None:
@@ -130,3 +161,47 @@ def test_root_prediction_failure_receives_zero_planning_mass() -> None:
     )
     assert snapshot.hypothesis_ids == ("one-step",)
     assert snapshot.weights == (1.0,)
+    assert snapshot.invalid_hypothesis_ids == ("root-failure",)
+
+
+def test_goal_failure_invalidates_hypothesis_instead_of_substituting_zero() -> None:
+    observation = Observation(
+        np.zeros((2, 2), dtype=np.int16),
+        frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
+        GameState.NOT_FINISHED,
+        level=1,
+        win_levels=2,
+    )
+    history = History.from_observation(observation)
+    actions = (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2))
+    snapshot = BeamSearchPlanner().evaluate(
+        history,
+        actions,
+        ((_OneStepHypothesis(), 0.5), (_GoalFailureHypothesis(), 0.5)),
+        win_levels=2,
+    )
+
+    assert snapshot.hypothesis_ids == ("one-step",)
+    assert snapshot.invalid_hypothesis_ids == ("goal-failure",)
+    assert snapshot.weights == (1.0,)
+
+
+def test_goal_failure_with_no_survivor_fails_closed() -> None:
+    observation = Observation(
+        np.zeros((2, 2), dtype=np.int16),
+        frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
+        GameState.NOT_FINISHED,
+        level=1,
+        win_levels=2,
+    )
+    history = History.from_observation(observation)
+    actions = (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2))
+
+    with pytest.raises(NoValidHypotheses) as raised:
+        BeamSearchPlanner().evaluate(
+            history,
+            actions,
+            ((_GoalFailureHypothesis(), 1.0),),
+            win_levels=2,
+        )
+    assert raised.value.invalid_hypothesis_ids == ("goal-failure",)

@@ -12,7 +12,7 @@ from arc3_voi.controller import (
     Variant,
 )
 from arc3_voi.hypothesis import HypothesisPool
-from arc3_voi.planner import PlanningSnapshot
+from arc3_voi.planner import NoValidHypotheses, PlanningSnapshot
 from arc3_voi.types import (
     Action,
     ActionKind,
@@ -109,15 +109,90 @@ class _OneSurvivorPlanner(_SnapshotPlanner):
         )
 
 
+class _NoSurvivorPlanner(_SnapshotPlanner):
+    def evaluate(
+        self,
+        history: History,
+        actions: tuple[Action, ...],
+        weighted_hypotheses: tuple[tuple[_Hypothesis, float], ...],
+        *,
+        win_levels: int,
+        deadline: float | None = None,
+    ) -> PlanningSnapshot:
+        del history, actions, weighted_hypotheses, win_levels, deadline
+        raise NoValidHypotheses(
+            "all failed",
+            invalid_hypothesis_ids=("h0", "h1"),
+        )
+
+
+class _ThresholdPlanner(_SnapshotPlanner):
+    def __init__(self) -> None:
+        super().__init__(disagreement=True)
+
+    def evaluate(
+        self,
+        history: History,
+        actions: tuple[Action, ...],
+        weighted_hypotheses: tuple[tuple[_Hypothesis, float], ...],
+        *,
+        win_levels: int,
+        deadline: float | None = None,
+    ) -> PlanningSnapshot:
+        del history, weighted_hypotheses, win_levels, deadline
+        first, second = actions[:2]
+        low = Prediction(np.zeros((2, 2), dtype=np.int16), GameState.NOT_FINISHED, 0)
+        high = Prediction(np.ones((2, 2), dtype=np.int16), GameState.NOT_FINISHED, 0)
+        return PlanningSnapshot(
+            actions=(first, second),
+            hypothesis_ids=("h0", "h1"),
+            weights=(0.5, 0.5),
+            predictions={first: (low, high), second: (high, low)},
+            costs={first: (0.0, 0.8), second: (0.8, 0.0)},
+        )
+
+
+class _FlatCostPlanner(_SnapshotPlanner):
+    def __init__(self) -> None:
+        super().__init__(disagreement=True)
+
+    def evaluate(
+        self,
+        history: History,
+        actions: tuple[Action, ...],
+        weighted_hypotheses: tuple[tuple[_Hypothesis, float], ...],
+        *,
+        win_levels: int,
+        deadline: float | None = None,
+    ) -> PlanningSnapshot:
+        snapshot = super().evaluate(
+            history,
+            actions,
+            weighted_hypotheses,
+            win_levels=win_levels,
+            deadline=deadline,
+        )
+        return PlanningSnapshot(
+            actions=snapshot.actions,
+            hypothesis_ids=snapshot.hypothesis_ids,
+            weights=snapshot.weights,
+            predictions=snapshot.predictions,
+            costs={action: (2.0, 4.0) for action in snapshot.actions},
+        )
+
+
 def _observation(
-    *, state: GameState = GameState.NOT_FINISHED, level: int = 1
+    *,
+    state: GameState = GameState.NOT_FINISHED,
+    level: int = 1,
+    win_levels: int = 3,
 ) -> Observation:
     return Observation(
         np.zeros((2, 2), dtype=np.int16),
         frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
         state,
         level=level,
-        win_levels=3,
+        win_levels=win_levels,
     )
 
 
@@ -159,6 +234,23 @@ def test_planner_root_failures_trigger_direct_fallback() -> None:
     assert decision.diagnostics["reason"] == "planner_invalidated_hypotheses"
 
 
+def test_planner_all_failures_are_persistently_invalidated() -> None:
+    controller = Controller(
+        direct_policy=_direct_policy,
+        pool=_pool(),
+        planner=_NoSurvivorPlanner(disagreement=True),  # type: ignore[arg-type]
+        config=ControllerConfig(variant=Variant.CROSS_LEVEL),
+    )
+
+    decision = controller.act(_observation(), Budget())
+
+    assert decision.mode is DecisionMode.DIRECT_FALLBACK
+    assert decision.diagnostics["reason"] == "planner_invalidated_hypotheses"
+    assert decision.diagnostics["invalid_programs"] == 2
+    assert controller.pool is not None
+    assert controller.pool.all_invalid
+
+
 def test_cross_level_controller_probes_when_disagreement_has_positive_value() -> None:
     controller = Controller(
         direct_policy=_direct_policy,
@@ -170,6 +262,8 @@ def test_cross_level_controller_probes_when_disagreement_has_positive_value() ->
     assert decision.mode is DecisionMode.PROBE
     assert decision.diagnostics["probe_evsi"] == pytest.approx(2.0)
     assert decision.diagnostics["level_multiplier"] > 1.0
+    assert decision.diagnostics["probe_selected"] is True
+    assert decision.diagnostics["probe_gate_reason"] == "selected"
 
 
 def test_controller_exploits_when_committee_agrees() -> None:
@@ -182,6 +276,79 @@ def test_controller_exploits_when_committee_agrees() -> None:
     decision = controller.act(_observation(), Budget())
     assert decision.mode is DecisionMode.EXPLOIT
     assert decision.action.kind is ActionKind.ACTION1
+    assert decision.diagnostics["probe_selected"] is False
+    assert (
+        decision.diagnostics["probe_gate_reason"]
+        == "agreement_at_or_above_threshold"
+    )
+
+
+def test_flat_costs_log_zero_evsi_and_indifference() -> None:
+    controller = Controller(
+        direct_policy=_direct_policy,
+        pool=_pool(),
+        planner=_FlatCostPlanner(),  # type: ignore[arg-type]
+        config=ControllerConfig(variant=Variant.CROSS_LEVEL),
+    )
+
+    decision = controller.act(_observation(), Budget())
+
+    assert decision.mode is DecisionMode.EXPLOIT
+    assert decision.diagnostics["agreement"] == 1.0
+    assert decision.diagnostics["committee_indifference"] == 1.0
+    assert decision.diagnostics["probe_evsi"] == 0.0
+    assert decision.diagnostics["probe_utility"] == -1.0
+    assert (
+        decision.diagnostics["probe_gate_reason"]
+        == "agreement_at_or_above_threshold"
+    )
+
+
+def test_cross_level_multiplier_creates_an_x_only_probe_region() -> None:
+    myopic = Controller(
+        direct_policy=_direct_policy,
+        pool=_pool(),
+        planner=_ThresholdPlanner(),  # type: ignore[arg-type]
+        config=ControllerConfig(variant=Variant.MYOPIC),
+    )
+    cross_level = Controller(
+        direct_policy=_direct_policy,
+        pool=_pool(),
+        planner=_ThresholdPlanner(),  # type: ignore[arg-type]
+        config=ControllerConfig(variant=Variant.CROSS_LEVEL),
+    )
+
+    myopic_decision = myopic.act(_observation(), Budget())
+    cross_level_decision = cross_level.act(_observation(), Budget())
+
+    assert myopic_decision.diagnostics["probe_evsi"] == pytest.approx(0.4)
+    assert myopic_decision.diagnostics["probe_utility"] == pytest.approx(-0.6)
+    assert myopic_decision.mode is DecisionMode.EXPLOIT
+    assert cross_level_decision.diagnostics["level_multiplier"] == pytest.approx(3.5)
+    assert cross_level_decision.diagnostics["probe_utility"] == pytest.approx(0.4)
+    assert cross_level_decision.mode is DecisionMode.PROBE
+
+
+def test_myopic_and_cross_level_are_equivalent_on_final_level() -> None:
+    decisions = []
+    for variant in (Variant.MYOPIC, Variant.CROSS_LEVEL):
+        controller = Controller(
+            direct_policy=_direct_policy,
+            pool=_pool(),
+            planner=_ThresholdPlanner(),  # type: ignore[arg-type]
+            config=ControllerConfig(variant=variant),
+        )
+        decisions.append(
+            controller.act(_observation(level=3, win_levels=3), Budget())
+        )
+
+    assert decisions[0].mode is decisions[1].mode is DecisionMode.EXPLOIT
+    assert decisions[0].action == decisions[1].action
+    assert decisions[0].diagnostics["level_multiplier"] == 1.0
+    assert decisions[1].diagnostics["level_multiplier"] == 1.0
+    assert decisions[0].diagnostics["probe_utility"] == pytest.approx(
+        decisions[1].diagnostics["probe_utility"]
+    )
 
 
 def test_probe_cap_is_enforced_per_level() -> None:
