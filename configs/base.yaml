@@ -1,6 +1,7 @@
 experiment:
   seed: 20260712
   variant: X
+  implementation_contract_version: crosslevel-voi-runtime-v1
   prompt_contract_version: grounded-actions-palette-graded-goals-v3
   perception_contract_version: arc-agi-0.9.9-color-map-scale8-grid-v1
   prompt_contract_sha256: 391eadfb3bbf860cb8266fea6f4a3cd5855eb9ab60fc1610b37b66516a44b6de

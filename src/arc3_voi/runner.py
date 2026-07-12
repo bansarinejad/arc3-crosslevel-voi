@@ -46,6 +46,8 @@ def run_game(
         config_hash,
         model_revision=model_revision,
         weight_manifest_sha256=weight_manifest_sha256,
+        controller_decision_seconds=0.0,
+        environment_step_seconds=0.0,
     )
     budget = Budget(
         max_environment_actions=max_environment_actions,
@@ -64,7 +66,9 @@ def run_game(
         while observation.game_state is not GameState.WIN:
             elapsed = time.perf_counter() - started
             budget = replace(budget, elapsed_seconds=min(elapsed, budget.max_wall_seconds))
+            decision_started = time.perf_counter()
             decision = controller.act(observation, budget)
+            decision_elapsed = time.perf_counter() - decision_started
             # act() first ingests the previous revealed observation.  Backfill
             # that transition before logging the new pre-action pool snapshot.
             _backfill_latest_transition(metrics, controller)
@@ -79,7 +83,7 @@ def run_game(
             persistence_estimate, persistence_successes, persistence_trials = (
                 _persistence_snapshot(controller)
             )
-            step_started = time.perf_counter()
+            environment_step_started = time.perf_counter()
             environment_diagnostics = {
                 key: value
                 for key, value in decision.diagnostics.items()
@@ -93,14 +97,20 @@ def run_game(
                     "diagnostics": environment_diagnostics,
                 },
             )
-            step_elapsed = time.perf_counter() - step_started
+            environment_step_elapsed = time.perf_counter() - environment_step_started
             budget = budget.consume(
                 environment_actions=1,
                 generated_tokens=generated_tokens,
-                wall_seconds=min(step_elapsed, budget.remaining_wall_seconds),
+                wall_seconds=min(environment_step_elapsed, budget.remaining_wall_seconds),
             )
             metrics.total_actions += 1
             metrics.generated_tokens += generated_tokens
+            metrics.controller_decision_seconds = float(
+                metrics.controller_decision_seconds or 0.0
+            ) + decision_elapsed
+            metrics.environment_step_seconds = float(
+                metrics.environment_step_seconds or 0.0
+            ) + environment_step_elapsed
             actions_in_level += 1
             level_delta = next_observation.level - observation.level
             metrics.steps.append(
@@ -131,7 +141,9 @@ def run_game(
                     persistence_trials=persistence_trials,
                     boundary_survival=None,
                     fallback=decision.mode is DecisionMode.DIRECT_FALLBACK,
-                    elapsed_seconds=step_elapsed,
+                    # Retain the legacy alias while emitting explicit latency
+                    # components for all newly written traces.
+                    elapsed_seconds=environment_step_elapsed,
                     observed_grid=next_observation.grid.tolist(),
                     observed_available_actions=tuple(
                         action.name
@@ -141,6 +153,8 @@ def run_game(
                     observed_level=next_observation.level,
                     observed_win_levels=next_observation.win_levels,
                     observed_level_delta=level_delta,
+                    controller_decision_seconds=decision_elapsed,
+                    environment_step_seconds=environment_step_elapsed,
                 )
             )
             metrics.direct_fallbacks += decision.mode is DecisionMode.DIRECT_FALLBACK

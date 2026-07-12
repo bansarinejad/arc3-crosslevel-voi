@@ -7,7 +7,7 @@ import pytest
 
 import arc3_voi.run_store as run_store
 from arc3_voi.experiment import RunSpec, completed_run_ids
-from arc3_voi.metrics import RunMetrics, write_run
+from arc3_voi.metrics import RunMetrics, load_run, write_run
 from arc3_voi.runner import run_game
 
 from .test_runner import FakeController, FakeSession
@@ -66,6 +66,43 @@ def test_resume_rejects_valid_json_trace_with_wrong_checksum(tmp_path: Path) -> 
     trace.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
     assert completed_run_ids((row,), tmp_path) == frozenset()
+
+
+def test_load_run_accepts_legacy_trace_without_split_latency_fields(tmp_path: Path) -> None:
+    row = _row()
+    summary, trace = write_run(_metrics(row), tmp_path)
+    summary_payload = json.loads(summary.read_text(encoding="utf-8"))
+    summary_payload.pop(run_store.TRACE_ARTIFACT_KEY)
+    summary_payload.pop("controller_decision_seconds")
+    summary_payload.pop("environment_step_seconds")
+    summary.write_text(
+        json.dumps(summary_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    legacy_records = []
+    for line in trace.read_text(encoding="utf-8").splitlines():
+        record = json.loads(line)
+        record.pop("controller_decision_seconds")
+        record.pop("environment_step_seconds")
+        legacy_records.append(record)
+    trace.write_text(
+        "".join(
+            json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n"
+            for record in legacy_records
+        ),
+        encoding="utf-8",
+        newline="\n",
+    )
+
+    loaded = load_run(summary, trace)
+
+    assert loaded.controller_decision_seconds is None
+    assert loaded.environment_step_seconds is None
+    assert all(step.controller_decision_seconds is None for step in loaded.steps)
+    assert all(
+        step.environment_step_seconds == step.elapsed_seconds for step in loaded.steps
+    )
 
 
 def test_write_refuses_to_replace_clean_claim_with_missing_trace(tmp_path: Path) -> None:

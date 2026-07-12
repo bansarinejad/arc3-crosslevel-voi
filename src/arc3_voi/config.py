@@ -29,6 +29,7 @@ def _non_negative_float(name: str, value: float) -> None:
 class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
+    implementation_contract_version: str = "crosslevel-voi-runtime-v1"
     prompt_contract_version: str = "grounded-actions-palette-graded-goals-v3"
     perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
     prompt_contract_sha256: str = (
@@ -48,6 +49,8 @@ class ExperimentConfig:
             raise ConfigError("seed must be an integer")
         if self.variant not in {"D", "S", "M", "X"}:
             raise ConfigError("variant must be one of D, S, M, or X")
+        if not self.implementation_contract_version.strip():
+            raise ConfigError("implementation_contract_version cannot be empty")
         if not self.prompt_contract_version.strip():
             raise ConfigError("prompt_contract_version cannot be empty")
         if not self.perception_contract_version.strip():
@@ -274,6 +277,7 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                 {
                     "seed",
                     "variant",
+                    "implementation_contract_version",
                     "prompt_contract_version",
                     "perception_contract_version",
                     "prompt_contract_sha256",

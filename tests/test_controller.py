@@ -382,6 +382,9 @@ def test_game_over_is_reset_only_and_active_play_never_resets() -> None:
     )
     decision = terminal.act(_observation(state=GameState.GAME_OVER), Budget())
     assert decision.action.kind is ActionKind.RESET
+    assert decision.mode is DecisionMode.LIFECYCLE
+    assert decision.diagnostics["lifecycle_action"] is True
+    assert decision.diagnostics["reason"] == "game_over_reset"
 
 
 def test_environment_action_budget_is_enforced() -> None:

@@ -15,6 +15,7 @@ from .controller import (
     RefreshResult,
     Variant,
 )
+from .grounding import evaluate_program_grounding
 from .hypothesis import (
     HypothesisPool,
     WeightedHypothesis,
@@ -22,7 +23,7 @@ from .hypothesis import (
     replay_cumulative_loss,
 )
 from .model import ModelBackend
-from .program import ExecutableHypothesis
+from .program import ExecutableHypothesis, candidate_points_from_source
 from .types import Action, ActionKind, Budget, History
 
 
@@ -84,9 +85,40 @@ class _HypothesisGenerator:
             max_wall_seconds=budget.remaining_wall_seconds,
         )
 
+        grounding_points = tuple(
+            point for source in result.texts for point in candidate_points_from_source(source)
+        )
+        grounding_actions = candidates_from_history(
+            history,
+            cached_points=grounding_points,
+            max_candidates=self.config.planning.max_candidates,
+        )
         generated: list[ExecutableHypothesis] = []
         invalid_programs = 0
-        for source in result.texts:
+        grounding_eligible_programs = 0
+        grounding_rejected_programs = 0
+        for source_index, source in enumerate(result.texts):
+            require_discriminative_behavior = source_index > 0
+            try:
+                grounding = evaluate_program_grounding(
+                    source,
+                    history,
+                    grounding_actions,
+                    timeout_seconds=self.config.sandbox.timeout_ms / 1000,
+                    memory_limit_mb=self.config.sandbox.memory_mb,
+                    rollout_depth=self.config.planning.depth,
+                    require_action_sensitivity=require_discriminative_behavior,
+                    require_goal_conditioning=require_discriminative_behavior,
+                )
+            except Exception:
+                grounding_rejected_programs += 1
+                invalid_programs += 1
+                continue
+            if not grounding.eligible:
+                grounding_rejected_programs += 1
+                invalid_programs += 1
+                continue
+            grounding_eligible_programs += 1
             try:
                 hypothesis = ExecutableHypothesis(
                     source,
@@ -108,14 +140,14 @@ class _HypothesisGenerator:
         if self.controller is not None:
             self.controller.cache_points(model_points)
 
-        survivors = [] if current is None else [
-            entry.hypothesis for entry in current.entries if entry.valid
-        ]
+        survivors = (
+            []
+            if current is None
+            else [entry.hypothesis for entry in current.entries if entry.valid]
+        )
         candidates = [*survivors, *generated]
         recorded_transitions = (
-            ()
-            if self.controller is None
-            else tuple(self.controller.recorded_transitions)
+            () if self.controller is None else tuple(self.controller.recorded_transitions)
         )
         actions = candidates_from_history(
             history,
@@ -133,9 +165,9 @@ class _HypothesisGenerator:
         else:
             selected = tuple(candidates[:target])
 
-        existing = {} if current is None else {
-            entry.hypothesis_id: entry for entry in current.entries
-        }
+        existing = (
+            {} if current is None else {entry.hypothesis_id: entry for entry in current.entries}
+        )
         replayed: dict[str, WeightedHypothesis] = {}
         for hypothesis in generated:
             try:
@@ -164,17 +196,14 @@ class _HypothesisGenerator:
             complexity_lambda=self.config.hypotheses.complexity_lambda,
             max_hypotheses=target,
             effective_pool_refresh_threshold=(
-                1.0
-                if target == 1
-                else self.config.hypotheses.effective_pool_refresh_threshold
+                1.0 if target == 1 else self.config.hypotheses.effective_pool_refresh_threshold
             ),
             loss_refresh_threshold=self.config.hypotheses.loss_refresh_threshold,
             consecutive_loss_refreshes=self.config.hypotheses.consecutive_loss_refreshes,
-            recent_weighted_losses=(
-                () if current is None else current.recent_weighted_losses
-            ),
+            recent_weighted_losses=(() if current is None else current.recent_weighted_losses),
         )
         selected_ids = {entry.hypothesis_id for entry in entries}
+        grounding_selected_hypothesis_ids = tuple(entry.hypothesis_id for entry in entries)
         for hypothesis_id in tuple(self._owned):
             if hypothesis_id not in selected_ids:
                 self._retire(self._owned.pop(hypothesis_id))
@@ -184,6 +213,9 @@ class _HypothesisGenerator:
             invalid_programs=invalid_programs,
             peak_vram_gb=result.peak_vram_gb,
             generated_sources=result.texts,
+            grounding_eligible_programs=grounding_eligible_programs,
+            grounding_rejected_programs=grounding_rejected_programs,
+            grounding_selected_hypothesis_ids=grounding_selected_hypothesis_ids,
         )
 
     def _current_or_empty(self, target: int) -> HypothesisPool:
@@ -195,9 +227,7 @@ class _HypothesisGenerator:
             complexity_lambda=self.config.hypotheses.complexity_lambda,
             max_hypotheses=target,
             effective_pool_refresh_threshold=(
-                1.0
-                if target == 1
-                else self.config.hypotheses.effective_pool_refresh_threshold
+                1.0 if target == 1 else self.config.hypotheses.effective_pool_refresh_threshold
             ),
             loss_refresh_threshold=self.config.hypotheses.loss_refresh_threshold,
             consecutive_loss_refreshes=self.config.hypotheses.consecutive_loss_refreshes,

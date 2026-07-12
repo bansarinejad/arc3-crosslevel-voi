@@ -83,16 +83,32 @@ class RefreshResult:
     invalid_programs: int = 0
     peak_vram_gb: float | None = None
     generated_sources: tuple[str, ...] = ()
+    grounding_eligible_programs: int = 0
+    grounding_rejected_programs: int = 0
+    grounding_selected_hypothesis_ids: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if isinstance(self.generated_tokens, bool) or self.generated_tokens < 0:
             raise ValueError("generated_tokens must be a non-negative integer")
         if isinstance(self.invalid_programs, bool) or self.invalid_programs < 0:
             raise ValueError("invalid_programs must be a non-negative integer")
+        for name in ("grounding_eligible_programs", "grounding_rejected_programs"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or value < 0:
+                raise ValueError(f"{name} must be a non-negative integer")
         if self.peak_vram_gb is not None and self.peak_vram_gb < 0:
             raise ValueError("peak_vram_gb must be non-negative")
         if any(not isinstance(source, str) for source in self.generated_sources):
             raise TypeError("generated_sources must contain strings")
+        if any(
+            not isinstance(hypothesis_id, str) or not hypothesis_id
+            for hypothesis_id in self.grounding_selected_hypothesis_ids
+        ):
+            raise TypeError("grounding_selected_hypothesis_ids must contain non-empty strings")
+        if len(set(self.grounding_selected_hypothesis_ids)) != len(
+            self.grounding_selected_hypothesis_ids
+        ):
+            raise ValueError("grounding_selected_hypothesis_ids must be unique")
 
 
 DirectPolicy: TypeAlias = Callable[  # noqa: UP040 - supported by the pinned mypy
@@ -205,10 +221,11 @@ class Controller:
             return self._remember(
                 Decision(
                     Action(ActionKind.RESET),
-                    DecisionMode.EXPLOIT,
+                    DecisionMode.LIFECYCLE,
                     0.0,
                     {
                         "reason": "game_over_reset",
+                        "lifecycle_action": True,
                         "generated_tokens": 0,
                         **self._telemetry(),
                     },
@@ -225,9 +242,7 @@ class Controller:
             raise ControllerError("the active observation exposes no valid actions")
 
         if self.config.variant is Variant.DIRECT:
-            return self._direct(
-                candidates, budget, reason="direct_variant", deadline=deadline
-            )
+            return self._direct(candidates, budget, reason="direct_variant", deadline=deadline)
 
         refresh_result = self._maybe_refresh(budget, deadline)
         refreshed = refresh_result is not None
@@ -235,6 +250,15 @@ class Controller:
         invalid_programs = 0 if refresh_result is None else refresh_result.invalid_programs
         peak_vram_gb = None if refresh_result is None else refresh_result.peak_vram_gb
         generated_sources = () if refresh_result is None else refresh_result.generated_sources
+        grounding_eligible_programs = (
+            0 if refresh_result is None else refresh_result.grounding_eligible_programs
+        )
+        grounding_rejected_programs = (
+            0 if refresh_result is None else refresh_result.grounding_rejected_programs
+        )
+        grounding_selected_hypothesis_ids = (
+            () if refresh_result is None else refresh_result.grounding_selected_hypothesis_ids
+        )
         required_hypotheses = 1 if self.config.variant is Variant.SINGLE else 2
         if self.pool is None or len(self.pool.weighted_hypotheses) < required_hypotheses:
             return self._direct(
@@ -245,6 +269,9 @@ class Controller:
                 already_invalid_programs=invalid_programs,
                 prior_peak_vram_gb=peak_vram_gb,
                 generated_sources=generated_sources,
+                grounding_eligible_programs=grounding_eligible_programs,
+                grounding_rejected_programs=grounding_rejected_programs,
+                grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
                 deadline=deadline,
             )
 
@@ -278,6 +305,9 @@ class Controller:
                 already_invalid_programs=invalid_programs,
                 prior_peak_vram_gb=peak_vram_gb,
                 generated_sources=generated_sources,
+                grounding_eligible_programs=grounding_eligible_programs,
+                grounding_rejected_programs=grounding_rejected_programs,
+                grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
                 deadline=deadline,
             )
         except PlanningError:
@@ -289,6 +319,9 @@ class Controller:
                 already_invalid_programs=invalid_programs,
                 prior_peak_vram_gb=peak_vram_gb,
                 generated_sources=generated_sources,
+                grounding_eligible_programs=grounding_eligible_programs,
+                grounding_rejected_programs=grounding_rejected_programs,
+                grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
                 deadline=deadline,
             )
         if snapshot.invalid_hypothesis_ids:
@@ -307,6 +340,9 @@ class Controller:
                 already_invalid_programs=invalid_programs,
                 prior_peak_vram_gb=peak_vram_gb,
                 generated_sources=generated_sources,
+                grounding_eligible_programs=grounding_eligible_programs,
+                grounding_rejected_programs=grounding_rejected_programs,
+                grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
                 deadline=deadline,
             )
         exploit = robust_exploitation(
@@ -316,9 +352,7 @@ class Controller:
             standard_deviation_coefficient=self.config.robust_std_coefficient,
         )
         agreement = committee_agreement(snapshot.actions, snapshot.costs, snapshot.weights)
-        indifference = committee_indifference(
-            snapshot.actions, snapshot.costs, snapshot.weights
-        )
+        indifference = committee_indifference(snapshot.actions, snapshot.costs, snapshot.weights)
 
         selected_action = exploit.action
         selected_score = exploit.score
@@ -331,6 +365,12 @@ class Controller:
             "cost_std": exploit.standard_deviation,
             "generated_tokens": refresh_tokens,
             "invalid_programs": invalid_programs,
+            "grounding_eligible_programs": grounding_eligible_programs,
+            "grounding_rejected_programs": grounding_rejected_programs,
+            "grounding_selected_hypothesis_ids": json.dumps(
+                grounding_selected_hypothesis_ids,
+                separators=(",", ":"),
+            ),
             "peak_vram_gb": peak_vram_gb,
             "hypothesis_weights": ",".join(
                 f"{hypothesis_id}:{weight:.12g}"
@@ -367,9 +407,7 @@ class Controller:
                 sort_keys=True,
             ),
             "generated_program_sources": (
-                json.dumps(generated_sources, ensure_ascii=False)
-                if generated_sources
-                else None
+                json.dumps(generated_sources, ensure_ascii=False) if generated_sources else None
             ),
             **self._telemetry(),
         }
@@ -420,9 +458,7 @@ class Controller:
                 selected_score = probe.utility
                 strategy_mode = DecisionMode.PROBE
                 self._probes_by_level[observation.level] = probe_count + 1
-            diagnostics["probe_count_after"] = self._probes_by_level.get(
-                observation.level, 0
-            )
+            diagnostics["probe_count_after"] = self._probes_by_level.get(observation.level, 0)
 
         decision_mode = DecisionMode.REFRESH if refreshed else strategy_mode
         if refreshed:
@@ -491,11 +527,7 @@ class Controller:
             pre_boundary_ids = (
                 ()
                 if self.pool is None
-                else (
-                    entry.hypothesis_id
-                    for entry in self.pool.entries
-                    if entry.valid
-                )
+                else (entry.hypothesis_id for entry in self.pool.entries if entry.valid)
             )
             self._boundary_program_losses = {
                 hypothesis_id: [] for hypothesis_id in pre_boundary_ids
@@ -554,6 +586,9 @@ class Controller:
         already_invalid_programs: int = 0,
         prior_peak_vram_gb: float | None = None,
         generated_sources: tuple[str, ...] = (),
+        grounding_eligible_programs: int = 0,
+        grounding_rejected_programs: int = 0,
+        grounding_selected_hypothesis_ids: tuple[str, ...] = (),
         deadline: float,
     ) -> Decision:
         remaining_budget = self._budget_before_deadline(
@@ -585,11 +620,15 @@ class Controller:
             "invalid_direct_action_replaced": invalid_action,
             "generated_tokens": total_tokens,
             "invalid_programs": already_invalid_programs,
+            "grounding_eligible_programs": grounding_eligible_programs,
+            "grounding_rejected_programs": grounding_rejected_programs,
+            "grounding_selected_hypothesis_ids": json.dumps(
+                grounding_selected_hypothesis_ids,
+                separators=(",", ":"),
+            ),
             "peak_vram_gb": peak_vram_gb,
             "generated_program_sources": (
-                json.dumps(generated_sources, ensure_ascii=False)
-                if generated_sources
-                else None
+                json.dumps(generated_sources, ensure_ascii=False) if generated_sources else None
             ),
             **self._telemetry(),
         }

@@ -46,6 +46,24 @@ def test_hand_calculated_evsi() -> None:
     assert no_information == pytest.approx(0.0)
 
 
+def test_evsi_canonicalizes_only_numerical_residue_to_zero() -> None:
+    action_1 = Action(ActionKind.ACTION1)
+    action_2 = Action(ActionKind.ACTION2)
+    actions = (action_1, action_2)
+    predictions = (_prediction(0), _prediction(1))
+    weights = (0.5, 0.5)
+
+    tiny_costs = {action_1: (0.0, 8e-13), action_2: (8e-13, 0.0)}
+    boundary_costs = {action_1: (0.0, 2e-12), action_2: (2e-12, 0.0)}
+    meaningful_costs = {action_1: (0.0, 8e-12), action_2: (8e-12, 0.0)}
+
+    assert weighted_evsi(predictions, actions, tiny_costs, weights) == 0.0
+    assert weighted_evsi(predictions, actions, boundary_costs, weights) == 0.0
+    assert weighted_evsi(predictions, actions, meaningful_costs, weights) == pytest.approx(
+        4e-12
+    )
+
+
 def test_prediction_signature_is_exact_and_ignores_private_memory() -> None:
     first = Prediction(np.array([[1, 2]], dtype=np.int16), GameState.NOT_FINISHED, 0, {"x": 1})
     same_observable = Prediction(

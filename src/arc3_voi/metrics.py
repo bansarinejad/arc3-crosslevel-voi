@@ -55,6 +55,10 @@ class StepRecord:
     observed_level: int
     observed_win_levels: int
     observed_level_delta: int
+    # Added as optional trailing fields so schema-v1 traces remain loadable.
+    # ``elapsed_seconds`` retains its legacy environment-step meaning.
+    controller_decision_seconds: float | None = None
+    environment_step_seconds: float | None = None
 
 
 @dataclass(slots=True)
@@ -72,6 +76,8 @@ class RunMetrics:
     total_actions: int = 0
     generated_tokens: int = 0
     wall_seconds: float = 0.0
+    controller_decision_seconds: float | None = None
+    environment_step_seconds: float | None = None
     peak_vram_gb: float | None = None
     invalid_programs: int = 0
     program_timeouts: int = 0
@@ -202,6 +208,10 @@ def load_run(summary_path: str | Path, trace_path: str | Path | None = None) -> 
             "observed_available_actions",
         ):
             value[key] = tuple(value[key])
+        # Legacy schema-v1 rows recorded only ``elapsed_seconds``, whose
+        # historical meaning was the environment/session step duration.
+        value.setdefault("controller_decision_seconds", None)
+        value.setdefault("environment_step_seconds", value["elapsed_seconds"])
         metrics.steps.append(StepRecord(**value))
     return metrics
 

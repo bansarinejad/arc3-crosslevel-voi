@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
+import arc3_voi.runner as runner_module
 from arc3_voi.controller import Controller, ControllerConfig, Variant
 from arc3_voi.hypothesis import HypothesisPool
 from arc3_voi.runner import run_game
@@ -99,6 +101,48 @@ def test_runner_records_levels_actions_tokens_and_rhae() -> None:
     assert result.rhae == 1.0
     assert result.steps[-1].observed_state == "WIN"
     assert result.steps[-1].history[-1]["level"] == 2
+
+
+def test_runner_separates_controller_and_environment_latency(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class Clock:
+        now = 0.0
+
+        def perf_counter(self) -> float:
+            return self.now
+
+    clock = Clock()
+
+    class TimedController(FakeController):
+        def act(self, observation: Observation, budget: object) -> Decision:
+            clock.now += 0.25
+            return super().act(observation, budget)
+
+    class TimedSession(FakeSession):
+        def step(self, action: Action, *, reasoning: object = None) -> Observation:
+            clock.now += 0.5
+            return super().step(action, reasoning=reasoning)
+
+    monkeypatch.setattr(runner_module, "time", clock)
+    result = run_game(
+        TimedSession(),
+        TimedController(),
+        run_id="latency",
+        seed=1,
+        variant="D",
+        model_profile="test",
+        config_hash="h",
+    )
+
+    assert result.controller_decision_seconds == pytest.approx(0.5)
+    assert result.environment_step_seconds == pytest.approx(1.0)
+    assert result.wall_seconds == pytest.approx(1.5)
+    assert [step.controller_decision_seconds for step in result.steps] == [0.25, 0.25]
+    assert [step.environment_step_seconds for step in result.steps] == [0.5, 0.5]
+    assert all(
+        step.elapsed_seconds == step.environment_step_seconds for step in result.steps
+    )
 
 
 class PerfectHypothesis:

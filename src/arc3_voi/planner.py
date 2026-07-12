@@ -237,9 +237,11 @@ def weighted_evsi(
         )
         posterior_best += cluster_mass * conditional_best
 
-    # Information cannot hurt when the post-observation policy may ignore it;
-    # clamp only tiny floating-point violations of this decision-theoretic fact.
-    return max(0.0, prior_best - posterior_best)
+    # Information cannot hurt when the post-observation policy may ignore it.
+    # Canonicalize numerically meaningless positive residue here, before EVSI
+    # reaches probe utility or trace diagnostics.
+    evsi = max(0.0, prior_best - posterior_best)
+    return 0.0 if evsi <= 1e-12 else evsi
 
 
 def level_multiplier(level: int, win_levels: int, persistence: float) -> float:

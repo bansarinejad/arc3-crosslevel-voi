@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from arc3_voi.config import ExperimentConfig, load_config
+from arc3_voi.config import ExperimentConfig, SystemConfig, load_config
+from arc3_voi.experiment import stable_config_hash
 from arc3_voi.prompts import PROMPT_CONTRACT_SHA256, PROMPT_CONTRACT_VERSION
 from arc3_voi.rendering import PERCEPTION_CONTRACT_SHA256
 
@@ -31,8 +32,18 @@ def test_inherited_local_model_config_loads() -> None:
 def test_bare_experiment_defaults_match_implemented_prompt_contract() -> None:
     config = ExperimentConfig()
 
+    assert config.implementation_contract_version == "crosslevel-voi-runtime-v1"
     assert config.prompt_contract_version == PROMPT_CONTRACT_VERSION
     assert config.prompt_contract_sha256 == PROMPT_CONTRACT_SHA256
+
+
+def test_implementation_contract_versions_change_the_config_hash() -> None:
+    current = SystemConfig(experiment=ExperimentConfig())
+    previous = SystemConfig(
+        experiment=ExperimentConfig(implementation_contract_version="legacy-runtime")
+    )
+
+    assert stable_config_hash(current) != stable_config_hash(previous)
 
 
 def test_kaggle_offline_fields_load() -> None:

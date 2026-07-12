@@ -32,7 +32,7 @@ class ExecutableHypothesis:
         self.validated: ValidatedProgram = validate_program(source)
         self.hypothesis_id = self.validated.sha256
         self.ast_nodes = self.validated.node_count
-        self.candidate_points = _candidate_points(self.validated.canonical_source)
+        self.candidate_points = candidate_points_from_source(self.validated.canonical_source)
         self.prediction_calls = 0
         self.goal_calls = 0
         self.timeout_count = 0
@@ -119,10 +119,13 @@ class ExecutableHypothesis:
         self.close()
 
 
-def _candidate_points(source: str) -> tuple[tuple[int, int], ...]:
+def candidate_points_from_source(source: str) -> tuple[tuple[int, int], ...]:
     """Read the optional literal CANDIDATE_POINTS declaration without executing it."""
 
-    tree = ast.parse(source, mode="exec")
+    try:
+        tree = ast.parse(source, mode="exec")
+    except SyntaxError:
+        return ()
     for statement in tree.body:
         if not isinstance(statement, ast.Assign):
             continue

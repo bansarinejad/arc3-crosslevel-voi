@@ -334,6 +334,7 @@ class DecisionMode(StrEnum):
     PROBE = "probe"
     REFRESH = "refresh"
     DIRECT_FALLBACK = "direct_fallback"
+    LIFECYCLE = "lifecycle"
 
 
 @dataclass(frozen=True, slots=True)
