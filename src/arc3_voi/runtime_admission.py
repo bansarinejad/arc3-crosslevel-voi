@@ -256,48 +256,22 @@ def x_only_probe_actions(
     )
 
 
-def run_runtime_admission_audit(
+def audit_source_batch(
+    source_rows: Sequence[Mapping[str, Any]],
+    history: History,
+    actions: Sequence[Action],
     *,
-    grounding_artifact_path: Path,
-    fixture_path: Path,
     config: SystemConfig,
+    win_levels: int,
 ) -> dict[str, Any]:
-    """Re-run grounding, selection, and planning without model or environment calls."""
+    """Apply the exact grounding, selection, planning, and admission path to sources.
 
-    grounding_artifact = _load_json_object(grounding_artifact_path)
-    fixture = _load_json_object(fixture_path)
-    _grounding_schema_version(grounding_artifact)
-    if fixture.get("schema_version") != 1:
-        raise ValueError("runtime admission requires a schema-v1 history fixture")
-    _validate_contract_identity(grounding_artifact, config)
+    This producer-neutral boundary lets model generations and deterministic source
+    libraries share one admission implementation without fabricating model metadata.
+    The caller remains responsible for validating and reporting producer-specific
+    provenance.
+    """
 
-    fixture_sha = _file_sha256(fixture_path)
-    declared_fixture_sha = grounding_artifact.get("source_input_sha256")
-    if declared_fixture_sha != fixture_sha:
-        raise ValueError("grounding artifact and history fixture digests differ")
-    records = _fixture_history_records(fixture)
-    history_payload = json.dumps(records, separators=(",", ":"), sort_keys=True).encode()
-    history_sha = hashlib.sha256(history_payload).hexdigest()
-    if fixture.get("history_canonical_sha256") != history_sha:
-        raise ValueError("history fixture does not match its declared digest")
-    if grounding_artifact.get("history_canonical_sha256") != history_sha:
-        raise ValueError("grounding artifact was produced from a different history")
-    history = history_from_records(records)
-
-    raw_programs = grounding_artifact.get("programs")
-    if not isinstance(raw_programs, list) or not raw_programs:
-        raise ValueError("grounding artifact has no source programs")
-    source_rows: tuple[Mapping[str, Any], ...] = tuple(
-        _require_mapping(row, "program") for row in raw_programs
-    )
-    cached_points = tuple(
-        point for row in source_rows for point in candidate_points_from_source(str(row["source"]))
-    )
-    actions = candidates_from_history(
-        history,
-        cached_points=cached_points,
-        max_candidates=config.planning.max_candidates,
-    )
     timeout_seconds = config.sandbox.timeout_ms / 1000.0
     evaluated = evaluate_source_programs(
         source_rows,
@@ -341,7 +315,7 @@ def run_runtime_admission_audit(
                     history,
                     actions,
                     pool.weighted_hypotheses,
-                    win_levels=int(records[-1]["win_levels"]),
+                    win_levels=win_levels,
                 )
             except NoValidHypotheses as exc:
                 planner_error = str(exc)
@@ -359,7 +333,7 @@ def run_runtime_admission_audit(
         planning = _planning_report(
             snapshot,
             level=history.current_level,
-            win_levels=int(records[-1]["win_levels"]),
+            win_levels=win_levels,
             persistence=INITIAL_CROSS_LEVEL_PERSISTENCE,
             risk_coefficient=config.planning.risk_coefficient,
             agreement_threshold=config.planning.agreement_threshold,
@@ -379,45 +353,6 @@ def run_runtime_admission_audit(
         )
         ineligible_selected = sorted(set(selected_ids) - set(eligible_ids))
         return {
-            "schema_version": 1,
-            "contract_version": ADMISSION_CONTRACT_VERSION,
-            "status": "pilot_admitted" if not reasons else "pilot_blocked",
-            "offline": True,
-            "git": asdict(inspect_git_provenance()),
-            "inputs": {
-                "grounding_artifact": _repo_relative_path(grounding_artifact_path),
-                "grounding_artifact_sha256": _file_sha256(grounding_artifact_path),
-                "grounding_artifact_schema": grounding_artifact["schema_version"],
-                "fixture": _repo_relative_path(fixture_path),
-                "fixture_sha256": fixture_sha,
-                "history_canonical_sha256": history_sha,
-                "source_base_config_sha256": grounding_artifact.get("base_config_sha256"),
-                "current_config_sha256": stable_config_hash(config),
-                "source_prompt_contract_version": grounding_artifact.get("prompt_contract_version"),
-            },
-            "contract": {
-                "planning_depth": config.planning.depth,
-                "beam_width": config.planning.beam_width,
-                "agreement_threshold": config.planning.agreement_threshold,
-                "material_evsi_threshold_actions": MATERIAL_EVSI_THRESHOLD,
-                "initial_cross_level_persistence": INITIAL_CROSS_LEVEL_PERSISTENCE,
-                "role_policy": (
-                    "candidate 0 is conservative; every later candidate must be "
-                    "action-sensitive and goal-conditioned"
-                ),
-                "admission_rule": (
-                    "at least two eligible distinct selected programs, no selected "
-                    "grounding failures or planner invalids, and at least one action with "
-                    "agreement below threshold, material EVSI, positive cross-level "
-                    "utility, and non-positive myopic utility"
-                ),
-            },
-            "history": {
-                "frames": len(history.frames),
-                "level": history.current_level,
-                "win_levels": int(records[-1]["win_levels"]),
-                "actions": [_action_label(action) for action in actions],
-            },
             "programs": [_program_report(item) for item in evaluated],
             "selection": {
                 "eligible_ids": list(eligible_ids),
@@ -439,6 +374,99 @@ def run_runtime_admission_audit(
     finally:
         for hypothesis in selected:
             hypothesis.close()
+
+
+def run_runtime_admission_audit(
+    *,
+    grounding_artifact_path: Path,
+    fixture_path: Path,
+    config: SystemConfig,
+) -> dict[str, Any]:
+    """Re-run grounding, selection, and planning without model or environment calls."""
+
+    grounding_artifact = _load_json_object(grounding_artifact_path)
+    fixture = _load_json_object(fixture_path)
+    _grounding_schema_version(grounding_artifact)
+    if fixture.get("schema_version") != 1:
+        raise ValueError("runtime admission requires a schema-v1 history fixture")
+    _validate_contract_identity(grounding_artifact, config)
+
+    fixture_sha = _file_sha256(fixture_path)
+    declared_fixture_sha = grounding_artifact.get("source_input_sha256")
+    if declared_fixture_sha != fixture_sha:
+        raise ValueError("grounding artifact and history fixture digests differ")
+    records = _fixture_history_records(fixture)
+    history_payload = json.dumps(records, separators=(",", ":"), sort_keys=True).encode()
+    history_sha = hashlib.sha256(history_payload).hexdigest()
+    if fixture.get("history_canonical_sha256") != history_sha:
+        raise ValueError("history fixture does not match its declared digest")
+    if grounding_artifact.get("history_canonical_sha256") != history_sha:
+        raise ValueError("grounding artifact was produced from a different history")
+    history = history_from_records(records)
+
+    raw_programs = grounding_artifact.get("programs")
+    if not isinstance(raw_programs, list) or not raw_programs:
+        raise ValueError("grounding artifact has no source programs")
+    source_rows: tuple[Mapping[str, Any], ...] = tuple(
+        _require_mapping(row, "program") for row in raw_programs
+    )
+    cached_points = tuple(
+        point for row in source_rows for point in candidate_points_from_source(str(row["source"]))
+    )
+    actions = candidates_from_history(
+        history,
+        cached_points=cached_points,
+        max_candidates=config.planning.max_candidates,
+    )
+    batch = audit_source_batch(
+        source_rows,
+        history,
+        actions,
+        config=config,
+        win_levels=int(records[-1]["win_levels"]),
+    )
+    return {
+        "schema_version": 1,
+        "contract_version": ADMISSION_CONTRACT_VERSION,
+        "status": "pilot_admitted" if batch["gate"]["passes"] else "pilot_blocked",
+        "offline": True,
+        "git": asdict(inspect_git_provenance()),
+        "inputs": {
+            "grounding_artifact": _repo_relative_path(grounding_artifact_path),
+            "grounding_artifact_sha256": _file_sha256(grounding_artifact_path),
+            "grounding_artifact_schema": grounding_artifact["schema_version"],
+            "fixture": _repo_relative_path(fixture_path),
+            "fixture_sha256": fixture_sha,
+            "history_canonical_sha256": history_sha,
+            "source_base_config_sha256": grounding_artifact.get("base_config_sha256"),
+            "current_config_sha256": stable_config_hash(config),
+            "source_prompt_contract_version": grounding_artifact.get("prompt_contract_version"),
+        },
+        "contract": {
+            "planning_depth": config.planning.depth,
+            "beam_width": config.planning.beam_width,
+            "agreement_threshold": config.planning.agreement_threshold,
+            "material_evsi_threshold_actions": MATERIAL_EVSI_THRESHOLD,
+            "initial_cross_level_persistence": INITIAL_CROSS_LEVEL_PERSISTENCE,
+            "role_policy": (
+                "candidate 0 is conservative; every later candidate must be "
+                "action-sensitive and goal-conditioned"
+            ),
+            "admission_rule": (
+                "at least two eligible distinct selected programs, no selected "
+                "grounding failures or planner invalids, and at least one action with "
+                "agreement below threshold, material EVSI, positive cross-level "
+                "utility, and non-positive myopic utility"
+            ),
+        },
+        "history": {
+            "frames": len(history.frames),
+            "level": history.current_level,
+            "win_levels": int(records[-1]["win_levels"]),
+            "actions": [_action_label(action) for action in actions],
+        },
+        **batch,
+    }
 
 
 def _planning_report(
@@ -701,6 +729,7 @@ __all__ = [
     "MATERIAL_EVSI_THRESHOLD",
     "EvaluatedSource",
     "admission_gate_reasons",
+    "audit_source_batch",
     "construct_eligible_hypotheses",
     "evaluate_source_programs",
     "role_requirements",
