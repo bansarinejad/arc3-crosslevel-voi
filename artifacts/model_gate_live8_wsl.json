@@ -1,0 +1,89 @@
+{
+  "config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
+  "elapsed_seconds": 50.32418155999949,
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "fits_vram_gate": true,
+  "git": {
+    "commit": "d242c234712b46dd2c409dbf44933320c6516050",
+    "dirty": false,
+    "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "total_vram_gb": 15.99169921875
+  },
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "output_tokens": 1452,
+  "passes_runtime_gate": null,
+  "passes_throughput_gate": true,
+  "peak_vram_gb": 9.380682468414307,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "program_source_lengths": [
+    529,
+    1848,
+    1602,
+    1056
+  ],
+  "program_source_sha256": [
+    "d502c454323f04d83168b84c3180e25a5d395127953f645acada0c43b04d01d0",
+    "8504b3d4a485c56e69a4975e9e9200fa29e001572322d1a3f63d4358eca9da0f",
+    "a471106e3d6c0190788b625e5822a1f21e9e5132c42f001d29154c8978bea337",
+    "65d7f7ad98100b3911d7f2a610f585714d246d8794926eaa48255c9732708acf"
+  ],
+  "program_sources": [
+    "def predict(history, action):\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    # Action 1 fills the next row with increasing values, but here we just return\n    # the grid as is since ACTION1 has been fully exhausted and no new action\n    # data is provided for the current step.\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.0",
+    "def predict(history, action):\n    kind = int(action.kind)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Simple fill: set the entire row to the action kind if it's not already filled\n        # Or fill a specific cell. Given the history shows filling rows, let's fill the target row.\n        # However, the history shows ACTION1 filling cells 0,1,2... sequentially.\n        # The provided history shows ACTION1 filling cells in a row.\n        # Let's assume ACTION6 is a fill action for the target row.\n        # Check if row is already full.\n        if np.sum(grid == row) == 0:\n             grid = grid.copy()\n             grid[row, :] = row\n             game_state = \"WIN\" if np.max(grid) == 15 else \"NOT_FINISHED\"\n        else:\n             # Partial fill or different logic\n             # Based on history, ACTION1 fills cells. ACTION6 is the coordinate one.\n             # Let's assume it fills the row if empty, or sets the cell.\n             # A safe \"action-sensitive\" effect is filling the row if it's empty.\n             # If not empty, maybe it sets the specific cell to the action value?\n             # Let's try setting the specific cell.\n             grid[row, col] = kind\n             game_state = \"NOT_FINISHED\"\n    else:\n        game_state = \"NOT_FINISHED\"\n        \n    return {\n        \"next_grid\": grid,\n        \"game_state\": game_state,\n        \"level_delta\": 0,\n        \"memory\": {}\n    }\n\ndef goal_value(history):\n    # Check if all levels are complete or a specific condition met\n    # History shows level 1, delta 0.\n    # Let's check the last frame for completeness or max value.\n    last_grid = history.frames[-1]\n    if len(last_grid) == 0:\n        return 0.0\n    if np.max(last_grid) == 15:\n        return 1.0\n    return 0.0",
+    "def predict(history, action):\n    # Infer ACTION1 fills the topmost empty row.\n    # ACTION2 fills the bottommost empty row.\n    # ACTION6 sets the entire row to a specific color.\n    \n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    \n    if kind == 1:\n        # Fill topmost empty row\n        rows, cols = grid.shape\n        empty_rows = np.where(np.all(grid == 0, axis=1))[0]\n        if len(empty_rows) > 0:\n            target_row = empty_rows[0]\n            grid[target_row, :] = 1\n        else:\n            grid = grid.copy()\n            \n    elif kind == 2:\n        # Fill bottommost empty row\n        rows, cols = grid.shape\n        empty_rows = np.where(np.all(grid == 0, axis=1))[0]\n        if len(empty_rows) > 0:\n            target_row = empty_rows[-1]\n            grid[target_row, :] = 1\n        else:\n            grid = grid.copy()\n            \n    elif kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Set entire row to the color specified by the cell at (row, col)\n        color = grid[row, col]\n        grid[row, :] = color\n        # If the cell itself was 0, set it to 1 (as per history pattern)\n        if color == 0:\n            grid[row, col] = 1\n\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Goal is to fill the grid with a single non-zero color\n    last_grid = np.array(history.frames[-1], dtype=np.int8)\n    unique_vals = np.unique(last_grid)\n    if len(unique_vals) == 1 and unique_vals[0] != 0:\n        return 1.0\n    return 0.0",
+    "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Toggle the cell at (row, col)\n        grid[row, col] = 15 - grid[row, col]\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Heuristic: if the last few frames show a monochromatic bar filling the screen,\n    # the goal is likely to clear it or reach a specific state.\n    # Based on the images, the bar is filling up. The goal is likely \"WIN\" when the bar is full.\n    # However, without a clear win condition definition, we return a neutral value.\n    # A simple heuristic: if the grid is all one color (excluding white), goal is near.\n    # In the last frame, the bottom 10 rows are magenta (6).\n    # Let's assume the goal is to have a uniform bar.\n    last_vals = history.grid_values[-1]\n    if len(set(last_vals)) == 1 and last_vals[0] != 0:\n        return 1.0\n    return 0.0"
+  ],
+  "projected_p95_seconds": null,
+  "prompt_contract_sha256": "2850bc72cf42c42e2c813962aa7fb413d74f3ff65789719ac76dd32e26157b96",
+  "prompt_contract_version": "grounded-actions-palette-diverse-v2",
+  "requested_sequences": 4,
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "5.15.167.4-microsoft-standard-WSL2",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "runtime_fraction": null,
+  "statically_valid_programs": 3,
+  "syntactically_valid_programs": 3,
+  "tokens_per_second": 28.85292825416026,
+  "truncated_sequences": 0,
+  "validation_failures": {
+    "disallowed_attribute": 1
+  }
+}
