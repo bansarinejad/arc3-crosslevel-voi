@@ -10,12 +10,12 @@ from typing import Any
 
 from .rendering import ARC_PALETTE_LEGEND, GRID_LINE_RGB
 
-PROMPT_CONTRACT_VERSION = "grounded-actions-palette-diverse-v2"
+PROMPT_CONTRACT_VERSION = "grounded-actions-palette-graded-goals-v3"
 HYPOTHESIS_DIVERSITY_ROLES = (
-    "Conservative evidence-first baseline; a no-effect transition is allowed when best supported.",
-    "Prioritize local coordinate-dependent interaction caused by ACTION6.",
-    "Prioritize action-dependent object or agent motion caused by exposed simple actions.",
-    "Prioritize component-wide, toggle, selection, or global action effects.",
+    "Conservative evidence-first baseline; no effect is allowed only when best supported.",
+    "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
+    "Object or agent motion with graded progress from normalized distance or alignment.",
+    "Component-wide, toggle, selection, or global effects with graded component progress.",
 )
 PROGRAM_ACTION_CONTRACT = """Action kinds are opaque numeric labels: RESET=0,
 ACTION1=1, ACTION2=2, ACTION3=3, ACTION4=4, ACTION5=5, ACTION6=6, ACTION7=7.
@@ -53,6 +53,9 @@ available_action_sets, game_states, level_deltas, and levels. The newest frame i
 history.frames[-1]. action is a read-only record with integer kind and optional row/col.
 History images are ordered oldest to newest; grid_image_index is zero based and the
 final image is the latest frame.
+The JSON prompt's grid_values field is model-only metadata. It is not present inside
+runtime history entries. In particular, history.levels is a tuple of positive integers;
+never call .get on a level. Derive runtime cell values from a frame with np.unique.
 """ + PROGRAM_ACTION_CONTRACT + VISUAL_GROUNDING_CONTRACT + """
 Copy a frame before changing it. Return a grid with the same shape and values in [0,15].
 game_state must be exactly "NOT_FINISHED", "WIN", or "GAME_OVER". Available NumPy
@@ -61,6 +64,19 @@ argwhere, unique, roll/flip/rot90, concatenate/stack, min/max/sum/mean, count_no
 clip, and basic arithmetic/comparisons. Safe array methods include copy, astype, reshape,
 flatten, tolist, nonzero, argmin/argmax, min/max/sum/mean/std. Local lists/sets may use
 append, extend, add, and discard. Prefer short, general rules.
+Planner calls are cached and may be scheduled independently. Functions must be
+referentially transparent in history/action and must not mutate top-level literal data
+or rely on call order.
+goal_value is evaluated on counterfactual histories, including grids not yet observed.
+It must be total for every valid history and always return a finite value in [0,1].
+Normalize counts by grid.size, normalize distances by the grid dimensions, and clip the
+final score. Never divide a cell count by an arbitrary constant such as 100. For an
+action-sensitive role, goal_value must be aligned with predict: the encoded plausible
+effect should produce graded progress differences within at most four simulated actions.
+A constant or unreachable-threshold goal_value does not satisfy an action-sensitive role.
+Observed evidence takes precedence over the diversity role. If the images and transition
+history do not support any action effect, return a conservative program even when assigned
+an action-sensitive role; never invent a transition merely to create disagreement.
 Never read files, use the network, or execute code. Do not use imports, classes,
 decorators, type annotations, exceptions, context managers, or markdown. Keep the
 whole program below 120 logical lines and define both required functions completely
@@ -198,9 +214,13 @@ def program_prompt(
         "transition is acceptable when it is the best-supported hypothesis. Do not import or "
         "use pass."
         if not action_sensitive_role
-        else "Infer one behaviorally plausible transition-and-goal program with one small "
-        "action-dependent effect supported by the assigned role. Predictions should differ for "
-        "at least two currently valid actions. Do not import or use pass."
+        else "Infer one behaviorally plausible transition-and-goal program. When the images or "
+        "history support the assigned role, encode one small action-dependent effect: predictions "
+        "should differ for at least two currently valid actions, and the aligned graded "
+        "goal_value should differ on at least two resulting states within the four-step planning "
+        "horizon. A constant goal_value does not satisfy this role. If no supported action effect "
+        "exists, return a conservative program instead of inventing disagreement. Do not import "
+        "or use pass."
     )
     request = {
         "committee_candidate": {

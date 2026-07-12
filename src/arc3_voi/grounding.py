@@ -12,7 +12,7 @@ from dataclasses import dataclass
 
 from .program import ExecutableHypothesis
 from .rendering import ARC_COLOR_NAMES
-from .types import Action, ActionKind, History, Prediction
+from .types import Action, ActionKind, History, Observation, Prediction
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +33,15 @@ class ActionResult:
 
 
 @dataclass(frozen=True, slots=True)
+class GoalResult:
+    action: str
+    depth: int
+    ok: bool
+    value: float | None = None
+    error: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class ProgramGroundingResult:
     source_sha256: str
     source_length: int
@@ -43,6 +52,13 @@ class ProgramGroundingResult:
     palette_claims: tuple[PaletteClaim, ...]
     goal_value_ok: bool
     goal_value_error: str | None
+    observed_goal_value: float | None
+    goal_results: tuple[GoalResult, ...]
+    goal_sensitive: bool
+    goal_value_range: float | None
+    max_action_goal_spread: float | None
+    action_sensitivity_required: bool
+    goal_sensitivity_required: bool
     action_results: tuple[ActionResult, ...]
     simple_action_contract_ok: bool
     all_actions_ok: bool
@@ -66,6 +82,8 @@ class ProgramGroundingResult:
             and self.goal_value_ok
             and self.all_actions_ok
             and not self.palette_conflicts
+            and (not self.action_sensitivity_required or self.action_sensitive)
+            and (not self.goal_sensitivity_required or self.goal_sensitive)
         )
 
 
@@ -173,9 +191,14 @@ def evaluate_program_grounding(
     *,
     timeout_seconds: float = 0.100,
     memory_limit_mb: int = 256,
+    rollout_depth: int = 4,
+    require_action_sensitivity: bool = False,
+    require_goal_sensitivity: bool = False,
 ) -> ProgramGroundingResult:
-    """Execute one generated program against every exposed candidate action."""
+    """Execute a program on root actions and bounded counterfactual rollouts."""
 
+    if rollout_depth < 1:
+        raise ValueError("rollout_depth must be positive")
     source_sha = hashlib.sha256(source.encode("utf-8")).hexdigest()
     reads = coordinate_read_lines(source)
     claims = audit_palette_claims(source)
@@ -196,6 +219,13 @@ def evaluate_program_grounding(
             palette_claims=claims,
             goal_value_ok=False,
             goal_value_error=None,
+            observed_goal_value=None,
+            goal_results=(),
+            goal_sensitive=False,
+            goal_value_range=None,
+            max_action_goal_spread=None,
+            action_sensitivity_required=require_action_sensitivity,
+            goal_sensitivity_required=require_goal_sensitivity,
             action_results=(),
             simple_action_contract_ok=False,
             all_actions_ok=False,
@@ -210,21 +240,25 @@ def evaluate_program_grounding(
     memory_baseline_bytes: int | None = None
     memory_ceiling_bytes: int | None = None
     memory_limit_diagnostic: str | None = None
+    observed_goal_value: float | None = None
+    goal_results: list[GoalResult] = []
     try:
         try:
-            hypothesis.goal_value(history)
-            goal_ok = True
+            observed_goal_value = hypothesis.goal_value(history)
+            observed_goal_ok = True
             goal_error = None
         except Exception as exc:
-            goal_ok = False
+            observed_goal_ok = False
             goal_error = f"{type(exc).__name__}: {exc}"
 
         results: list[ActionResult] = []
         prediction_hashes: list[str] = []
+        root_predictions: list[Prediction | None] = []
         for action in actions:
             try:
                 prediction = hypothesis.predict(history, action)
             except Exception as exc:
+                root_predictions.append(None)
                 results.append(
                     ActionResult(
                         _action_label(action),
@@ -233,6 +267,7 @@ def evaluate_program_grounding(
                     )
                 )
                 continue
+            root_predictions.append(prediction)
             prediction_sha = _prediction_hash(prediction)
             prediction_hashes.append(prediction_sha)
             results.append(
@@ -240,6 +275,48 @@ def evaluate_program_grounding(
                     _action_label(action), True, prediction_sha256=prediction_sha
                 )
             )
+
+        available_actions = frozenset(action.kind for action in actions)
+        for action, root_prediction in zip(actions, root_predictions, strict=True):
+            if root_prediction is None:
+                continue
+            rollout_history = history
+            prediction = root_prediction
+            for depth in range(1, rollout_depth + 1):
+                if depth > 1:
+                    try:
+                        prediction = hypothesis.predict(rollout_history, action)
+                    except Exception as exc:
+                        goal_results.append(
+                            GoalResult(
+                                _action_label(action),
+                                depth,
+                                False,
+                                error=f"predict: {type(exc).__name__}: {exc}",
+                            )
+                        )
+                        break
+                rollout_history = _advance_history(
+                    rollout_history,
+                    action,
+                    prediction,
+                    available_actions,
+                )
+                try:
+                    value = hypothesis.goal_value(rollout_history)
+                except Exception as exc:
+                    goal_results.append(
+                        GoalResult(
+                            _action_label(action),
+                            depth,
+                            False,
+                            error=f"{type(exc).__name__}: {exc}",
+                        )
+                    )
+                    break
+                goal_results.append(
+                    GoalResult(_action_label(action), depth, True, value=value)
+                )
         metadata = hypothesis.worker_metadata
         if metadata is not None:
             memory_enforced = metadata.hard_memory_limit_enforced
@@ -250,6 +327,38 @@ def evaluate_program_grounding(
     finally:
         hypothesis.close()
 
+    goal_values = [
+        value
+        for value in (
+            observed_goal_value,
+            *(result.value for result in goal_results if result.ok),
+        )
+        if value is not None
+    ]
+    goal_range = max(goal_values) - min(goal_values) if goal_values else None
+    depth_spreads = [
+        max(values) - min(values)
+        for depth in range(1, rollout_depth + 1)
+        if len(
+            values := [
+                result.value
+                for result in goal_results
+                if result.ok and result.depth == depth and result.value is not None
+            ]
+        )
+        >= 2
+    ]
+    max_action_goal_spread = max(depth_spreads) if depth_spreads else None
+    goal_sensitive = (
+        max_action_goal_spread is not None and max_action_goal_spread > 1e-6
+    )
+    goal_ok = (
+        observed_goal_ok
+        and bool(goal_results)
+        and all(result.ok for result in goal_results)
+    )
+    if observed_goal_ok and not goal_ok and goal_error is None:
+        goal_error = "one or more counterfactual goal rollouts failed"
     simple_ok = all(
         result.ok
         for action, result in zip(actions, results, strict=True)
@@ -274,6 +383,13 @@ def evaluate_program_grounding(
         palette_claims=claims,
         goal_value_ok=goal_ok,
         goal_value_error=goal_error,
+        observed_goal_value=observed_goal_value,
+        goal_results=tuple(goal_results),
+        goal_sensitive=goal_sensitive,
+        goal_value_range=goal_range,
+        max_action_goal_spread=max_action_goal_spread,
+        action_sensitivity_required=require_action_sensitivity,
+        goal_sensitivity_required=require_goal_sensitivity,
         action_results=tuple(results),
         simple_action_contract_ok=simple_ok,
         all_actions_ok=all_ok,
@@ -313,6 +429,8 @@ def grounding_gate_reasons(
         reasons.append("fewer than two distinct grounded behavior classes")
     if not any(program.action_sensitive for program in eligible):
         reasons.append("no grounded-safe program is action-sensitive")
+    if not any(program.goal_sensitive for program in eligible):
+        reasons.append("no grounded-safe program has graded counterfactual goal variation")
     if peak_vram_gb is None or peak_vram_gb > max_peak_vram_gb:
         reasons.append("peak VRAM gate failed")
     if tokens_per_second < min_tokens_per_second:
@@ -322,6 +440,23 @@ def grounding_gate_reasons(
     ):
         reasons.append("hard sandbox memory limit was not enforced for every eligible program")
     return tuple(reasons)
+
+
+def _advance_history(
+    history: History,
+    action: Action,
+    prediction: Prediction,
+    available_actions: frozenset[ActionKind],
+) -> History:
+    level = max(1, history.current_level + max(0, prediction.level_delta))
+    observation = Observation(
+        prediction.next_grid,
+        available_actions,
+        prediction.game_state,
+        level=level,
+        win_levels=level,
+    )
+    return history.append(observation, action, prediction.level_delta)
 
 
 def _collect_comment_claims(

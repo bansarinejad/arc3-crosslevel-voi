@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import replace
 
 import numpy as np
+import pytest
 
 from arc3_voi.grounding import (
     audit_palette_claims,
@@ -19,10 +20,28 @@ def predict(history, action):
         grid[int(action.row), int(action.col)] = 1
     return {"next_grid": grid, "game_state": "NOT_FINISHED", "level_delta": 0, "memory": {}}
 def goal_value(history):
-    return 0.0
+    grid = np.array(history.frames[-1], dtype=np.int8)
+    return float(np.count_nonzero(grid == 1)) / float(grid.size)
 """
 
 SECOND_SAFE_PROGRAM = SAFE_PROGRAM.replace("= 1", "= 2")
+
+CONSTANT_GOAL_PROGRAM = SAFE_PROGRAM.replace(
+    "grid = np.array(history.frames[-1], dtype=np.int8)\n"
+    "    return float(np.count_nonzero(grid == 1)) / float(grid.size)",
+    "return 0.0",
+)
+
+UNREACHABLE_GOAL_PROGRAM = SAFE_PROGRAM.replace(
+    "return float(np.count_nonzero(grid == 1)) / float(grid.size)",
+    "return 1.0 if np.count_nonzero(grid == 1) > 100 else 0.0",
+)
+
+TIME_ONLY_GOAL_PROGRAM = SAFE_PROGRAM.replace(
+    "grid = np.array(history.frames[-1], dtype=np.int8)\n"
+    "    return float(np.count_nonzero(grid == 1)) / float(grid.size)",
+    "return min(1.0, float(len(history.frames)) / 8.0)",
+)
 
 UNSAFE_PROGRAM = """
 def predict(history, action):
@@ -94,6 +113,7 @@ def test_action_matrix_accepts_action6_guard_and_distinct_gate() -> None:
     )
     assert first.eligible and second.eligible
     assert first.action_sensitive and second.action_sensitive
+    assert first.goal_sensitive and second.goal_sensitive
     assert not grounding_gate_reasons(
         (first, second),
         truncated_sequences=0,
@@ -118,6 +138,68 @@ def test_action_matrix_accepts_action6_guard_and_distinct_gate() -> None:
         tokens_per_second=20.0,
         require_hard_memory_limit=True,
     )[0]
+
+
+def test_action_sensitive_role_requires_graded_counterfactual_goal() -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    result = evaluate_program_grounding(
+        SAFE_PROGRAM,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        rollout_depth=4,
+        require_action_sensitivity=True,
+        require_goal_sensitivity=True,
+    )
+
+    assert result.eligible
+    assert result.goal_value_ok
+    assert result.goal_sensitive
+    assert result.goal_value_range == 1 / 16
+    assert result.max_action_goal_spread == 1 / 16
+    assert len(result.goal_results) == len(actions) * 4
+    assert all(item.ok for item in result.goal_results)
+
+
+@pytest.mark.parametrize("source", [CONSTANT_GOAL_PROGRAM, UNREACHABLE_GOAL_PROGRAM])
+def test_constant_or_unreachable_goal_fails_graded_role_gate(source: str) -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    result = evaluate_program_grounding(
+        source,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        rollout_depth=4,
+        require_action_sensitivity=True,
+        require_goal_sensitivity=True,
+    )
+
+    assert result.sandbox_valid
+    assert result.all_actions_ok
+    assert result.action_sensitive
+    assert result.goal_value_ok
+    assert not result.goal_sensitive
+    assert result.goal_value_range == 0.0
+    assert not result.eligible
+
+
+def test_depth_only_goal_does_not_count_as_action_sensitive_progress() -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    result = evaluate_program_grounding(
+        TIME_ONLY_GOAL_PROGRAM,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        rollout_depth=4,
+        require_action_sensitivity=True,
+        require_goal_sensitivity=True,
+    )
+
+    assert result.goal_value_ok
+    assert result.goal_value_range is not None and result.goal_value_range > 0
+    assert result.max_action_goal_spread == 0.0
+    assert not result.goal_sensitive
+    assert not result.eligible
 
 
 def test_palette_audit_flags_explicit_conflicts_only() -> None:

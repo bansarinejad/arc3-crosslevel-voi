@@ -102,8 +102,11 @@ def main() -> int:
             actions,
             timeout_seconds=config.sandbox.timeout_ms / 1000,
             memory_limit_mb=config.sandbox.memory_mb,
+            rollout_depth=config.planning.depth,
+            require_action_sensitivity=index > 0,
+            require_goal_sensitivity=index > 0,
         )
-        for source in generation.texts
+        for index, source in enumerate(generation.texts)
     )
     truncated = sum(generation.hit_token_limit)
     reasons = grounding_gate_reasons(
@@ -128,7 +131,7 @@ def main() -> int:
         program_payloads.append(value)
     eligible = [program for program in programs if program.eligible]
     report: dict[str, Any] = {
-        "schema_version": 3,
+        "schema_version": 4,
         "offline": True,
         "git": asdict(inspect_git_provenance()),
         "model_id": config.model.id,
@@ -196,6 +199,15 @@ def main() -> int:
             ),
             "action_sensitive_programs": sum(
                 program.action_sensitive for program in eligible
+            ),
+            "goal_sensitive_programs": sum(
+                program.goal_sensitive for program in eligible
+            ),
+            "graded_role_programs": sum(
+                program.action_sensitivity_required
+                and program.goal_sensitivity_required
+                and program.eligible
+                for program in programs
             ),
             "unsafe_coordinate_programs": sum(
                 program.unsafe_coordinate_use for program in programs

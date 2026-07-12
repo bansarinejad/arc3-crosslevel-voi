@@ -29,10 +29,10 @@ def _non_negative_float(name: str, value: float) -> None:
 class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
-    prompt_contract_version: str = "grounded-actions-palette-diverse-v2"
+    prompt_contract_version: str = "grounded-actions-palette-graded-goals-v3"
     perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
     prompt_contract_sha256: str = (
-        "2850bc72cf42c42e2c813962aa7fb413d74f3ff65789719ac76dd32e26157b96"
+        "391eadfb3bbf860cb8266fea6f4a3cd5855eb9ab60fc1610b37b66516a44b6de"
     )
     perception_contract_sha256: str = (
         "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0"

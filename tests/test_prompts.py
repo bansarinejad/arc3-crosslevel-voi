@@ -9,6 +9,7 @@ from arc3_voi.prompts import (
     DIRECT_SYSTEM_PROMPT,
     PROGRAM_SYSTEM_PROMPT,
     PROMPT_CONTRACT_SHA256,
+    PROMPT_CONTRACT_VERSION,
     PROMPT_REFERENCE_DIRECT_SHA256,
     PROMPT_REFERENCE_PROGRAM_SHA256,
     extract_python,
@@ -121,6 +122,11 @@ def test_prompts_share_exact_palette_and_action_contracts() -> None:
     assert "For every other kind, row and col are None" in PROGRAM_SYSTEM_PROMPT
     assert "copy one exact" in DIRECT_SYSTEM_PROMPT.lower()
     assert "Return one listed" in DIRECT_SYSTEM_PROMPT
+    assert PROMPT_CONTRACT_VERSION == "grounded-actions-palette-graded-goals-v3"
+    assert "history.levels is a tuple of positive integers" in PROGRAM_SYSTEM_PROMPT
+    assert "Never divide a cell count by an arbitrary constant" in PROGRAM_SYSTEM_PROMPT
+    assert "referentially transparent" in PROGRAM_SYSTEM_PROMPT
+    assert "within at most four simulated actions" in PROGRAM_SYSTEM_PROMPT
     assert len(PROMPT_CONTRACT_SHA256) == 64
     int(PROMPT_CONTRACT_SHA256, 16)
     assert len(PROMPT_REFERENCE_PROGRAM_SHA256) == 64
@@ -144,7 +150,8 @@ def test_program_prompt_assigns_distinct_action_sensitive_committee_roles() -> N
 
     assert len(set(prompts)) == 4
     assert "no-effect transition is acceptable" in prompts[0]
-    assert all("Predictions should differ" in prompt for prompt in prompts[1:])
+    assert all("predictions should differ" in prompt for prompt in prompts[1:])
+    assert all("constant goal_value does not satisfy" in prompt for prompt in prompts[1:])
     assert '"index":0' in prompts[0]
     assert '"index":3' in prompts[3]
     assert '"requires_action_sensitivity":false' in prompts[0]

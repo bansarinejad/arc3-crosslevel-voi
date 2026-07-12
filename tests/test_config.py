@@ -1,14 +1,17 @@
 from __future__ import annotations
 
-from arc3_voi.config import load_config
-from arc3_voi.prompts import PROMPT_CONTRACT_SHA256
+from arc3_voi.config import ExperimentConfig, load_config
+from arc3_voi.prompts import PROMPT_CONTRACT_SHA256, PROMPT_CONTRACT_VERSION
 from arc3_voi.rendering import PERCEPTION_CONTRACT_SHA256
 
 
 def test_inherited_local_model_config_loads() -> None:
     config = load_config("configs/local_9b.yaml")
     assert config.experiment.max_environment_actions == 256
-    assert config.experiment.prompt_contract_version == "grounded-actions-palette-diverse-v2"
+    assert (
+        config.experiment.prompt_contract_version
+        == "grounded-actions-palette-graded-goals-v3"
+    )
     assert (
         config.experiment.perception_contract_version
         == "arc-agi-0.9.9-color-map-scale8-grid-v1"
@@ -23,6 +26,13 @@ def test_inherited_local_model_config_loads() -> None:
         config.model.expected_weight_manifest_sha256
         == "7d241f65e84063d41e959e31cbaf0ea50b7a0b43faf49f5ef3ff62d005c0f655"
     )
+
+
+def test_bare_experiment_defaults_match_implemented_prompt_contract() -> None:
+    config = ExperimentConfig()
+
+    assert config.prompt_contract_version == PROMPT_CONTRACT_VERSION
+    assert config.prompt_contract_sha256 == PROMPT_CONTRACT_SHA256
 
 
 def test_kaggle_offline_fields_load() -> None:
