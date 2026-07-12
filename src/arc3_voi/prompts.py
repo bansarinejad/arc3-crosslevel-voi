@@ -10,12 +10,16 @@ from typing import Any
 
 from .rendering import ARC_PALETTE_LEGEND, GRID_LINE_RGB
 
-PROMPT_CONTRACT_VERSION = "grounded-actions-palette-graded-goals-v3"
+PROMPT_CONTRACT_VERSION = "evidence-first-visible-causal-alternatives-v4"
 HYPOTHESIS_DIVERSITY_ROLES = (
-    "Conservative evidence-first baseline; no effect is allowed only when best supported.",
-    "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
-    "Object or agent motion with graded progress from normalized distance or alignment.",
-    "Component-wide, toggle, selection, or global effects with graded component progress.",
+    "Conservative evidence-first baseline; reproduce observed transitions and "
+    "otherwise prefer no effect.",
+    "Local contact alternative: a currently valid action affects a visible cell or "
+    "connected component at a visually derived target.",
+    "Object-motion alternative: a currently valid action displaces or aligns a visible "
+    "connected component relative to visible geometry.",
+    "Component-state alternative: a currently valid action selects, toggles, or "
+    "transforms an existing visible component or palette state.",
 )
 PROGRAM_ACTION_CONTRACT = """Action kinds are opaque numeric labels: RESET=0,
 ACTION1=1, ACTION2=2, ACTION3=3, ACTION4=4, ACTION5=5, ACTION6=6, ACTION7=7.
@@ -69,20 +73,39 @@ referentially transparent in history/action and must not mutate top-level litera
 or rely on call order.
 goal_value is evaluated on counterfactual histories, including grids not yet observed.
 It must be total for every valid history and always return a finite value in [0,1].
-Normalize counts by grid.size, normalize distances by the grid dimensions, and clip the
-final score. Never divide a cell count by an arbitrary constant such as 100. For an
-action-sensitive role, goal_value must be aligned with predict: the encoded plausible
-effect should produce graded progress differences within at most four simulated actions.
-A constant or unreachable-threshold goal_value does not satisfy an action-sensitive role.
-Observed evidence takes precedence over the diversity role. If the images and transition
-history do not support any action effect, return a conservative program even when assigned
-an action-sensitive role; never invent a transition merely to create disagreement.
+Scale progress by the most relevant visible object or connected component: for example,
+divide affected-cell progress by that component's size, or normalize displacement,
+distance, overlap, or alignment by the corresponding visible geometry. Use grid.size only
+when no defensible localized object, component, target extent, or geometric denominator
+exists. Never divide by an arbitrary constant such as 100. Sparse but object-complete
+effects must not be forced to machine-small progress merely because the grid is large.
+For an action-sensitive role, goal_value must be aligned with predict: the encoded causal
+alternative must produce a same-depth goal spread of at least 0.0125 between currently
+valid actions within at most four simulated actions. The hypothesized progress action must
+increase goal_value relative to unrelated or predicted-no-effect actions. The 0.0125 floor
+is a heuristic materiality threshold equal to 0.05 unresolved-cost units under the
+planner's 4-to-8 mapping; it does not guarantee positive EVSI. A constant,
+unreachable-threshold, reversed, or materially smaller goal spread does not satisfy an
+action-sensitive role.
+Recorded action-to-successor transitions take precedence over every diversity role,
+including recorded no-effect transitions. Encode those transitions even when they
+contradict the assigned role; use the role only to resolve behavior that evidence leaves
+underdetermined. When there is no recorded transition evidence, candidates 1-3 must each
+encode their assigned distinct, falsifiable causal alternative, but only by linking a
+currently available action to a visible cell, connected component, palette state, or
+relative geometry in the supplied frames. Derive affected cells, values, and targets from
+the current frame or ACTION6 coordinates. Never use arbitrary fixed coordinates, repaint
+unrelated cells, assume universal meanings for opaque actions, or invent WIN, GAME_OVER,
+or level_delta merely to create disagreement. If the assigned alternative cannot be
+expressed from visible structure and available actions, choose the closest visibly
+grounded effect in the same role and keep it small and reversible.
 Never read files, use the network, or execute code. Do not use imports, classes,
 decorators, type annotations, exceptions, context managers, or markdown. Keep the
 whole program below 120 logical lines and define both required functions completely
 before the token limit. Do not use pass statements. A conservative no-effect baseline is
-allowed when evidence supports it; candidates assigned an action-sensitive role should encode
-one small plausible action-dependent effect rather than manufacture arbitrary disagreement.
+appropriate for candidate 0 and whenever recorded evidence supports no effect. Graded-role
+candidates propose bounded hypotheses only where behavior remains underdetermined; their
+differences must come from the assigned visible causal alternative, not arbitrary novelty.
 You may optionally add a top-level literal
 CANDIDATE_POINTS = [(row, col), ...] with promising ACTION6 coordinates from the
 latest frame. A minimal contract-valid shape is:
@@ -209,18 +232,25 @@ def program_prompt(
         raise ValueError("candidate_index must identify one candidate in candidate_count")
     role = HYPOTHESIS_DIVERSITY_ROLES[candidate_index % len(HYPOTHESIS_DIVERSITY_ROLES)]
     action_sensitive_role = candidate_index % len(HYPOTHESIS_DIVERSITY_ROLES) != 0
+    history_data = history_payload(history, include_grid_ascii=False)
+    transition_evidence_count = sum(
+        entry["action"] is not None for entry in history_data
+    )
     instruction = (
-        "Infer one conservative behaviorally plausible transition-and-goal program. A no-effect "
-        "transition is acceptable when it is the best-supported hypothesis. Do not import or "
-        "use pass."
+        "Infer the conservative evidence-first transition-and-goal baseline. Reproduce every "
+        "recorded action-to-successor transition; where no transition evidence constrains an "
+        "action, prefer no effect. Do not import or use pass."
         if not action_sensitive_role
-        else "Infer one behaviorally plausible transition-and-goal program. When the images or "
-        "history support the assigned role, encode one small action-dependent effect: predictions "
-        "should differ for at least two currently valid actions, and the aligned graded "
-        "goal_value should differ on at least two resulting states within the four-step planning "
-        "horizon. A constant goal_value does not satisfy this role. If no supported action effect "
-        "exists, return a conservative program instead of inventing disagreement. Do not import "
-        "or use pass."
+        else "Infer one evidence-consistent program for the assigned causal-alternative role. "
+        "First reproduce all recorded action-to-successor transitions, including no-effect "
+        "transitions. For behavior those transitions leave underdetermined, encode the assigned "
+        "small, falsifiable action-dependent alternative using only a currently available action "
+        "and cells, components, palette values, ACTION6 coordinates, or relative geometry visible "
+        "in the supplied frames. Predictions must differ for at least two currently valid actions. "
+        "The aligned goal_value must increase for the hypothesized progress action relative to an "
+        "unrelated or predicted-no-effect action, with a same-depth spread of at least 0.0125 "
+        "within four simulated actions, normalized by the relevant visible component or geometry. "
+        "Do not use arbitrary coordinates or effects, and do not import or use pass."
     )
     request = {
         "committee_candidate": {
@@ -228,9 +258,14 @@ def program_prompt(
             "role": role,
             "requires_action_sensitivity": action_sensitive_role,
         },
+        "evidence_priority": (
+            "recorded action-to-successor transitions override the assigned role; "
+            "the role resolves only remaining underdetermination"
+        ),
         "frame_encoding": "grid_image_index refers to ordered images, oldest first",
-        "history": history_payload(history, include_grid_ascii=False),
+        "history": history_data,
         "instruction": instruction,
+        "recorded_transition_count": transition_evidence_count,
     }
     if feedback:
         request["contradiction_feedback"] = feedback

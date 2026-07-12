@@ -14,7 +14,11 @@ from .program import ExecutableHypothesis
 from .rendering import ARC_COLOR_NAMES
 from .types import Action, ActionKind, GameState, History, Observation, Prediction
 
-GOAL_ACTION_SPREAD_THRESHOLD = 1e-6
+# The planner maps unresolved goal value to cost as ``8 - 4 * goal_value``.
+# A spread of 0.0125 is therefore the smallest admitted difference that can move
+# the modeled action cost by 0.05; smaller numerical differences are not treated
+# as decision-relevant graded progress.
+GOAL_ACTION_SPREAD_THRESHOLD = 0.0125
 
 
 @dataclass(frozen=True, slots=True)
@@ -364,7 +368,7 @@ def evaluate_program_grounding(
     max_action_goal_spread = max(depth_spreads) if depth_spreads else None
     goal_action_conditioned = (
         max_action_goal_spread is not None
-        and max_action_goal_spread > GOAL_ACTION_SPREAD_THRESHOLD
+        and max_action_goal_spread >= GOAL_ACTION_SPREAD_THRESHOLD
     )
     goal_ok = (
         observed_goal_ok
@@ -427,8 +431,22 @@ def grounding_gate_reasons(
     min_tokens_per_second: float = 12.0,
     require_hard_memory_limit: bool = False,
 ) -> tuple[str, ...]:
+    """Return fail-closed reasons for the offline model-generation smoke diagnostic.
+
+    This two-graded-role diagnostic is deliberately stricter than live runtime
+    admission. It demonstrates that a candidate model/configuration can generate a
+    minimally useful committee before an expensive gameplay pilot; it does not alter
+    the controller's general runtime semantics.
+    """
+
     reasons: list[str] = []
     eligible = [program for program in programs if program.eligible]
+    eligible_graded_roles = [
+        program
+        for program in eligible
+        if program.action_sensitivity_required
+        and program.goal_conditioning_required
+    ]
     signatures = {
         program.behavior_signature
         for program in eligible
@@ -438,6 +456,8 @@ def grounding_gate_reasons(
         reasons.append("generation truncated one or more programs")
     if len(eligible) < 2:
         reasons.append("fewer than two grounded-safe programs")
+    if len(eligible_graded_roles) < 2:
+        reasons.append("fewer than two eligible graded-role programs")
     if len(signatures) < 2:
         reasons.append("fewer than two distinct grounded behavior classes")
     if not any(program.action_sensitive for program in eligible):

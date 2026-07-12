@@ -30,10 +30,10 @@ class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
     implementation_contract_version: str = "crosslevel-voi-runtime-v1"
-    prompt_contract_version: str = "grounded-actions-palette-graded-goals-v3"
+    prompt_contract_version: str = "evidence-first-visible-causal-alternatives-v4"
     perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
     prompt_contract_sha256: str = (
-        "391eadfb3bbf860cb8266fea6f4a3cd5855eb9ab60fc1610b37b66516a44b6de"
+        "e045cc2481eaaf11e2dcfaa0470d1844958a173cd9bac308eded27f896a68de3"
     )
     perception_contract_sha256: str = (
         "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0"

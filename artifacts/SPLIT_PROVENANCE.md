@@ -17,8 +17,10 @@ embeds every full game version and the immutable metadata snapshot hash.
   `76bcfd53547b4cf4c376bff45fab5511dad4bc30ccf778f2f90e07da88bef495`
 - Historical goal-v3 pilot matrix `development_matrix_goal_v3_pilot.json` SHA-256:
   `7bf39d2c1ea7c986e7c473069a8647ae8d8677b66ab5a2a510576d00b4bd3816`
-- Active runtime-v1 matrix `development_matrix.json` SHA-256:
+- Historical runtime-v1 matrix `development_matrix_runtime_v1.json` SHA-256:
   `b207c451e81ef6f6b815fbd9dc557a7149d221f8af3f7d4034f6d79325580fc7`
+- Active evidence-first-v4 matrix `development_matrix.json` SHA-256:
+  `6f7f5b9f6748cd06335eb269d6afa1277bb9b5d690feba5c082dc609d7e471d9`
 
 The unchanged split first fed the fair-v2 manifest. Its corrected four-row seed-11
 D/S/M/X pilot is retained as negative engineering evidence; the other 176 fair-v2 rows
@@ -39,14 +41,19 @@ Its variant configuration hashes were D
 `8054a950f7215ba13c28628b45eac0b49e0f7bd9b513b4194dab416176155f16`, and X
 `21a2fb16fc2865527f50efa1cf7d729c46b9689bb4eda6d8daf1c1e18434cb3c`.
 
-The active matrix freezes prompt contract `grounded-actions-palette-graded-goals-v3`,
+The superseded zero-run runtime-v1 matrix preserved the goal-v3 prompt contract and the
+post-audit admission-order/telemetry fixes. Both historical source committees then failed
+the offline runtime-admission decision-diversity gate, so all 180 rows were abandoned
+without gameplay and preserved at `development_matrix_runtime_v1.json`.
+
+The active matrix freezes prompt contract `evidence-first-visible-causal-alternatives-v4`,
 perception contract `arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
 `crosslevel-voi-runtime-v1`. It contains 180 pending rows: 15 development games, seeds
 `11`, `23`, and `47`, and variants D/S/M/X. No active-matrix gameplay has run. The active
 variant configuration hashes are D
-`189a399c2405f28ee81884db3e7f2bd64ed30c2c517d3c24de7adbb4d1467d6f`, S
-`9fe7776c7d9effad7a143d04f2d581d6eb7aaa6a23e2daac8db0bca2418dfa0e`, M
-`1f444c4170dd38fd172dae17d806434b5fe50eb1da9f2a00a7473b4bb9816919`, and X
-`5e8515c81db38475798a15d76f4379dd8a524d87a753d8bc972f6df364158c4a`.
+`00b57684f79d3c034360ce78ce2116150535133a3ebf8cbdb6df22639f4f8093`, S
+`13e353119b03f2c3500f2d15947963e9ef10a6d9cdad1bd1365fa8c257da9cc6`, M
+`9b2012320484a6087e69f409dfcf9b899cce02b46a22a1a49df47503183c7cd2`, and X
+`8b7bc51de6d6fd306141e16c76c1487ae5ec44a542dc5e48556634fe37edfede`.
 The JSON manifests use explicit LF line endings, so these digests are stable across
 Windows and Linux.

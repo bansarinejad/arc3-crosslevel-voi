@@ -6,6 +6,7 @@ import numpy as np
 import pytest
 
 from arc3_voi.grounding import (
+    GOAL_ACTION_SPREAD_THRESHOLD,
     audit_palette_claims,
     evaluate_program_grounding,
     grounding_gate_reasons,
@@ -84,10 +85,10 @@ def goal_value(history):
 """
 
 
-def _history() -> History:
+def _history(shape: tuple[int, int] = (4, 4)) -> History:
     return History.from_observation(
         Observation(
-            np.zeros((4, 4), dtype=np.int8),
+            np.zeros(shape, dtype=np.int8),
             frozenset({ActionKind.ACTION3, ActionKind.ACTION6}),
             GameState.NOT_FINISHED,
             1,
@@ -124,9 +125,21 @@ def test_general_execution_failure_is_not_mislabeled_as_coordinate_use() -> None
 
 def test_action_matrix_accepts_action6_guard_and_distinct_gate() -> None:
     actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
-    first = evaluate_program_grounding(SAFE_PROGRAM, _history(), actions, timeout_seconds=1.0)
+    first = evaluate_program_grounding(
+        SAFE_PROGRAM,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        require_action_sensitivity=True,
+        require_goal_conditioning=True,
+    )
     second = evaluate_program_grounding(
-        SECOND_SAFE_PROGRAM, _history(), actions, timeout_seconds=1.0
+        SECOND_SAFE_PROGRAM,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        require_action_sensitivity=True,
+        require_goal_conditioning=True,
     )
     assert first.eligible and second.eligible
     assert first.action_sensitive and second.action_sensitive
@@ -157,6 +170,33 @@ def test_action_matrix_accepts_action6_guard_and_distinct_gate() -> None:
     )[0]
 
 
+def test_grounding_gate_requires_two_eligible_graded_roles() -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    conservative = evaluate_program_grounding(
+        SECOND_SAFE_PROGRAM,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+    )
+    graded = evaluate_program_grounding(
+        SAFE_PROGRAM,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        require_action_sensitivity=True,
+        require_goal_conditioning=True,
+    )
+
+    reasons = grounding_gate_reasons(
+        (conservative, graded),
+        truncated_sequences=0,
+        peak_vram_gb=10.0,
+        tokens_per_second=20.0,
+    )
+
+    assert "fewer than two eligible graded-role programs" in reasons
+
+
 def test_action_sensitive_role_requires_graded_counterfactual_goal() -> None:
     actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
     result = evaluate_program_grounding(
@@ -176,6 +216,41 @@ def test_action_sensitive_role_requires_graded_counterfactual_goal() -> None:
     assert result.max_action_goal_spread == 1 / 16
     assert len(result.goal_results) == len(actions) * 4
     assert all(item.ok for item in result.goal_results)
+
+
+def test_machine_small_grid_normalized_goal_spread_fails_graded_role() -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    result = evaluate_program_grounding(
+        SAFE_PROGRAM,
+        _history((64, 64)),
+        actions,
+        timeout_seconds=1.0,
+        rollout_depth=4,
+        require_action_sensitivity=True,
+        require_goal_conditioning=True,
+    )
+
+    assert result.max_action_goal_spread == 1 / 4096
+    assert result.max_action_goal_spread < GOAL_ACTION_SPREAD_THRESHOLD
+    assert not result.goal_action_conditioned
+    assert not result.eligible
+
+
+def test_goal_spread_exactly_at_planner_relevance_threshold_is_admitted() -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    result = evaluate_program_grounding(
+        SAFE_PROGRAM,
+        _history((8, 10)),
+        actions,
+        timeout_seconds=1.0,
+        rollout_depth=4,
+        require_action_sensitivity=True,
+        require_goal_conditioning=True,
+    )
+
+    assert result.max_action_goal_spread == GOAL_ACTION_SPREAD_THRESHOLD
+    assert result.goal_action_conditioned
+    assert result.eligible
 
 
 @pytest.mark.parametrize("source", [CONSTANT_GOAL_PROGRAM, UNREACHABLE_GOAL_PROGRAM])

@@ -24,7 +24,7 @@ trigger. Kaggle additionally applies its global evaluator deadline and the 20% h
 gate.
 
 The active hashed experiment configuration freezes prompt contract
-`grounded-actions-palette-graded-goals-v3`, perception contract
+`evidence-first-visible-causal-alternatives-v4`, perception contract
 `arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
 `crosslevel-voi-runtime-v1`. The original four-row pilot used a renderer
 whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
@@ -101,8 +101,11 @@ small 0.02246-action cost range and differing optimal sets, but no observation p
 changed the weighted optimal action, so EVSI was still zero. The gate blocked a fresh pilot. See
 `artifacts/runtime_admission_goal_v3_wsl.json` and
 `artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked while the
-prompt/grounding contract is revised to require decision-relevant alternatives; no
-current-runtime gameplay-pilot pass is claimed.
+replacement evidence-first v4 prompt/grounding contract is tested. Its offline grounding
+smoke requires two eligible graded-role programs, while the stricter runtime-admission v2
+gate requires at least one material low-agreement probe with positive X utility and
+non-positive M utility. These are pre-pilot diagnostics, not performance claims. No v4
+model gate, runtime-admission pass, or gameplay-pilot pass is claimed.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no

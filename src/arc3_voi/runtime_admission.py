@@ -33,7 +33,7 @@ from .replay import history_from_records
 from .runtime.sandbox import validate_program
 from .types import Action, ActionKind, History, Prediction
 
-ADMISSION_CONTRACT_VERSION = "runtime-admission-v1"
+ADMISSION_CONTRACT_VERSION = "runtime-admission-v2"
 MATERIAL_EVSI_THRESHOLD = 0.05
 INITIAL_CROSS_LEVEL_PERSISTENCE = 0.5
 
@@ -172,12 +172,7 @@ def admission_gate_reasons(
     eligible_ids: Sequence[str],
     distinct_selected_behaviors: int,
     planner_invalid_ids: Sequence[str],
-    agreement: float | None,
-    differing_optimal_sets: bool,
-    maximum_evsi: float,
-    maximum_cross_level_utility: float,
-    agreement_threshold: float,
-    material_evsi_threshold: float = MATERIAL_EVSI_THRESHOLD,
+    x_only_probe_actions: Sequence[str],
 ) -> tuple[str, ...]:
     """Apply the conservative admission gate without any runtime side effects."""
 
@@ -192,23 +187,39 @@ def admission_gate_reasons(
     if planner_invalid_ids:
         reasons.append("one or more selected programs became invalid during depth-four planning")
 
-    low_agreement_with_positive_utility = (
-        agreement is not None
-        and agreement < agreement_threshold
-        and maximum_evsi >= material_evsi_threshold
-        and maximum_cross_level_utility > 0.0
-    )
-    differing_decisions_with_information = (
-        differing_optimal_sets and maximum_evsi >= material_evsi_threshold
-    )
-    if not (
-        low_agreement_with_positive_utility or differing_decisions_with_information
-    ):
+    if not x_only_probe_actions:
         reasons.append(
-            "no material decision diversity: require low agreement with positive "
-            "cross-level utility, or differing optimal sets with material EVSI"
+            "no X-only probe opportunity: require one action with low committee "
+            "agreement, material EVSI, positive cross-level utility, and non-positive "
+            "myopic utility"
         )
     return tuple(reasons)
+
+
+def x_only_probe_actions(
+    probe_rows: Sequence[Mapping[str, Any]],
+    *,
+    agreement: float,
+    agreement_threshold: float,
+    material_evsi_threshold: float = MATERIAL_EVSI_THRESHOLD,
+) -> tuple[str, ...]:
+    """Return probes that X would take while the myopic controller would reject."""
+
+    if not 0.0 <= agreement <= 1.0:
+        raise ValueError("agreement must be in [0, 1]")
+    if not 0.0 <= agreement_threshold <= 1.0:
+        raise ValueError("agreement_threshold must be in [0, 1]")
+    if material_evsi_threshold < 0.0:
+        raise ValueError("material_evsi_threshold must be non-negative")
+    if agreement >= agreement_threshold:
+        return ()
+    return tuple(
+        str(row["action"])
+        for row in probe_rows
+        if float(row["evsi"]) >= material_evsi_threshold
+        and float(row["cross_level_utility"]) > 0.0
+        and float(row["myopic_utility"]) <= 0.0
+    )
 
 
 def run_runtime_admission_audit(
@@ -322,6 +333,7 @@ def run_runtime_admission_audit(
             win_levels=int(records[-1]["win_levels"]),
             persistence=INITIAL_CROSS_LEVEL_PERSISTENCE,
             risk_coefficient=config.planning.risk_coefficient,
+            agreement_threshold=config.planning.agreement_threshold,
         )
         selected_ids = tuple(hypothesis.hypothesis_id for hypothesis in selected)
         selected_behavior_signatures = {
@@ -335,11 +347,7 @@ def run_runtime_admission_audit(
             eligible_ids=eligible_ids,
             distinct_selected_behaviors=len(selected_behavior_signatures),
             planner_invalid_ids=planner_invalid_ids,
-            agreement=planning["agreement"],
-            differing_optimal_sets=planning["differing_optimal_sets"],
-            maximum_evsi=planning["maximum_evsi"],
-            maximum_cross_level_utility=planning["maximum_cross_level_utility"],
-            agreement_threshold=config.planning.agreement_threshold,
+            x_only_probe_actions=planning["x_only_probe_actions"],
         )
         ineligible_selected = sorted(set(selected_ids) - set(eligible_ids))
         return {
@@ -375,9 +383,9 @@ def run_runtime_admission_audit(
                 ),
                 "admission_rule": (
                     "at least two eligible distinct selected programs, no selected "
-                    "grounding failures or planner invalids, and either agreement below "
-                    "threshold with material EVSI and positive cross-level utility, or "
-                    "differing optimal action sets with material EVSI"
+                    "grounding failures or planner invalids, and at least one action with "
+                    "agreement below threshold, material EVSI, positive cross-level "
+                    "utility, and non-positive myopic utility"
                 ),
             },
             "history": {
@@ -418,6 +426,7 @@ def _planning_report(
     win_levels: int,
     persistence: float,
     risk_coefficient: float,
+    agreement_threshold: float,
 ) -> dict[str, Any]:
     m_multiplier = 1.0
     x_multiplier = level_multiplier(level, win_levels, persistence)
@@ -437,6 +446,7 @@ def _planning_report(
             "maximum_evsi": 0.0,
             "maximum_myopic_utility": -1.0,
             "maximum_cross_level_utility": -1.0,
+            "x_only_probe_actions": [],
         }
 
     agreement = committee_agreement(snapshot.actions, snapshot.costs, snapshot.weights)
@@ -494,6 +504,11 @@ def _planning_report(
                 }
             ),
         }
+    x_only_actions = x_only_probe_actions(
+        probe_rows,
+        agreement=agreement,
+        agreement_threshold=agreement_threshold,
+    )
     return {
         "hypothesis_ids": list(snapshot.hypothesis_ids),
         "invalid_hypothesis_ids": list(snapshot.invalid_hypothesis_ids),
@@ -511,6 +526,7 @@ def _planning_report(
         "maximum_cross_level_utility": max(
             row["cross_level_utility"] for row in probe_rows
         ),
+        "x_only_probe_actions": list(x_only_actions),
     }
 
 
@@ -673,4 +689,5 @@ __all__ = [
     "evaluate_source_programs",
     "role_requirements",
     "run_runtime_admission_audit",
+    "x_only_probe_actions",
 ]

@@ -11,7 +11,7 @@ def test_inherited_local_model_config_loads() -> None:
     assert config.experiment.max_environment_actions == 256
     assert (
         config.experiment.prompt_contract_version
-        == "grounded-actions-palette-graded-goals-v3"
+        == "evidence-first-visible-causal-alternatives-v4"
     )
     assert (
         config.experiment.perception_contract_version

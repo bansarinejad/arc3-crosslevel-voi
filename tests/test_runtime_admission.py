@@ -7,11 +7,11 @@ from types import SimpleNamespace
 import numpy as np
 
 from arc3_voi.runtime_admission import (
-    MATERIAL_EVSI_THRESHOLD,
     EvaluatedSource,
     admission_gate_reasons,
     construct_eligible_hypotheses,
     role_requirements,
+    x_only_probe_actions,
 )
 from arc3_voi.types import Action, ActionKind, GameState, History, Observation, Prediction
 
@@ -115,29 +115,55 @@ def test_admission_gate_fails_closed_without_material_decision_diversity() -> No
         eligible_ids=("a", "b"),
         distinct_selected_behaviors=2,
         planner_invalid_ids=(),
-        agreement=1.0,
-        differing_optimal_sets=False,
-        maximum_evsi=MATERIAL_EVSI_THRESHOLD - 1e-6,
-        maximum_cross_level_utility=1.0,
-        agreement_threshold=0.8,
+        x_only_probe_actions=(),
     )
 
     assert reasons == (
-        "no material decision diversity: require low agreement with positive "
-        "cross-level utility, or differing optimal sets with material EVSI",
+        "no X-only probe opportunity: require one action with low committee agreement, "
+        "material EVSI, positive cross-level utility, and non-positive myopic utility",
     )
 
 
-def test_admission_gate_accepts_differing_optima_with_material_evsi() -> None:
+def test_admission_gate_accepts_an_x_only_probe_opportunity() -> None:
     assert not admission_gate_reasons(
         selected_ids=("a", "b"),
         eligible_ids=("a", "b"),
         distinct_selected_behaviors=2,
         planner_invalid_ids=(),
-        agreement=1.0,
-        differing_optimal_sets=True,
-        maximum_evsi=MATERIAL_EVSI_THRESHOLD,
-        maximum_cross_level_utility=-0.5,
+        x_only_probe_actions=("ACTION6(1,2)",),
+    )
+
+
+def test_x_only_probe_requires_every_controller_condition_on_the_same_action() -> None:
+    rows = (
+        {
+            "action": "ACTION6(1,2)",
+            "evsi": 0.05,
+            "myopic_utility": -0.95,
+            "cross_level_utility": 0.15,
+        },
+        {
+            "action": "ACTION6(2,3)",
+            "evsi": 0.049,
+            "myopic_utility": -0.951,
+            "cross_level_utility": 0.127,
+        },
+        {
+            "action": "ACTION6(3,4)",
+            "evsi": 0.1,
+            "myopic_utility": 0.1,
+            "cross_level_utility": 1.3,
+        },
+    )
+
+    assert x_only_probe_actions(
+        rows,
+        agreement=0.79,
+        agreement_threshold=0.8,
+    ) == ("ACTION6(1,2)",)
+    assert not x_only_probe_actions(
+        rows,
+        agreement=0.8,
         agreement_threshold=0.8,
     )
 
@@ -148,11 +174,7 @@ def test_admission_gate_reports_grounding_selection_and_planner_failures() -> No
         eligible_ids=("a",),
         distinct_selected_behaviors=1,
         planner_invalid_ids=("bad",),
-        agreement=0.5,
-        differing_optimal_sets=True,
-        maximum_evsi=1.0,
-        maximum_cross_level_utility=1.0,
-        agreement_threshold=0.8,
+        x_only_probe_actions=("ACTION6(1,2)",),
     )
 
     assert "one or more selected programs failed role-specific grounding" in reasons
