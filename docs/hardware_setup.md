@@ -34,3 +34,10 @@ Dependency consistency and a BF16 CUDA matrix multiplication both pass. The mode
 grounding gate artifacts are regenerated separately before gameplay. The machine-readable
 stack evidence is `artifacts/wsl_stack_check.json`. Close GPU-heavy desktop applications
 because the 4090 Laptop GPU has only 16 GiB physical VRAM.
+
+The exact WSL eight-frame preflight passes with 4/4 statically valid programs, no
+truncation, 9.35 GiB peak VRAM, and 26.64 generated tokens/s. Loading the model directly
+from `/mnt/d` was aborted after three minutes at 6% because safetensors tensor mappings were
+dominated by the `p9` bridge. Copying the manifest-verified snapshot to
+`/home/bansarinejad/models/Qwen3.5-4B` reduced weight loading to about one second. See
+`artifacts/model_gate_live8_wsl.json`.

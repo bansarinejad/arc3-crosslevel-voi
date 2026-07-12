@@ -23,9 +23,10 @@ does not contain code from Duck or other competition entries.
   `artifacts/official_model_smoke.json`.
 - Verified the WSL reference stack: Ubuntu 24.04.1, Python 3.12.3, Torch 2.11.0+cu130,
   CUDA 13.0, driver 581.15, `sm_89`, bitsandbytes 0.49.2, and Transformers 5.13.1.
-  Dependency consistency and a BF16 CUDA operation pass. Model and grounding gates are
-  being regenerated under this exact stack before gameplay. See
-  `artifacts/wsl_stack_check.json`.
+  Dependency consistency and a BF16 CUDA operation pass. See `artifacts/wsl_stack_check.json`.
+- Passed the WSL eight-frame 4B model gate from the manifest-verified native model copy:
+  4/4 programs statically valid, no truncation, 9.35 GiB peak VRAM, and 26.64 generated
+  tokens/s. See `artifacts/model_gate_live8_wsl.json`.
 - Preserved earlier official-palette Windows model and grounding checks as diagnostics only;
   their artifacts predate contract-content fingerprints and the checked-in history fixture,
   so they are explicitly marked superseded.
@@ -38,8 +39,8 @@ does not contain code from Duck or other competition entries.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official
-4B BF16 fallback is the selected candidate pending the WSL model gate. There are deliberately
-no corrected-contract controlled gameplay scores or positive cross-level performance claims
+The 4B BF16 fallback is the selected local model. There are deliberately no
+corrected-contract controlled gameplay scores or positive cross-level performance claims
 until the controlled matrices are executed.
 
 ## Quick start

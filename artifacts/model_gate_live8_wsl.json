@@ -1,0 +1,87 @@
+{
+  "config_sha256": "11b42cf6d1adc3c6e4f0771705723c4f376d174e77d9c8f1d620e8f1bc04b514",
+  "elapsed_seconds": 27.63156238700003,
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "fits_vram_gate": true,
+  "git": {
+    "commit": "9a648003be11fbe913e817ab59a679205d00f721",
+    "dirty": false,
+    "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "total_vram_gb": 15.99169921875
+  },
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "output_tokens": 736,
+  "passes_runtime_gate": null,
+  "passes_throughput_gate": true,
+  "peak_vram_gb": 9.353718757629395,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "program_source_lengths": [
+    1025,
+    369,
+    351,
+    609
+  ],
+  "program_source_sha256": [
+    "39df6eb55e498ed6c7926b0b6ab8749a84f2d11cd6e5651c4d1dac94282cb167",
+    "fb7ad97ebc3984a401350af8de1600760c83d31db30c8c848df3c95dc8b94126",
+    "663463eda5a601a34e27083a2f89011b035d8f7c810d96a4b9df672c10403909",
+    "dfeb613655c253af98bfa058df0a2a203d32810261ce356684dcb9c0b9a2ecc1"
+  ],
+  "program_sources": [
+    "def predict(history, action):\n    # Extract the current grid from the latest frame\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    \n    # If this is an ACTION6, it carries coordinates to modify a specific cell\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Cycle through palette values 0-15 for the targeted cell\n        current_val = int(grid[row, col])\n        next_val = (current_val + 1) % 16\n        grid[row, col] = next_val\n\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # The goal is to reach the maximum palette value (15)\n    # by filling the row from left to right with sequential colors.\n    # Check if the last cell in the row is 15.\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    row = 6  # The active row index based on the history progression\n    last_cell = int(grid[row, -1])\n    \n    if last_cell == 15:\n        return 1.0\n    return 0.0",
+    "def predict(history, action):\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    if kind == 6:\n        grid[row, col] = 5\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.0",
+    "def predict(history, action):\n    kind = int(action.kind)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        grid[row, col] = 0\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.0",
+    "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Fill the entire row\n        grid[row, :] = 5\n    elif kind == 1:\n        # Fill top row\n        grid[0, :] = 5\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    last_grid = np.array(history.frames[-1], dtype=np.int8)\n    # Check if entire row 0 is filled (value 5)\n    if np.all(last_grid[0, :] == 5):\n        return 1.0\n    return 0.0"
+  ],
+  "projected_p95_seconds": null,
+  "prompt_contract_sha256": "b405470f41323c27d94f4f19d9860a0473e43b18c80100b6e66b83b1b129aad9",
+  "prompt_contract_version": "grounded-actions-palette-v1",
+  "requested_sequences": 4,
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "5.15.167.4-microsoft-standard-WSL2",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "runtime_fraction": null,
+  "statically_valid_programs": 4,
+  "syntactically_valid_programs": 4,
+  "tokens_per_second": 26.63620644000463,
+  "truncated_sequences": 0,
+  "validation_failures": {}
+}
