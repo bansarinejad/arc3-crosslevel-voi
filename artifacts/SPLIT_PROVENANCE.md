@@ -19,8 +19,10 @@ embeds every full game version and the immutable metadata snapshot hash.
   `7bf39d2c1ea7c986e7c473069a8647ae8d8677b66ab5a2a510576d00b4bd3816`
 - Historical runtime-v1 matrix `development_matrix_runtime_v1.json` SHA-256:
   `b207c451e81ef6f6b815fbd9dc557a7149d221f8af3f7d4034f6d79325580fc7`
-- Active evidence-first-v4 matrix `development_matrix.json` SHA-256:
+- Historical evidence-first-v4 matrix `development_matrix_visible_causal_v4.json` SHA-256:
   `6f7f5b9f6748cd06335eb269d6afa1277bb9b5d690feba5c082dc609d7e471d9`
+- Active repair-enabled-v5 matrix `development_matrix.json` SHA-256:
+  `ea2dbc2eec0159e63452ab805545021d5101a17882402dd3bc9869fc39241147`
 
 The unchanged split first fed the fair-v2 manifest. Its corrected four-row seed-11
 D/S/M/X pilot is retained as negative engineering evidence; the other 176 fair-v2 rows
@@ -46,14 +48,19 @@ post-audit admission-order/telemetry fixes. Both historical source committees th
 the offline runtime-admission decision-diversity gate, so all 180 rows were abandoned
 without gameplay and preserved at `development_matrix_runtime_v1.json`.
 
-The active matrix freezes prompt contract `evidence-first-visible-causal-alternatives-v4`,
+The zero-run evidence-first-v4 matrix was superseded after its first Windows grounding
+smoke produced no eligible program. The retained artifact also has an invalid concurrent
+throughput measurement and is not gate evidence. Its matrix is preserved at
+`development_matrix_visible_causal_v4.json` without gameplay.
+
+The active matrix freezes prompt contract `evidence-first-visible-causal-alternatives-v5`,
 perception contract `arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
-`crosslevel-voi-runtime-v1`. It contains 180 pending rows: 15 development games, seeds
+`crosslevel-voi-runtime-v2`. It contains 180 pending rows: 15 development games, seeds
 `11`, `23`, and `47`, and variants D/S/M/X. No active-matrix gameplay has run. The active
 variant configuration hashes are D
-`00b57684f79d3c034360ce78ce2116150535133a3ebf8cbdb6df22639f4f8093`, S
-`13e353119b03f2c3500f2d15947963e9ef10a6d9cdad1bd1365fa8c257da9cc6`, M
-`9b2012320484a6087e69f409dfcf9b899cce02b46a22a1a49df47503183c7cd2`, and X
-`8b7bc51de6d6fd306141e16c76c1487ae5ec44a542dc5e48556634fe37edfede`.
+`e56fe0e2a55e344edc53bd0d5f09c448305da3b07825c8d12798c935e51a68e6`, S
+`e254bbf925180ac197696913250cbbbab1b454a3f163391b470912e270bb0ded`, M
+`bd35d59f73baa0fe09d3e00aa6d4541c05505135da620fbe2556ccf1533bf13f`, and X
+`6e84fd03aea5012a8360410dc9386913d7767dd71377c2d5bdde6e374aa79c0e`.
 The JSON manifests use explicit LF line endings, so these digests are stable across
 Windows and Linux.

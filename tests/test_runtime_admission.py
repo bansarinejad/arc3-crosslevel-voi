@@ -5,11 +5,14 @@ from dataclasses import dataclass
 from types import SimpleNamespace
 
 import numpy as np
+import pytest
 
 from arc3_voi.runtime_admission import (
     EvaluatedSource,
+    _grounding_schema_version,
     admission_gate_reasons,
     construct_eligible_hypotheses,
+    evaluate_source_programs,
     role_requirements,
     x_only_probe_actions,
 )
@@ -30,9 +33,7 @@ class _FakeHypothesis:
     def predict(self, history: History, action: Action) -> Prediction:
         del action
         value = 1 if self.source == "eligible" else 2
-        return Prediction(
-            np.full_like(history.latest_grid, value), GameState.NOT_FINISHED, 0
-        )
+        return Prediction(np.full_like(history.latest_grid, value), GameState.NOT_FINISHED, 0)
 
     def goal_value(self, history: History) -> float:
         del history
@@ -46,6 +47,102 @@ def test_role_requirements_reserve_only_candidate_zero_as_conservative() -> None
     assert role_requirements(0) == (False, False)
     assert role_requirements(1) == (True, True)
     assert role_requirements(3) == (True, True)
+
+
+def test_runtime_admission_accepts_historical_v4_and_multibatch_v5_schemas() -> None:
+    assert _grounding_schema_version({"schema_version": 4}) == 4
+    assert _grounding_schema_version({"schema_version": 5}) == 5
+    with pytest.raises(ValueError, match="schema-v4 or schema-v5"):
+        _grounding_schema_version({"schema_version": 6})
+
+
+def test_schema_v5_batch_local_role_index_resets_candidate_zero() -> None:
+    source = """
+def predict(history, action):
+    return {
+        "next_grid": history.frames[-1].copy(),
+        "game_state": "NOT_FINISHED",
+        "level_delta": 0,
+        "memory": {},
+    }
+def goal_value(history):
+    return 0.0
+"""
+    digest = hashlib.sha256(source.encode()).hexdigest()
+    rows = (
+        {
+            "candidate_index": 0,
+            "batch_index": 0,
+            "batch_candidate_index": 0,
+            "assigned_role": "conservative",
+            "source": source,
+            "source_sha256": digest,
+        },
+        {
+            "candidate_index": 1,
+            "batch_index": 1,
+            "batch_candidate_index": 0,
+            "assigned_role": "conservative repair",
+            "source": source,
+            "source_sha256": digest,
+        },
+    )
+    history = History.from_observation(
+        Observation(
+            np.zeros((2, 2), dtype=np.int16),
+            frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
+            GameState.NOT_FINISHED,
+            level=1,
+            win_levels=2,
+        )
+    )
+
+    evaluated = evaluate_source_programs(
+        rows,
+        history,
+        (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2)),
+        timeout_seconds=1.0,
+        memory_limit_mb=256,
+        rollout_depth=2,
+    )
+
+    assert [item.result.action_sensitivity_required for item in evaluated] == [
+        False,
+        False,
+    ]
+    assert all(item.result.eligible for item in evaluated)
+
+
+@pytest.mark.parametrize(
+    "rows",
+    [
+        (
+            {"candidate_index": 0, "batch_index": 0, "batch_candidate_index": 0},
+            {"candidate_index": 1},
+        ),
+        ({"candidate_index": 0, "batch_index": 0},),
+    ],
+)
+def test_schema_v5_rejects_mixed_or_incomplete_batch_metadata(rows: tuple[dict, ...]) -> None:
+    history = History.from_observation(
+        Observation(
+            np.zeros((2, 2), dtype=np.int16),
+            frozenset({ActionKind.ACTION1}),
+            GameState.NOT_FINISHED,
+            level=1,
+            win_levels=2,
+        )
+    )
+
+    with pytest.raises(ValueError, match="batch"):
+        evaluate_source_programs(
+            rows,
+            history,
+            (Action(ActionKind.ACTION1),),
+            timeout_seconds=1.0,
+            memory_limit_mb=256,
+            rollout_depth=2,
+        )
 
 
 def test_ineligible_source_is_filtered_before_persistent_worker_construction() -> None:

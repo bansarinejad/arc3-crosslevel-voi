@@ -15,7 +15,7 @@ from .controller import (
     RefreshResult,
     Variant,
 )
-from .grounding import evaluate_program_grounding
+from .grounding_repair import generate_grounded_program_batches
 from .hypothesis import (
     HypothesisPool,
     WeightedHypothesis,
@@ -23,7 +23,7 @@ from .hypothesis import (
     replay_cumulative_loss,
 )
 from .model import ModelBackend
-from .program import ExecutableHypothesis, candidate_points_from_source
+from .program import ExecutableHypothesis
 from .types import Action, ActionKind, Budget, History
 
 
@@ -70,58 +70,42 @@ class _HypothesisGenerator:
                 + ", ".join(f"{value:.4f}" for value in current.recent_weighted_losses)
                 + ". Propose materially different rules that explain the contradiction."
             )
-        generation_count = min(target, budget.remaining_generated_tokens)
-        if generation_count <= 0:
-            return RefreshResult(self._current_or_empty(target), 0)
-        per_sequence_limit = min(
-            self.config.generation.max_new_tokens_per_hypothesis,
-            budget.remaining_generated_tokens // generation_count,
+        batches_already_used = (
+            0 if self.controller is None else self.controller.generation_batches_used
         )
-        result = self.backend.generate_programs(
+        grounded_generation = generate_grounded_program_batches(
+            self.backend,
             history,
-            generation_count,
-            feedback=feedback,
-            max_new_tokens=per_sequence_limit,
-            max_wall_seconds=budget.remaining_wall_seconds,
-        )
-
-        grounding_points = tuple(
-            point for source in result.texts for point in candidate_points_from_source(source)
-        )
-        grounding_actions = candidates_from_history(
-            history,
-            cached_points=grounding_points,
+            variant=variant,
+            target=target,
+            initial_feedback=feedback,
+            max_new_tokens_per_hypothesis=(self.config.generation.max_new_tokens_per_hypothesis),
             max_candidates=self.config.planning.max_candidates,
+            timeout_seconds=self.config.sandbox.timeout_ms / 1000,
+            memory_limit_mb=self.config.sandbox.memory_mb,
+            rollout_depth=self.config.planning.depth,
+            remaining_generated_tokens=budget.remaining_generated_tokens,
+            remaining_wall_seconds=budget.remaining_wall_seconds,
+            remaining_generation_batches=(
+                self.config.experiment.max_generation_batches - batches_already_used
+            ),
         )
+        evaluated = grounded_generation.programs
+
         generated: list[ExecutableHypothesis] = []
         invalid_programs = 0
         grounding_eligible_programs = 0
         grounding_rejected_programs = 0
-        for source_index, source in enumerate(result.texts):
-            require_discriminative_behavior = source_index > 0
-            try:
-                grounding = evaluate_program_grounding(
-                    source,
-                    history,
-                    grounding_actions,
-                    timeout_seconds=self.config.sandbox.timeout_ms / 1000,
-                    memory_limit_mb=self.config.sandbox.memory_mb,
-                    rollout_depth=self.config.planning.depth,
-                    require_action_sensitivity=require_discriminative_behavior,
-                    require_goal_conditioning=require_discriminative_behavior,
-                )
-            except Exception:
-                grounding_rejected_programs += 1
-                invalid_programs += 1
-                continue
-            if not grounding.eligible:
+        for item in evaluated:
+            grounding = item.result
+            if grounding is None or not grounding.eligible:
                 grounding_rejected_programs += 1
                 invalid_programs += 1
                 continue
             grounding_eligible_programs += 1
             try:
                 hypothesis = ExecutableHypothesis(
-                    source,
+                    item.source,
                     timeout_seconds=self.config.sandbox.timeout_ms / 1000,
                     memory_limit_mb=self.config.sandbox.memory_mb,
                 )
@@ -209,13 +193,31 @@ class _HypothesisGenerator:
                 self._retire(self._owned.pop(hypothesis_id))
         return RefreshResult(
             pool,
-            result.output_tokens,
+            grounded_generation.output_tokens,
             invalid_programs=invalid_programs,
-            peak_vram_gb=result.peak_vram_gb,
-            generated_sources=result.texts,
+            peak_vram_gb=max(
+                (
+                    batch.generation.peak_vram_gb
+                    for batch in grounded_generation.batches
+                    if batch.generation.peak_vram_gb is not None
+                ),
+                default=None,
+            ),
+            generated_sources=tuple(
+                source for batch in grounded_generation.batches for source in batch.generation.texts
+            ),
             grounding_eligible_programs=grounding_eligible_programs,
             grounding_rejected_programs=grounding_rejected_programs,
             grounding_selected_hypothesis_ids=grounding_selected_hypothesis_ids,
+            generation_batches_used=len(grounded_generation.batches),
+            generation_batch_output_tokens=tuple(
+                batch.generation.output_tokens for batch in grounded_generation.batches
+            ),
+            generated_source_batches=tuple(
+                batch.generation.texts for batch in grounded_generation.batches
+            ),
+            grounding_repair_attempts=grounded_generation.repair_attempts,
+            grounding_repair_feedback=grounded_generation.repair_feedback,
         )
 
     def _current_or_empty(self, target: int) -> HypothesisPool:

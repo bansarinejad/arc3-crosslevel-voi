@@ -10,13 +10,9 @@ def test_inherited_local_model_config_loads() -> None:
     config = load_config("configs/local_9b.yaml")
     assert config.experiment.max_environment_actions == 256
     assert (
-        config.experiment.prompt_contract_version
-        == "evidence-first-visible-causal-alternatives-v4"
+        config.experiment.prompt_contract_version == "evidence-first-visible-causal-alternatives-v5"
     )
-    assert (
-        config.experiment.perception_contract_version
-        == "arc-agi-0.9.9-color-map-scale8-grid-v1"
-    )
+    assert config.experiment.perception_contract_version == "arc-agi-0.9.9-color-map-scale8-grid-v1"
     assert config.experiment.prompt_contract_sha256 == PROMPT_CONTRACT_SHA256
     assert config.experiment.perception_contract_sha256 == PERCEPTION_CONTRACT_SHA256
     assert config.model is not None
@@ -32,7 +28,7 @@ def test_inherited_local_model_config_loads() -> None:
 def test_bare_experiment_defaults_match_implemented_prompt_contract() -> None:
     config = ExperimentConfig()
 
-    assert config.implementation_contract_version == "crosslevel-voi-runtime-v1"
+    assert config.implementation_contract_version == "crosslevel-voi-runtime-v2"
     assert config.prompt_contract_version == PROMPT_CONTRACT_VERSION
     assert config.prompt_contract_sha256 == PROMPT_CONTRACT_SHA256
 

@@ -188,34 +188,37 @@ SAFE_METHOD_CALLS = frozenset(
 # Attribute reads are useful for dataclass-like History/Action values and NumPy
 # array metadata.  Inputs are converted to inert records before user code sees
 # them, and stores through attributes are never allowed.
-SAFE_DATA_ATTRIBUTES = frozenset(
-    {
-        "T",
-        "actions",
-        "available_action_sets",
-        "available_actions",
-        "dtype",
-        "frames",
-        "game_state",
-        "game_states",
-        "kind",
-        "level_delta",
-        "level_deltas",
-        "levels",
-        "current_level",
-        "memory",
-        "ndim",
-        "next_grid",
-        "row",
-        "shape",
-        "size",
-        "stable_frames",
-        "win_levels",
-        "x",
-        "y",
-        "col",
-    }
-) | SAFE_METHOD_CALLS
+SAFE_DATA_ATTRIBUTES = (
+    frozenset(
+        {
+            "T",
+            "actions",
+            "available_action_sets",
+            "available_actions",
+            "dtype",
+            "frames",
+            "game_state",
+            "game_states",
+            "kind",
+            "level_delta",
+            "level_deltas",
+            "levels",
+            "current_level",
+            "memory",
+            "ndim",
+            "next_grid",
+            "row",
+            "shape",
+            "size",
+            "stable_frames",
+            "win_levels",
+            "x",
+            "y",
+            "col",
+        }
+    )
+    | SAFE_METHOD_CALLS
+)
 
 _REQUIRED_SIGNATURES = {"predict": ("history", "action"), "goal_value": ("history",)}
 _RESERVED_NAMES = SAFE_BUILTIN_CALLS | {"np", "__builtins__"}
@@ -304,7 +307,6 @@ _ALLOWED_NODE_TYPES = (
     ast.While,
     ast.Break,
     ast.Continue,
-    ast.Pass,
     ast.BoolOp,
     ast.BinOp,
     ast.UnaryOp,

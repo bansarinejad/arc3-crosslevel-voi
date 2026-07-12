@@ -61,20 +61,14 @@ def test_transport_reuses_only_immutable_contiguous_arrays() -> None:
     aliased = np.arange(16, dtype=np.int16).reshape(4, 4)
     aliased.flags.writeable = False
 
-    assert (
-        worker_runtime._transport_value(immutable, path="history.frames[0]")
-        is immutable
-    )
+    assert worker_runtime._transport_value(immutable, path="history.frames[0]") is immutable
     writable_copy = worker_runtime._transport_value(
         writable,
         path="history.frames[0]",
     )
     assert writable_copy is not writable
     assert np.array_equal(writable_copy, writable)
-    assert (
-        worker_runtime._transport_value(aliased, path="history.frames[0]")
-        is not aliased
-    )
+    assert worker_runtime._transport_value(aliased, path="history.frames[0]") is not aliased
 
 
 def test_validation_canonicalizes_source_and_counts_ast_nodes() -> None:
@@ -125,7 +119,8 @@ def goal_value(history):
         ("np.save('grid.npy', history.frames[-1])\n    return {}", ValidationCode.DISALLOWED_CALL),
         ("return history.system('whoami')", ValidationCode.DISALLOWED_CALL),
         ("helper = lambda: 1\n    return helper()", ValidationCode.DISALLOWED_NODE),
-        ("while True:\n        pass\n    return {}", None),
+        ("pass\n    return {}", ValidationCode.DISALLOWED_NODE),
+        ("while True:\n        value = 0\n    return {}", None),
     ],
 )
 def test_validator_rejects_unsafe_constructs(
@@ -436,7 +431,7 @@ def test_infinite_generated_code_times_out_and_worker_is_retired() -> None:
     source = """
 def predict(history, action):
     while True:
-        pass
+        value = 0
 def goal_value(history):
     return 0.0
 """
@@ -463,6 +458,4 @@ def goal_value(history):
 """
     with pytest.raises(SandboxValidationError) as captured:
         validate_program(source)
-    assert ValidationCode.DISALLOWED_ATTRIBUTE in {
-        issue.code for issue in captured.value.issues
-    }
+    assert ValidationCode.DISALLOWED_ATTRIBUTE in {issue.code for issue in captured.value.issues}

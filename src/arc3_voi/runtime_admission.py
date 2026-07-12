@@ -76,7 +76,17 @@ def evaluate_source_programs(
     are deliberately constructed later, after this eligibility boundary.
     """
 
+    batch_metadata_rows = [
+        "batch_index" in row or "batch_candidate_index" in row for row in source_rows
+    ]
+    if any(batch_metadata_rows) and not all(batch_metadata_rows):
+        raise ValueError("source rows cannot mix legacy and batch-aware metadata")
+    if any(("batch_index" in row) != ("batch_candidate_index" in row) for row in source_rows):
+        raise ValueError("source rows must provide both batch metadata fields")
+
     evaluated: list[EvaluatedSource] = []
+    next_batch_candidate: dict[int, int] = {}
+    last_batch_index = 0
     for expected_index, row in enumerate(source_rows):
         index = row.get("candidate_index")
         if index != expected_index:
@@ -91,7 +101,33 @@ def evaluate_source_programs(
         actual_sha = hashlib.sha256(source.encode("utf-8")).hexdigest()
         if declared_sha != actual_sha:
             raise ValueError(f"candidate {expected_index} source digest mismatch")
-        require_sensitivity, require_goal = role_requirements(expected_index)
+        has_batch_metadata = "batch_index" in row or "batch_candidate_index" in row
+        if has_batch_metadata:
+            batch_index = row.get("batch_index")
+            role_index = row.get("batch_candidate_index")
+            if (
+                isinstance(batch_index, bool)
+                or not isinstance(batch_index, int)
+                or batch_index < 0
+                or isinstance(role_index, bool)
+                or not isinstance(role_index, int)
+                or role_index < 0
+            ):
+                raise ValueError("source batch indices must be non-negative integers")
+            if expected_index == 0 and batch_index != 0:
+                raise ValueError("source batches must start at batch zero")
+            if batch_index < last_batch_index or batch_index > last_batch_index + 1:
+                raise ValueError("source batches must be contiguous and ordered")
+            last_batch_index = batch_index
+            expected_role_index = next_batch_candidate.get(batch_index, 0)
+            if role_index != expected_role_index:
+                raise ValueError(
+                    "source batch candidate indices must be contiguous and reset per batch"
+                )
+            next_batch_candidate[batch_index] = expected_role_index + 1
+        else:
+            role_index = expected_index
+        require_sensitivity, require_goal = role_requirements(role_index)
         try:
             hypothesis_id = validate_program(source).sha256
         except Exception:
@@ -106,9 +142,7 @@ def evaluate_source_programs(
             require_action_sensitivity=require_sensitivity,
             require_goal_conditioning=require_goal,
         )
-        evaluated.append(
-            EvaluatedSource(expected_index, role, source, hypothesis_id, result)
-        )
+        evaluated.append(EvaluatedSource(expected_index, role, source, hypothesis_id, result))
     return tuple(evaluated)
 
 
@@ -232,8 +266,7 @@ def run_runtime_admission_audit(
 
     grounding_artifact = _load_json_object(grounding_artifact_path)
     fixture = _load_json_object(fixture_path)
-    if grounding_artifact.get("schema_version") != 4:
-        raise ValueError("runtime admission requires a schema-v4 grounding artifact")
+    _grounding_schema_version(grounding_artifact)
     if fixture.get("schema_version") != 1:
         raise ValueError("runtime admission requires a schema-v1 history fixture")
     _validate_contract_identity(grounding_artifact, config)
@@ -258,9 +291,7 @@ def run_runtime_admission_audit(
         _require_mapping(row, "program") for row in raw_programs
     )
     cached_points = tuple(
-        point
-        for row in source_rows
-        for point in candidate_points_from_source(str(row["source"]))
+        point for row in source_rows for point in candidate_points_from_source(str(row["source"]))
     )
     actions = candidates_from_history(
         history,
@@ -319,9 +350,7 @@ def run_runtime_admission_audit(
             except PlanningError as exc:
                 planner_error = str(exc)
                 snapshot = None
-                planner_invalid_ids = tuple(
-                    hypothesis.hypothesis_id for hypothesis in selected
-                )
+                planner_invalid_ids = tuple(hypothesis.hypothesis_id for hypothesis in selected)
             else:
                 planner_invalid_ids = snapshot.invalid_hypothesis_ids
         else:
@@ -339,8 +368,7 @@ def run_runtime_admission_audit(
         selected_behavior_signatures = {
             item.result.behavior_signature
             for item in evaluated
-            if item.hypothesis_id in selected_ids
-            and item.result.behavior_signature is not None
+            if item.hypothesis_id in selected_ids and item.result.behavior_signature is not None
         }
         reasons = admission_gate_reasons(
             selected_ids=selected_ids,
@@ -363,13 +391,9 @@ def run_runtime_admission_audit(
                 "fixture": _repo_relative_path(fixture_path),
                 "fixture_sha256": fixture_sha,
                 "history_canonical_sha256": history_sha,
-                "source_base_config_sha256": grounding_artifact.get(
-                    "base_config_sha256"
-                ),
+                "source_base_config_sha256": grounding_artifact.get("base_config_sha256"),
                 "current_config_sha256": stable_config_hash(config),
-                "source_prompt_contract_version": grounding_artifact.get(
-                    "prompt_contract_version"
-                ),
+                "source_prompt_contract_version": grounding_artifact.get("prompt_contract_version"),
             },
             "contract": {
                 "planning_depth": config.planning.depth,
@@ -405,9 +429,7 @@ def run_runtime_admission_audit(
                 "selected_ids": list(selected_ids),
                 "ineligible_selected_ids": ineligible_selected,
                 "behavioral_deduplicated_ids": list(deduplicated_ids),
-                "distinct_selected_behavior_classes": len(
-                    selected_behavior_signatures
-                ),
+                "distinct_selected_behavior_classes": len(selected_behavior_signatures),
                 "filter_precedes_persistent_worker_construction": True,
             },
             "planning": planning,
@@ -450,17 +472,13 @@ def _planning_report(
         }
 
     agreement = committee_agreement(snapshot.actions, snapshot.costs, snapshot.weights)
-    indifference = committee_indifference(
-        snapshot.actions, snapshot.costs, snapshot.weights
-    )
+    indifference = committee_indifference(snapshot.actions, snapshot.costs, snapshot.weights)
     optimal_sets = _optimal_action_sets(snapshot)
     differing_optimal_sets = len({tuple(value) for value in optimal_sets.values()}) > 1
     probe_rows: list[dict[str, Any]] = []
     for action in snapshot.actions:
         predictions = snapshot.predictions[action]
-        evsi = weighted_evsi(
-            predictions, snapshot.actions, snapshot.costs, snapshot.weights
-        )
+        evsi = weighted_evsi(predictions, snapshot.actions, snapshot.costs, snapshot.weights)
         catastrophe = catastrophe_probability(predictions, snapshot.weights)
         probe_rows.append(
             {
@@ -494,15 +512,8 @@ def _planning_report(
             "minimum": minimum,
             "maximum": maximum,
             "range": maximum - minimum,
-            "action_varying": not isclose(
-                minimum, maximum, rel_tol=1e-12, abs_tol=1e-12
-            ),
-            "distinct_costs": len(
-                {
-                    round(value, 12)
-                    for value in values
-                }
-            ),
+            "action_varying": not isclose(minimum, maximum, rel_tol=1e-12, abs_tol=1e-12),
+            "distinct_costs": len({round(value, 12) for value in values}),
         }
     x_only_actions = x_only_probe_actions(
         probe_rows,
@@ -523,9 +534,7 @@ def _planning_report(
         "cross_level_multiplier": x_multiplier,
         "maximum_evsi": max(row["evsi"] for row in probe_rows),
         "maximum_myopic_utility": max(row["myopic_utility"] for row in probe_rows),
-        "maximum_cross_level_utility": max(
-            row["cross_level_utility"] for row in probe_rows
-        ),
+        "maximum_cross_level_utility": max(row["cross_level_utility"] for row in probe_rows),
         "x_only_probe_actions": list(x_only_actions),
     }
 
@@ -595,8 +604,10 @@ def _fixture_history_records(fixture: Mapping[str, Any]) -> tuple[dict[str, Any]
     for raw_value in raw_history:
         raw = _require_mapping(raw_value, "fixture history row")
         rows = raw.get("grid_hex_rows")
-        if not isinstance(rows, list) or len(rows) != 64 or any(
-            not isinstance(row, str) or len(row) != 64 for row in rows
+        if (
+            not isinstance(rows, list)
+            or len(rows) != 64
+            or any(not isinstance(row, str) or len(row) != 64 for row in rows)
         ):
             raise ValueError("fixture grids must contain 64 hexadecimal rows")
         try:
@@ -637,9 +648,7 @@ def _validate_contract_identity(
         ),
     )
     mismatches = [
-        name
-        for name, expected_value in expected
-        if grounding_artifact.get(name) != expected_value
+        name for name, expected_value in expected if grounding_artifact.get(name) != expected_value
     ]
     if mismatches:
         raise ValueError(
@@ -652,6 +661,13 @@ def _action_label(action: Action) -> str:
     if action.kind is ActionKind.ACTION6:
         return f"ACTION6({action.row},{action.col})"
     return action.kind.name
+
+
+def _grounding_schema_version(artifact: Mapping[str, Any]) -> int:
+    version = artifact.get("schema_version")
+    if version not in {4, 5}:
+        raise ValueError("runtime admission requires a schema-v4 or schema-v5 grounding artifact")
+    return cast(int, version)
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:

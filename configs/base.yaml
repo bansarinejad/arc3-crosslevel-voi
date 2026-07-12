@@ -1,10 +1,10 @@
 experiment:
   seed: 20260712
   variant: X
-  implementation_contract_version: crosslevel-voi-runtime-v1
-  prompt_contract_version: evidence-first-visible-causal-alternatives-v4
+  implementation_contract_version: crosslevel-voi-runtime-v2
+  prompt_contract_version: evidence-first-visible-causal-alternatives-v5
   perception_contract_version: arc-agi-0.9.9-color-map-scale8-grid-v1
-  prompt_contract_sha256: e045cc2481eaaf11e2dcfaa0470d1844958a173cd9bac308eded27f896a68de3
+  prompt_contract_sha256: 960958a041dd5e80c47834dfe5be666e6bae8113b31bdd8b8d0388d65b5e7aa6
   perception_contract_sha256: fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0
   max_environment_actions: 256
   max_generated_tokens: 12288

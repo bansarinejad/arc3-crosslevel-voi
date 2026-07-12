@@ -24,9 +24,9 @@ trigger. Kaggle additionally applies its global evaluator deadline and the 20% h
 gate.
 
 The active hashed experiment configuration freezes prompt contract
-`evidence-first-visible-causal-alternatives-v4`, perception contract
+`evidence-first-visible-causal-alternatives-v5`, perception contract
 `arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
-`crosslevel-voi-runtime-v1`. The original four-row pilot used a renderer
+`crosslevel-voi-runtime-v2`. The original four-row pilot used a renderer
 whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
 retained only as pre-grounding diagnostics and cannot enter any aggregate or claim gate.
 
@@ -89,7 +89,7 @@ The current runtime filters role grounding before worker admission and deduplica
 clamps EVSI magnitudes at or below `1e-12` to zero, labels mandatory RESET decisions as
 lifecycle, and separates controller-decision latency from environment latency. Its active
 `development_matrix.json` has 180 pending rows with new content-addressed IDs under
-implementation contract `crosslevel-voi-runtime-v1`. No row in that active matrix has
+implementation contract `crosslevel-voi-runtime-v2`. No row in that active matrix has
 run.
 
 The deterministic offline runtime-admission audit then re-evaluated both historical
@@ -101,11 +101,14 @@ small 0.02246-action cost range and differing optimal sets, but no observation p
 changed the weighted optimal action, so EVSI was still zero. The gate blocked a fresh pilot. See
 `artifacts/runtime_admission_goal_v3_wsl.json` and
 `artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked while the
-replacement evidence-first v4 prompt/grounding contract is tested. Its offline grounding
+replacement evidence-first v5 prompt/grounding contract is tested. Its offline grounding
 smoke requires two eligible graded-role programs, while the stricter runtime-admission v2
 gate requires at least one material low-agreement probe with positive X utility and
-non-positive M utility. These are pre-pilot diagnostics, not performance claims. No v4
-model gate, runtime-admission pass, or gameplay-pilot pass is claimed.
+non-positive M utility. The v5/runtime-v2 path adds at most one grounding-repair batch with
+source-free categorical feedback. Both calls share the frozen token, wall-time, and game
+batch budgets; candidate roles reset within the repair batch before admission and dedup.
+These are pre-pilot diagnostics, not performance claims. No v5 model gate,
+runtime-admission pass, or gameplay-pilot pass is claimed.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no

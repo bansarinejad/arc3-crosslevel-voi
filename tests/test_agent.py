@@ -10,7 +10,7 @@ import pytest
 from arc3_voi.agent import build_agent
 from arc3_voi.config import ExperimentConfig, SandboxConfig, SystemConfig
 from arc3_voi.hypothesis import Hypothesis, behavioral_deduplicate
-from arc3_voi.model import ScriptedBackend
+from arc3_voi.model import GenerationResult, ScriptedBackend
 from arc3_voi.program import ExecutableHypothesis
 from arc3_voi.runtime.sandbox import validate_program
 from arc3_voi.types import ActionKind, Budget, GameState, Observation
@@ -81,6 +81,41 @@ def predict(history, action):
 def goal_value(history):
     return 0.0
 """
+
+INVALID_IMPORT = """
+import socket
+def predict(history, action):
+    return {}
+def goal_value(history):
+    return 0.0
+"""
+
+
+class _QueuedScriptedBackend(ScriptedBackend):
+    def __init__(self, batches: Sequence[GenerationResult]) -> None:
+        super().__init__()
+        self.batches = list(batches)
+        self.generation_calls: list[dict[str, Any]] = []
+
+    def generate_programs(
+        self,
+        history: Any,
+        count: int,
+        *,
+        feedback: str | None = None,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> GenerationResult:
+        del history
+        self.generation_calls.append(
+            {
+                "count": count,
+                "feedback": feedback,
+                "max_new_tokens": max_new_tokens,
+                "max_wall_seconds": max_wall_seconds,
+            }
+        )
+        return self.batches.pop(0)
 
 
 def _observation() -> Observation:
@@ -184,3 +219,42 @@ def test_single_program_variant_allows_total_conservative_index_zero() -> None:
         assert json.loads(str(decision.diagnostics["grounding_selected_hypothesis_ids"])) == [
             selected_id
         ]
+
+
+def test_runtime_repair_preserves_all_batch_sources_tokens_and_attempt_count() -> None:
+    initial_sources = (INVALID_IMPORT,) * 4
+    repair_sources = (
+        CONSERVATIVE_LARGE,
+        SENSITIVE_FIRST_CELL,
+        SENSITIVE_SECOND_CELL,
+        INVALID_IMPORT,
+    )
+    backend = _QueuedScriptedBackend(
+        (
+            GenerationResult(initial_sources, 6, 0.01),
+            GenerationResult(repair_sources, 8, 0.01),
+        )
+    )
+    config = SystemConfig(sandbox=SandboxConfig(timeout_ms=1_000))
+
+    with build_agent(backend, config) as agent:
+        decision = agent.controller.act(
+            _observation(), Budget(max_generated_tokens=100, max_wall_seconds=30)
+        )
+
+        assert len(backend.generation_calls) == 2
+        feedback = backend.generation_calls[1]["feedback"]
+        assert isinstance(feedback, str)
+        assert "import socket" not in feedback
+        assert decision.diagnostics["generated_tokens"] == 14
+        assert decision.diagnostics["generation_batches_used"] == 2
+        assert json.loads(str(decision.diagnostics["generation_batch_output_tokens"])) == [6, 8]
+        assert json.loads(str(decision.diagnostics["generated_program_batches"])) == [
+            list(initial_sources),
+            list(repair_sources),
+        ]
+        assert decision.diagnostics["grounding_repair_attempts"] == 1
+        assert decision.diagnostics["grounding_repair_feedback"] == feedback
+        assert decision.diagnostics["grounding_eligible_programs"] == 3
+        assert decision.diagnostics["grounding_rejected_programs"] == 5
+        assert agent.controller.generation_batches_used == 2

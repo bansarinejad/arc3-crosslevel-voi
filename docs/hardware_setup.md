@@ -97,5 +97,5 @@ eligible-only selection and zero planner failures, but both blocked on decision 
 agreement was 1.0, EVSI was 0.0, and cross-level probe utility was -1.0. See
 `artifacts/runtime_admission_goal_v3_wsl.json` and
 `artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked pending a
-new Windows/WSL grounding smoke and runtime-admission v2 pass for the evidence-first v4
+new Windows/WSL grounding smoke and runtime-admission v2 pass for the repair-enabled evidence-first v5
 prompt contract, and then a fresh four-run pilot.

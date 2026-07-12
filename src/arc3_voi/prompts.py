@@ -10,7 +10,7 @@ from typing import Any
 
 from .rendering import ARC_PALETTE_LEGEND, GRID_LINE_RGB
 
-PROMPT_CONTRACT_VERSION = "evidence-first-visible-causal-alternatives-v4"
+PROMPT_CONTRACT_VERSION = "evidence-first-visible-causal-alternatives-v5"
 HYPOTHESIS_DIVERSITY_ROLES = (
     "Conservative evidence-first baseline; reproduce observed transitions and "
     "otherwise prefer no effect.",
@@ -42,7 +42,8 @@ VISUAL_GROUNDING_CONTRACT = (
     "Each history entry also lists the exact grid_values present in its image.\n"
 )
 
-PROGRAM_SYSTEM_PROMPT = """You infer compact executable rules for a novel ARC-AGI-3 game.
+PROGRAM_SYSTEM_PROMPT = (
+    """You infer compact executable rules for a novel ARC-AGI-3 game.
 Return only one Python program. The runtime preloads numpy as np. Do not import anything.
 The program must define exactly:
 
@@ -55,12 +56,19 @@ def goal_value(history):
 history is a read-only record with aligned tuple fields: frames, actions,
 available_action_sets, game_states, level_deltas, and levels. The newest frame is
 history.frames[-1]. action is a read-only record with integer kind and optional row/col.
+History is not a sequence or dictionary. Use len(history.frames), history.frames[i],
+history.actions[i], and the other documented tuple fields. Never use len(history),
+history[i], history.get(...), frame.get(...), or hasattr(...).
 History images are ordered oldest to newest; grid_image_index is zero based and the
 final image is the latest frame.
 The JSON prompt's grid_values field is model-only metadata. It is not present inside
 runtime history entries. In particular, history.levels is a tuple of positive integers;
-never call .get on a level. Derive runtime cell values from a frame with np.unique.
-""" + PROGRAM_ACTION_CONTRACT + VISUAL_GROUNDING_CONTRACT + """
+never call .get on a level. Derive runtime palette values from a frame with np.unique;
+when cell counts are actually needed, use np.count_nonzero(frame == value).
+"""
+    + PROGRAM_ACTION_CONTRACT
+    + VISUAL_GROUNDING_CONTRACT
+    + """
 Copy a frame before changing it. Return a grid with the same shape and values in [0,15].
 game_state must be exactly "NOT_FINISHED", "WIN", or "GAME_OVER". Available NumPy
 operations include array/asarray, copy, zeros_like/ones_like/full_like, where, nonzero,
@@ -121,14 +129,19 @@ def predict(history, action):
 def goal_value(history):
     return 0.0
 """
+)
 
-DIRECT_SYSTEM_PROMPT = """You control a novel ARC-AGI-3 grid game.
+DIRECT_SYSTEM_PROMPT = (
+    """You control a novel ARC-AGI-3 grid game.
 Choose exactly one currently valid action. Return only compact JSON:
 {"kind":"ACTION1"} or {"kind":"ACTION6","row":12,"col":34}.
 Rows and columns are zero based in [0, 63]. Do not include markdown.
 History images are ordered oldest to newest; grid_image_index is zero based and the
 final image is the latest frame.
-""" + DIRECT_ACTION_CONTRACT + VISUAL_GROUNDING_CONTRACT
+"""
+    + DIRECT_ACTION_CONTRACT
+    + VISUAL_GROUNDING_CONTRACT
+)
 
 _FENCE_RE = re.compile(r"```(?:python)?\s*(.*?)```", re.DOTALL | re.IGNORECASE)
 _JSON_RE = re.compile(r"\{.*?\}", re.DOTALL)
@@ -141,9 +154,7 @@ def grid_to_ascii(grid: Any) -> str:
     return "\n".join("".join(format(int(value), "x") for value in row) for row in rows)
 
 
-def history_payload(
-    history: Any, *, include_grid_ascii: bool = True
-) -> list[dict[str, Any]]:
+def history_payload(history: Any, *, include_grid_ascii: bool = True) -> list[dict[str, Any]]:
     """Convert history to stable metadata, optionally embedding exact ASCII grids.
 
     Model prompts use ordered image blocks and therefore disable the ASCII grids.
@@ -185,8 +196,7 @@ def history_payload(
         entry_payload = {
             "action": None if action is None else _action_payload(action),
             "available_actions": [
-                getattr(action_kind, "name", str(action_kind))
-                for action_kind in available_actions
+                getattr(action_kind, "name", str(action_kind)) for action_kind in available_actions
             ],
             "game_state": getattr(
                 getattr(entry, "game_state", "NOT_FINISHED"),
@@ -233,9 +243,7 @@ def program_prompt(
     role = HYPOTHESIS_DIVERSITY_ROLES[candidate_index % len(HYPOTHESIS_DIVERSITY_ROLES)]
     action_sensitive_role = candidate_index % len(HYPOTHESIS_DIVERSITY_ROLES) != 0
     history_data = history_payload(history, include_grid_ascii=False)
-    transition_evidence_count = sum(
-        entry["action"] is not None for entry in history_data
-    )
+    transition_evidence_count = sum(entry["action"] is not None for entry in history_data)
     instruction = (
         "Infer the conservative evidence-first transition-and-goal baseline. Reproduce every "
         "recorded action-to-successor transition; where no transition evidence constrains an "
@@ -288,9 +296,7 @@ def extract_python(text: str) -> str:
     if "</think>" in text:
         text = text.rsplit("</think>", 1)[1]
     fenced = [match.group(1) for match in _FENCE_RE.finditer(text)]
-    complete = [
-        block for block in fenced if "def predict" in block and "def goal_value" in block
-    ]
+    complete = [block for block in fenced if "def predict" in block and "def goal_value" in block]
     candidate = complete[-1] if complete else (fenced[-1] if fenced else text)
     if "def predict" in candidate:
         candidate = candidate[candidate.index("def predict") :]

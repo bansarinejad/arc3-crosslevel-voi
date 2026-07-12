@@ -16,8 +16,8 @@ does not contain code from Duck or other competition entries.
   competition lifecycle, and lazy Qwen backends.
 - Frozen: the dated 25-game metadata snapshot and deterministic 15/10 split. The
   active 180-run development matrix under `artifacts/` uses prompt/grounding contract
-  `evidence-first-visible-causal-alternatives-v4`, implementation contract
-  `crosslevel-voi-runtime-v1`, and identical 256-action, 12,288-token, and 1,200-second
+  `evidence-first-visible-causal-alternatives-v5`, implementation contract
+  `crosslevel-voi-runtime-v2`, and identical 256-action, 12,288-token, and 1,200-second
   caps. All 180 active rows (15 games x seeds 11/23/47 x D/S/M/X) are pending; they
   have new content-addressed run IDs and no active-matrix gameplay has run.
 - Verified pre-grounding engineering smoke: the official anonymous endpoint accepted one
@@ -79,15 +79,23 @@ does not contain code from Duck or other competition entries.
   audits. No fresh gameplay pilot is authorized. See
   `artifacts/runtime_admission_goal_v3_wsl.json` and
   `artifacts/runtime_admission_goal_v3_windows.json`.
-- Replaced the failed goal-v3 proposal contract with an evidence-first v4 contract.
+- The first evidence-first v4 Windows smoke failed with zero eligible programs: generated
+  code treated `History` as JSON/list data, assumed an 8x8 grid, used forbidden reflection,
+  and produced goals that were constant or diluted by the 64x64 canvas. Its throughput is
+  non-gate evidence because two accidentally overlapping model processes slowed generation.
+  The diagnostic is explicitly preserved as
+  `artifacts/prompt_grounding_bp35_seed11_visible_causal_v4_windows_failed_concurrent.json`.
+- Replaced that failed proposal contract with an evidence-first v5 contract.
   Recorded transitions override role priors; candidate 0 remains conservative; candidates
   1-3 must express distinct causal alternatives using only visible components, current
   actions, palette states, ACTION6 coordinates, or relative geometry. Graded goals use
   relevant-component/geometry normalization and a declared 0.0125 heuristic spread floor
   (0.05 unresolved-cost units, not an EVSI guarantee). The offline grounding smoke now
   requires two eligible graded roles, and the runtime-admission v2 gate requires a concrete
-  probe that X would take while M would reject. No v4 model or runtime gate pass is yet
-  claimed; the 180-row active matrix remains locked.
+  probe that X would take while M would reject. The repair-enabled runtime may make exactly
+  one additional source-free grounding-repair call, charged to the same token, wall, and
+  three-batch game caps; it preserves batch-local roles and rejects backend over-reporting.
+  No v5 model or runtime gate pass is yet claimed; the 180-row active matrix remains locked.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its

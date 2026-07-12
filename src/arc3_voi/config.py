@@ -29,12 +29,10 @@ def _non_negative_float(name: str, value: float) -> None:
 class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
-    implementation_contract_version: str = "crosslevel-voi-runtime-v1"
-    prompt_contract_version: str = "evidence-first-visible-causal-alternatives-v4"
+    implementation_contract_version: str = "crosslevel-voi-runtime-v2"
+    prompt_contract_version: str = "evidence-first-visible-causal-alternatives-v5"
     perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
-    prompt_contract_sha256: str = (
-        "e045cc2481eaaf11e2dcfaa0470d1844958a173cd9bac308eded27f896a68de3"
-    )
+    prompt_contract_sha256: str = "960958a041dd5e80c47834dfe5be666e6bae8113b31bdd8b8d0388d65b5e7aa6"
     perception_contract_sha256: str = (
         "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0"
     )
@@ -163,9 +161,7 @@ class ModelConfig:
     def __post_init__(self) -> None:
         if not self.id.strip() or not self.profile.strip():
             raise ConfigError("model id and profile cannot be empty")
-        if (self.expected_revision is None) != (
-            self.expected_weight_manifest_sha256 is None
-        ):
+        if (self.expected_revision is None) != (self.expected_weight_manifest_sha256 is None):
             raise ConfigError(
                 "expected_revision and expected_weight_manifest_sha256 must be set together"
             )
@@ -181,9 +177,7 @@ class ModelConfig:
                 for character in self.expected_weight_manifest_sha256
             )
         ):
-            raise ConfigError(
-                "expected_weight_manifest_sha256 must be a lowercase SHA-256 digest"
-            )
+            raise ConfigError("expected_weight_manifest_sha256 must be a lowercase SHA-256 digest")
         _positive_int("context_length", self.context_length)
         if self.quantization not in {"none", "nf4", "fp8"}:
             raise ConfigError("quantization must be none, nf4, or fp8")

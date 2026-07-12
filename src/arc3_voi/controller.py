@@ -86,6 +86,11 @@ class RefreshResult:
     grounding_eligible_programs: int = 0
     grounding_rejected_programs: int = 0
     grounding_selected_hypothesis_ids: tuple[str, ...] = ()
+    generation_batches_used: int = 0
+    generation_batch_output_tokens: tuple[int, ...] = ()
+    generated_source_batches: tuple[tuple[str, ...], ...] = ()
+    grounding_repair_attempts: int = 0
+    grounding_repair_feedback: str | None = None
 
     def __post_init__(self) -> None:
         if isinstance(self.generated_tokens, bool) or self.generated_tokens < 0:
@@ -100,6 +105,37 @@ class RefreshResult:
             raise ValueError("peak_vram_gb must be non-negative")
         if any(not isinstance(source, str) for source in self.generated_sources):
             raise TypeError("generated_sources must contain strings")
+        if isinstance(self.generation_batches_used, bool) or self.generation_batches_used < 0:
+            raise ValueError("generation_batches_used must be a non-negative integer")
+        if any(
+            isinstance(value, bool) or value < 0 for value in self.generation_batch_output_tokens
+        ):
+            raise ValueError("generation_batch_output_tokens must be non-negative integers")
+        if self.generation_batch_output_tokens and (
+            len(self.generation_batch_output_tokens) != self.generation_batches_used
+            or sum(self.generation_batch_output_tokens) != self.generated_tokens
+        ):
+            raise ValueError("generation batch token telemetry is inconsistent")
+        if any(
+            not isinstance(source, str)
+            for batch in self.generated_source_batches
+            for source in batch
+        ):
+            raise TypeError("generated_source_batches must contain strings")
+        if self.generated_source_batches and (
+            len(self.generated_source_batches) != self.generation_batches_used
+            or tuple(source for batch in self.generated_source_batches for source in batch)
+            != self.generated_sources
+        ):
+            raise ValueError("generated source batch telemetry is inconsistent")
+        if isinstance(
+            self.grounding_repair_attempts, bool
+        ) or not 0 <= self.grounding_repair_attempts <= max(0, self.generation_batches_used - 1):
+            raise ValueError("grounding_repair_attempts is inconsistent with generation batches")
+        if self.grounding_repair_feedback is not None and not isinstance(
+            self.grounding_repair_feedback, str
+        ):
+            raise TypeError("grounding_repair_feedback must be a string or None")
         if any(
             not isinstance(hypothesis_id, str) or not hypothesis_id
             for hypothesis_id in self.grounding_selected_hypothesis_ids
@@ -196,6 +232,12 @@ class Controller:
     def probes_by_level(self) -> dict[int, int]:
         return dict(self._probes_by_level)
 
+    @property
+    def generation_batches_used(self) -> int:
+        """Return the number of model generation batches charged this game."""
+
+        return self._generation_batches
+
     def cache_points(self, points: Iterable[Point]) -> None:
         """Replace model-suggested click points for subsequent decisions."""
 
@@ -259,6 +301,21 @@ class Controller:
         grounding_selected_hypothesis_ids = (
             () if refresh_result is None else refresh_result.grounding_selected_hypothesis_ids
         )
+        generation_batches_used = (
+            0 if refresh_result is None else refresh_result.generation_batches_used
+        )
+        generation_batch_output_tokens = (
+            () if refresh_result is None else refresh_result.generation_batch_output_tokens
+        )
+        generated_source_batches = (
+            () if refresh_result is None else refresh_result.generated_source_batches
+        )
+        grounding_repair_attempts = (
+            0 if refresh_result is None else refresh_result.grounding_repair_attempts
+        )
+        grounding_repair_feedback = (
+            None if refresh_result is None else refresh_result.grounding_repair_feedback
+        )
         required_hypotheses = 1 if self.config.variant is Variant.SINGLE else 2
         if self.pool is None or len(self.pool.weighted_hypotheses) < required_hypotheses:
             return self._direct(
@@ -272,6 +329,11 @@ class Controller:
                 grounding_eligible_programs=grounding_eligible_programs,
                 grounding_rejected_programs=grounding_rejected_programs,
                 grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
+                generation_batches_used=generation_batches_used,
+                generation_batch_output_tokens=generation_batch_output_tokens,
+                generated_source_batches=generated_source_batches,
+                grounding_repair_attempts=grounding_repair_attempts,
+                grounding_repair_feedback=grounding_repair_feedback,
                 deadline=deadline,
             )
 
@@ -308,6 +370,11 @@ class Controller:
                 grounding_eligible_programs=grounding_eligible_programs,
                 grounding_rejected_programs=grounding_rejected_programs,
                 grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
+                generation_batches_used=generation_batches_used,
+                generation_batch_output_tokens=generation_batch_output_tokens,
+                generated_source_batches=generated_source_batches,
+                grounding_repair_attempts=grounding_repair_attempts,
+                grounding_repair_feedback=grounding_repair_feedback,
                 deadline=deadline,
             )
         except PlanningError:
@@ -322,6 +389,11 @@ class Controller:
                 grounding_eligible_programs=grounding_eligible_programs,
                 grounding_rejected_programs=grounding_rejected_programs,
                 grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
+                generation_batches_used=generation_batches_used,
+                generation_batch_output_tokens=generation_batch_output_tokens,
+                generated_source_batches=generated_source_batches,
+                grounding_repair_attempts=grounding_repair_attempts,
+                grounding_repair_feedback=grounding_repair_feedback,
                 deadline=deadline,
             )
         if snapshot.invalid_hypothesis_ids:
@@ -343,6 +415,11 @@ class Controller:
                 grounding_eligible_programs=grounding_eligible_programs,
                 grounding_rejected_programs=grounding_rejected_programs,
                 grounding_selected_hypothesis_ids=(grounding_selected_hypothesis_ids),
+                generation_batches_used=generation_batches_used,
+                generation_batch_output_tokens=generation_batch_output_tokens,
+                generated_source_batches=generated_source_batches,
+                grounding_repair_attempts=grounding_repair_attempts,
+                grounding_repair_feedback=grounding_repair_feedback,
                 deadline=deadline,
             )
         exploit = robust_exploitation(
@@ -371,6 +448,17 @@ class Controller:
                 grounding_selected_hypothesis_ids,
                 separators=(",", ":"),
             ),
+            "generation_batches_used": generation_batches_used,
+            "generation_batch_output_tokens": json.dumps(
+                generation_batch_output_tokens, separators=(",", ":")
+            ),
+            "generated_program_batches": (
+                json.dumps(generated_source_batches, ensure_ascii=False)
+                if generated_source_batches
+                else None
+            ),
+            "grounding_repair_attempts": grounding_repair_attempts,
+            "grounding_repair_feedback": grounding_repair_feedback,
             "peak_vram_gb": peak_vram_gb,
             "hypothesis_weights": ",".join(
                 f"{hypothesis_id}:{weight:.12g}"
@@ -568,8 +656,15 @@ class Controller:
         result = raw_result if isinstance(raw_result, RefreshResult) else RefreshResult(raw_result)
         if not budget.can_afford(generated_tokens=result.generated_tokens):
             raise ControllerBudgetExhausted("hypothesis refresh exceeded the token budget")
+        if (
+            self._generation_batches + result.generation_batches_used
+            > self.config.max_generation_batches
+        ):
+            raise ControllerBudgetExhausted(
+                "hypothesis refresh exceeded the generation-batch budget"
+            )
         self.pool = result.pool
-        self._generation_batches += 1
+        self._generation_batches += result.generation_batches_used
         if not is_initial_batch:
             self._refreshes_by_level[level] = refreshes + 1
         if time.monotonic() >= deadline:
@@ -589,6 +684,11 @@ class Controller:
         grounding_eligible_programs: int = 0,
         grounding_rejected_programs: int = 0,
         grounding_selected_hypothesis_ids: tuple[str, ...] = (),
+        generation_batches_used: int = 0,
+        generation_batch_output_tokens: tuple[int, ...] = (),
+        generated_source_batches: tuple[tuple[str, ...], ...] = (),
+        grounding_repair_attempts: int = 0,
+        grounding_repair_feedback: str | None = None,
         deadline: float,
     ) -> Decision:
         remaining_budget = self._budget_before_deadline(
@@ -626,6 +726,17 @@ class Controller:
                 grounding_selected_hypothesis_ids,
                 separators=(",", ":"),
             ),
+            "generation_batches_used": generation_batches_used,
+            "generation_batch_output_tokens": json.dumps(
+                generation_batch_output_tokens, separators=(",", ":")
+            ),
+            "generated_program_batches": (
+                json.dumps(generated_source_batches, ensure_ascii=False)
+                if generated_source_batches
+                else None
+            ),
+            "grounding_repair_attempts": grounding_repair_attempts,
+            "grounding_repair_feedback": grounding_repair_feedback,
             "peak_vram_gb": peak_vram_gb,
             "generated_program_sources": (
                 json.dumps(generated_sources, ensure_ascii=False) if generated_sources else None

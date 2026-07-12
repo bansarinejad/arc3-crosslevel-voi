@@ -123,7 +123,7 @@ def test_prompts_share_exact_palette_and_action_contracts() -> None:
     assert "For every other kind, row and col are None" in PROGRAM_SYSTEM_PROMPT
     assert "copy one exact" in DIRECT_SYSTEM_PROMPT.lower()
     assert "Return one listed" in DIRECT_SYSTEM_PROMPT
-    assert PROMPT_CONTRACT_VERSION == "evidence-first-visible-causal-alternatives-v4"
+    assert PROMPT_CONTRACT_VERSION == "evidence-first-visible-causal-alternatives-v5"
     assert "history.levels is a tuple of positive integers" in PROGRAM_SYSTEM_PROMPT
     assert "Use grid.size only" in PROGRAM_SYSTEM_PROMPT
     assert "most relevant visible object or connected component" in PROGRAM_SYSTEM_PROMPT
@@ -151,26 +151,16 @@ def test_program_prompt_assigns_distinct_action_sensitive_committee_roles() -> N
     )
 
     prompts = [
-        program_prompt([entry], candidate_index=index, candidate_count=4)
-        for index in range(4)
+        program_prompt([entry], candidate_index=index, candidate_count=4) for index in range(4)
     ]
     requests = [json.loads(prompt) for prompt in prompts]
 
     assert len(set(prompts)) == 4
     assert "prefer no effect" in requests[0]["instruction"]
-    assert all(
-        "Predictions must differ" in request["instruction"]
-        for request in requests[1:]
-    )
-    assert all(
-        "at least 0.0125" in request["instruction"]
-        for request in requests[1:]
-    )
+    assert all("Predictions must differ" in request["instruction"] for request in requests[1:])
+    assert all("at least 0.0125" in request["instruction"] for request in requests[1:])
     assert all(request["recorded_transition_count"] == 0 for request in requests)
-    assert all(
-        "override the assigned role" in request["evidence_priority"]
-        for request in requests
-    )
+    assert all("override the assigned role" in request["evidence_priority"] for request in requests)
     assert "Local contact alternative" in requests[1]["committee_candidate"]["role"]
     assert "Object-motion alternative" in requests[2]["committee_candidate"]["role"]
     assert "Component-state alternative" in requests[3]["committee_candidate"]["role"]
@@ -206,9 +196,7 @@ def test_program_prompt_counts_recorded_transitions_and_keeps_evidence_first() -
     request = json.loads(program_prompt(entries, candidate_index=2, candidate_count=4))
 
     assert request["recorded_transition_count"] == 1
-    assert "First reproduce all recorded action-to-successor transitions" in request[
-        "instruction"
-    ]
+    assert "First reproduce all recorded action-to-successor transitions" in request["instruction"]
     assert "including no-effect transitions" in request["instruction"]
     assert "only a currently available action" in request["instruction"]
     assert "Do not use arbitrary coordinates or effects" in request["instruction"]

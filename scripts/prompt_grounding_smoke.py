@@ -12,13 +12,15 @@ from typing import Any
 
 import numpy as np
 
-from arc3_voi.candidates import candidates_from_history
 from arc3_voi.config import load_config
 from arc3_voi.experiment import stable_config_hash
 from arc3_voi.grounding import (
     GOAL_ACTION_SPREAD_THRESHOLD,
-    evaluate_program_grounding,
     grounding_gate_reasons,
+)
+from arc3_voi.grounding_repair import (
+    GroundedSource,
+    generate_grounded_program_batches,
 )
 from arc3_voi.model import backend_from_config
 from arc3_voi.preflight import detect_runtime
@@ -74,13 +76,8 @@ def main() -> int:
             raise ValueError("fixture history does not match its declared hash")
         source_kind = "history_fixture"
         source_path = args.fixture
-    if (
-        args.expected_canonical_trace_sha256
-        and trace_sha != args.expected_canonical_trace_sha256
-    ):
+    if args.expected_canonical_trace_sha256 and trace_sha != args.expected_canonical_trace_sha256:
         raise ValueError("source trace does not match the expected canonical hash")
-    actions = candidates_from_history(history, max_candidates=12)
-
     base_config = load_config(args.config)
     if base_config.model is None:
         raise ValueError("grounding smoke requires a model configuration")
@@ -89,65 +86,69 @@ def main() -> int:
         experiment=replace(base_config.experiment, seed=args.seed),
         model=replace(base_config.model, offline=True),
     )
+    model_config = config.model
+    assert model_config is not None
     backend = backend_from_config(config, model_path=args.model_path)
     try:
-        generation = backend.generate_programs(
+        grounded_generation = generate_grounded_program_batches(
+            backend,
             history,
-            config.hypotheses.max_hypotheses,
-            max_new_tokens=config.generation.max_new_tokens_per_hypothesis,
-            max_wall_seconds=config.experiment.max_wall_seconds,
+            variant=config.experiment.variant,
+            target=config.hypotheses.max_hypotheses,
+            initial_feedback=None,
+            max_new_tokens_per_hypothesis=(config.generation.max_new_tokens_per_hypothesis),
+            max_candidates=config.planning.max_candidates,
+            timeout_seconds=config.sandbox.timeout_ms / 1000,
+            memory_limit_mb=config.sandbox.memory_mb,
+            rollout_depth=config.planning.depth,
+            remaining_generated_tokens=config.experiment.max_generated_tokens,
+            remaining_wall_seconds=config.experiment.max_wall_seconds,
+            remaining_generation_batches=config.experiment.max_generation_batches,
         )
     finally:
         backend.close()
 
-    programs = tuple(
-        evaluate_program_grounding(
-            source,
-            history,
-            actions,
-            timeout_seconds=config.sandbox.timeout_ms / 1000,
-            memory_limit_mb=config.sandbox.memory_mb,
-            rollout_depth=config.planning.depth,
-            require_action_sensitivity=index > 0,
-            require_goal_conditioning=index > 0,
+    grounded_sources = grounded_generation.programs
+    programs = tuple(item.result for item in grounded_sources if item.result is not None)
+    truncated = sum(sum(batch.generation.hit_token_limit) for batch in grounded_generation.batches)
+    gate_reasons = list(
+        grounding_gate_reasons(
+            programs,
+            truncated_sequences=truncated,
+            peak_vram_gb=max(
+                (
+                    batch.generation.peak_vram_gb
+                    for batch in grounded_generation.batches
+                    if batch.generation.peak_vram_gb is not None
+                ),
+                default=None,
+            ),
+            tokens_per_second=(
+                grounded_generation.output_tokens
+                / sum(batch.generation.elapsed_seconds for batch in grounded_generation.batches)
+                if sum(batch.generation.elapsed_seconds for batch in grounded_generation.batches)
+                > 0
+                else 0.0
+            ),
+            max_peak_vram_gb=model_config.max_peak_vram_gb or float("inf"),
+            min_tokens_per_second=model_config.min_tokens_per_second or 0.0,
+            require_hard_memory_limit=os.name == "posix",
         )
-        for index, source in enumerate(generation.texts)
     )
-    truncated = sum(generation.hit_token_limit)
-    reasons = grounding_gate_reasons(
-        programs,
-        truncated_sequences=truncated,
-        peak_vram_gb=generation.peak_vram_gb,
-        tokens_per_second=generation.tokens_per_second,
-        max_peak_vram_gb=config.model.max_peak_vram_gb or float("inf"),
-        min_tokens_per_second=config.model.min_tokens_per_second or 0.0,
-        require_hard_memory_limit=os.name == "posix",
-    )
+    if len(programs) != len(grounded_sources):
+        gate_reasons.append("one or more grounding evaluations raised an exception")
+    reasons = tuple(gate_reasons)
 
-    history_payload = json.dumps(records, separators=(",", ":"), sort_keys=True).encode(
-        "utf-8"
-    )
-    program_payloads = []
-    for index, (source_text, program) in enumerate(
-        zip(generation.texts, programs, strict=True)
-    ):
-        value = asdict(program)
-        value["source"] = source_text
-        value["candidate_index"] = index
-        value["assigned_role"] = HYPOTHESIS_DIVERSITY_ROLES[
-            index % len(HYPOTHESIS_DIVERSITY_ROLES)
-        ]
-        value["palette_conflicts"] = len(program.palette_conflicts)
-        value["eligible"] = program.eligible
-        program_payloads.append(value)
+    history_payload = json.dumps(records, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    program_payloads = _program_payloads(grounded_sources)
     eligible = [program for program in programs if program.eligible]
     report: dict[str, Any] = {
-        "schema_version": 4,
+        "schema_version": 5,
         "offline": True,
         "git": asdict(inspect_git_provenance()),
-        "model_id": config.model.id,
-        "expected_model_revision": config.model.expected_revision,
-        "expected_weight_manifest_sha256": config.model.expected_weight_manifest_sha256,
+        "model_id": model_config.id,
+        "expected_model_revision": model_config.expected_revision,
+        "expected_weight_manifest_sha256": model_config.expected_weight_manifest_sha256,
         "model_artifact": asdict(inspect_model_artifact(args.model_path)),
         "seed": args.seed,
         "base_config_sha256": stable_config_hash(base_config),
@@ -168,7 +169,10 @@ def main() -> int:
         ).hexdigest(),
         "history_frames": len(history.frames),
         "observed_palette_values": [int(value) for value in np.unique(history.latest_grid)],
-        "evaluation_actions": [_action_label(action) for action in actions],
+        "evaluation_actions_by_batch": [
+            [_action_label(action) for action in batch.actions]
+            for batch in grounded_generation.batches
+        ],
         "grounding_evaluation": {
             "rollout_depth": config.planning.depth,
             "rollout_paths": "repeat each root candidate action",
@@ -181,18 +185,18 @@ def main() -> int:
             ),
             "candidate_roles": list(HYPOTHESIS_DIVERSITY_ROLES),
         },
-        "system_prompt_sha256": hashlib.sha256(
-            PROGRAM_SYSTEM_PROMPT.encode("utf-8")
-        ).hexdigest(),
+        "system_prompt_sha256": hashlib.sha256(PROGRAM_SYSTEM_PROMPT.encode("utf-8")).hexdigest(),
         "user_prompt_sha256": [
             hashlib.sha256(
                 program_prompt(
                     history,
+                    feedback=batch.feedback,
                     candidate_index=index,
                     candidate_count=config.hypotheses.max_hypotheses,
                 ).encode("utf-8")
             ).hexdigest()
-            for index in range(config.hypotheses.max_hypotheses)
+            for batch in grounded_generation.batches
+            for index in range(len(batch.generation.texts))
         ],
         "prompt_contract_version": PROMPT_CONTRACT_VERSION,
         "perception_contract_version": PERCEPTION_CONTRACT_VERSION,
@@ -202,12 +206,56 @@ def main() -> int:
         "runtime": asdict(detect_runtime()),
         "generation": {
             "requested": config.hypotheses.max_hypotheses,
-            "output_tokens": generation.output_tokens,
-            "sequence_token_counts": generation.sequence_token_counts,
-            "elapsed_seconds": generation.elapsed_seconds,
-            "tokens_per_second": generation.tokens_per_second,
-            "peak_vram_gb": generation.peak_vram_gb,
+            "batches_used": len(grounded_generation.batches),
+            "repair_attempts": grounded_generation.repair_attempts,
+            "repair_feedback": grounded_generation.repair_feedback,
+            "output_tokens": grounded_generation.output_tokens,
+            "sequence_token_counts": tuple(
+                value
+                for batch in grounded_generation.batches
+                for value in batch.generation.sequence_token_counts
+            ),
+            "elapsed_seconds": sum(
+                batch.generation.elapsed_seconds for batch in grounded_generation.batches
+            ),
+            "tokens_per_second": (
+                grounded_generation.output_tokens
+                / sum(batch.generation.elapsed_seconds for batch in grounded_generation.batches)
+                if sum(batch.generation.elapsed_seconds for batch in grounded_generation.batches)
+                > 0
+                else 0.0
+            ),
+            "peak_vram_gb": max(
+                (
+                    batch.generation.peak_vram_gb
+                    for batch in grounded_generation.batches
+                    if batch.generation.peak_vram_gb is not None
+                ),
+                default=None,
+            ),
             "truncated_sequences": truncated,
+            "batches": [
+                {
+                    "batch_index": batch.batch_index,
+                    "requested": (
+                        config.hypotheses.max_hypotheses
+                        if batch.batch_index > 0
+                        else min(
+                            config.hypotheses.max_hypotheses,
+                            config.experiment.max_generated_tokens,
+                        )
+                    ),
+                    "returned": len(batch.generation.texts),
+                    "feedback": batch.feedback,
+                    "output_tokens": batch.generation.output_tokens,
+                    "sequence_token_counts": batch.generation.sequence_token_counts,
+                    "elapsed_seconds": batch.generation.elapsed_seconds,
+                    "tokens_per_second": batch.generation.tokens_per_second,
+                    "peak_vram_gb": batch.generation.peak_vram_gb,
+                    "truncated_sequences": sum(batch.generation.hit_token_limit),
+                }
+                for batch in grounded_generation.batches
+            ],
         },
         "programs": program_payloads,
         "summary": {
@@ -220,9 +268,7 @@ def main() -> int:
                     if program.behavior_signature is not None
                 }
             ),
-            "action_sensitive_programs": sum(
-                program.action_sensitive for program in eligible
-            ),
+            "action_sensitive_programs": sum(program.action_sensitive for program in eligible),
             "goal_action_conditioned_programs": sum(
                 program.goal_action_conditioned for program in eligible
             ),
@@ -251,6 +297,34 @@ def main() -> int:
     args.output.write_text(rendered, encoding="utf-8", newline="\n")
     print(rendered, end="")
     return 0 if not reasons else 2
+
+
+def _program_payloads(
+    grounded_sources: tuple[GroundedSource, ...],
+) -> list[dict[str, Any]]:
+    """Serialize global order while preserving batch-local role indices."""
+
+    payloads: list[dict[str, Any]] = []
+    for index, grounded in enumerate(grounded_sources):
+        program = grounded.result
+        value: dict[str, Any]
+        if program is None:
+            value = {
+                "source_sha256": hashlib.sha256(grounded.source.encode("utf-8")).hexdigest(),
+                "evaluation_error": grounded.evaluation_error,
+                "eligible": False,
+            }
+        else:
+            value = asdict(program)
+            value["palette_conflicts"] = len(program.palette_conflicts)
+            value["eligible"] = program.eligible
+        value["source"] = grounded.source
+        value["candidate_index"] = index
+        value["batch_index"] = grounded.batch_index
+        value["batch_candidate_index"] = grounded.candidate_index
+        value["assigned_role"] = grounded.assigned_role
+        payloads.append(value)
+    return payloads
 
 
 def _action_label(action: Action) -> str:
