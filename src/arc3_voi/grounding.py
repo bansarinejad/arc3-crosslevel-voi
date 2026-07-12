@@ -243,6 +243,11 @@ def evaluate_program_grounding(
         for action, result in zip(actions, results, strict=True)
         if action.kind is not ActionKind.ACTION6
     )
+    action6_ok = any(
+        result.ok
+        for action, result in zip(actions, results, strict=True)
+        if action.kind is ActionKind.ACTION6
+    )
     all_ok = all(result.ok for result in results)
     behavior_signature = None
     if all_ok:
@@ -260,7 +265,7 @@ def evaluate_program_grounding(
         action_results=tuple(results),
         simple_action_contract_ok=simple_ok,
         all_actions_ok=all_ok,
-        unsafe_coordinate_use=bool(reads) and not simple_ok,
+        unsafe_coordinate_use=bool(reads) and not simple_ok and action6_ok,
         behavior_signature=behavior_signature,
         action_sensitive=len(set(prediction_hashes)) > 1,
         hard_memory_limit_enforced=memory_enforced,

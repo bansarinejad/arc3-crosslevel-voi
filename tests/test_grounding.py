@@ -34,6 +34,19 @@ def goal_value(history):
     return 0.0
 """
 
+BROKEN_FOR_EVERY_ACTION_PROGRAM = """
+def predict(history, action):
+    grid = np.array(history.frames[-1], dtype=np.int8)
+    if int(action.kind) == 6:
+        row = int(action.row)
+        col = int(action.col)
+    value = history.levels[-1].get("missing", 0)
+    grid[0, 0] = value
+    return {"next_grid": grid, "game_state": "NOT_FINISHED", "level_delta": 0, "memory": {}}
+def goal_value(history):
+    return 0.0
+"""
+
 
 def _history() -> History:
     return History.from_observation(
@@ -58,6 +71,19 @@ def test_action_matrix_catches_unconditional_coordinate_arithmetic() -> None:
     assert result.coordinate_read_lines
     assert not result.simple_action_contract_ok
     assert result.unsafe_coordinate_use
+
+
+def test_general_execution_failure_is_not_mislabeled_as_coordinate_use() -> None:
+    result = evaluate_program_grounding(
+        BROKEN_FOR_EVERY_ACTION_PROGRAM,
+        _history(),
+        (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2)),
+        timeout_seconds=1.0,
+    )
+
+    assert result.coordinate_read_lines
+    assert not result.all_actions_ok
+    assert not result.unsafe_coordinate_use
 
 
 def test_action_matrix_accepts_action6_guard_and_distinct_gate() -> None:
