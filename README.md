@@ -31,8 +31,10 @@ does not contain code from Duck or other competition entries.
   the seed-11 pilot exposed that its absolute 256 MiB `RLIMIT_DATA` ceiling was below the
   trusted NumPy runtime's existing data segment. The runtime now hard-limits allocation
   headroom to 256 MiB above a measured baseline and records both values. The old evidence is
-  retained at `artifacts/prompt_grounding_bp35_seed11_wsl_pre_worker_memory_fix.json`; a
-  schema-v3 WSL grounding remeasurement is required before retrying gameplay.
+  retained at `artifacts/prompt_grounding_bp35_seed11_wsl_pre_worker_memory_fix.json`. The
+  schema-v3 remeasurement passes with 3 safe, distinct, action-sensitive programs, exact
+  +256 MiB verified ceilings, no conflicts, 29.91 tokens/s, and 8.84 GiB peak. See
+  `artifacts/prompt_grounding_bp35_seed11_wsl.json`.
 - Passed the same fair-v2 gates on native Windows. The model preflight produced 2/4 valid
   programs with no truncation at 21.40 tokens/s and 10.78 GiB peak. The frozen-history gate
   produced 2 safe, 2 distinct, action-sensitive programs with no palette or coordinate

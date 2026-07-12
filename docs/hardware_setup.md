@@ -57,8 +57,11 @@ kernel-enforced incremental worker-lifetime allocation budget, not a claim that 
 Python/NumPy process occupies 256 MiB. Metadata records the limit kind, measured baseline,
 effective ceiling, enforcement status, and diagnostic. The full eight-frame 64x64 `int16`
 transport and a generated allocation above the budget are regression-tested. Incident details
-are in `artifacts/pilot_seed11_worker_memory_incident.json`; schema-v3 grounding evidence must
-pass before gameplay resumes.
+are in `artifacts/pilot_seed11_worker_memory_incident.json`. The clean schema-v3 WSL rerun
+passes with three safe, behaviorally distinct, action-sensitive programs, no palette or
+coordinate conflicts, 29.91 generated tokens/s, and 8.84 GiB peak VRAM. Every eligible
+program records an enforced ceiling exactly 256 MiB above its measured baseline. See
+`artifacts/prompt_grounding_bp35_seed11_wsl.json`.
 
 The fair-v2 native-Windows remeasurement also passes. Its model gate has 2/4 statically valid
 programs, no truncation, 21.40 generated tokens/s, and 10.78 GiB peak VRAM. Its grounding gate

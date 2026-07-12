@@ -1,6 +1,4 @@
 {
-  "contract_status": "superseded-one-frame-worker-memory-diagnostic",
-  "superseded_by": "artifacts/prompt_grounding_bp35_seed11_wsl.json",
   "base_config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
   "effective_offline_config_sha256": "2a2c4c534b64c39047288b24e84ca1d85f0186c9eb448928d9501b0cce80c1aa",
   "evaluation_actions": [
@@ -20,7 +18,7 @@
   "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
   "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
   "generation": {
-    "elapsed_seconds": 47.31631105500037,
+    "elapsed_seconds": 47.907606556000246,
     "output_tokens": 1433,
     "peak_vram_gb": 8.842219352722168,
     "requested": 4,
@@ -30,11 +28,11 @@
       478,
       344
     ],
-    "tokens_per_second": 30.285539342538435,
+    "tokens_per_second": 29.911742685891333,
     "truncated_sequences": 0
   },
   "git": {
-    "commit": "28aa6712a7deb4db89d2b40c2b1b3ed4a843e5c7",
+    "commit": "e6ac91e83312379162f671cc28686053ae2b16fa",
     "dirty": false,
     "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
     "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
@@ -163,6 +161,10 @@
       "goal_value_error": null,
       "goal_value_ok": true,
       "hard_memory_limit_enforced": true,
+      "memory_baseline_bytes": 1357221888,
+      "memory_ceiling_bytes": 1625657344,
+      "memory_limit_diagnostic": null,
+      "memory_limit_kind": "rlimit_data_baseline_plus_budget",
       "palette_claims": [],
       "palette_conflicts": 0,
       "sandbox_valid": true,
@@ -260,6 +262,10 @@
       "goal_value_error": null,
       "goal_value_ok": true,
       "hard_memory_limit_enforced": true,
+      "memory_baseline_bytes": 1357221888,
+      "memory_ceiling_bytes": 1625657344,
+      "memory_limit_diagnostic": null,
+      "memory_limit_kind": "rlimit_data_baseline_plus_budget",
       "palette_claims": [],
       "palette_conflicts": 0,
       "sandbox_valid": true,
@@ -357,6 +363,10 @@
       "goal_value_error": null,
       "goal_value_ok": true,
       "hard_memory_limit_enforced": true,
+      "memory_baseline_bytes": 1357221888,
+      "memory_ceiling_bytes": 1625657344,
+      "memory_limit_diagnostic": null,
+      "memory_limit_kind": "rlimit_data_baseline_plus_budget",
       "palette_claims": [
         {
           "claimed_value": 9,
@@ -483,6 +493,10 @@
       "goal_value_error": null,
       "goal_value_ok": true,
       "hard_memory_limit_enforced": true,
+      "memory_baseline_bytes": 1357221888,
+      "memory_ceiling_bytes": 1625657344,
+      "memory_limit_diagnostic": null,
+      "memory_limit_kind": "rlimit_data_baseline_plus_budget",
       "palette_claims": [],
       "palette_conflicts": 0,
       "sandbox_valid": true,
@@ -512,7 +526,7 @@
     "torch_cuda_version": "13.0",
     "torch_version": "2.11.0+cu130"
   },
-  "schema_version": 2,
+  "schema_version": 3,
   "seed": 11,
   "source_input": "fixtures/grounding/bp35_seed11_initial_history.json",
   "source_input_kind": "history_fixture",
