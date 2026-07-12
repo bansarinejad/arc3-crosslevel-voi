@@ -1,0 +1,886 @@
+{
+  "claim_limits": [
+    "all four variants scored zero RHAE and completed zero levels",
+    "one game/seed cannot satisfy the formal development or generalization claim gate",
+    "no level boundary occurred, persistence was not updated, and no probe was selected",
+    "M and X were behaviorally identical after declared cross-level/timing normalization",
+    "runtime-valid live hypotheses are not role-gate-eligible hypotheses",
+    "launch commit ancestry is recorded but command-time clean state is absent from runs"
+  ],
+  "comparisons": {
+    "M_X_semantic_equivalence": {
+      "M_normalized_sha256": "f066c4c31752df3959612ae942cf10a65f148868ea5b4225f18147b649e17f57",
+      "X_normalized_sha256": "f066c4c31752df3959612ae942cf10a65f148868ea5b4225f18147b649e17f57",
+      "actions_histories_observations_losses_weights_candidates_costs_predictions_agreement_evsi_probes_and_persistence_equal": true,
+      "allowed_difference_paths": [
+        "decision_diagnostics.level_multiplier",
+        "decision_diagnostics.probe_utility",
+        "decision_diagnostics.variant",
+        "elapsed_seconds",
+        "probe_utility"
+      ],
+      "difference_path_counts": {
+        "decision_diagnostics.level_multiplier": 243,
+        "decision_diagnostics.probe_utility": 59,
+        "decision_diagnostics.variant": 243,
+        "elapsed_seconds": 256,
+        "probe_utility": 59
+      },
+      "equal_after_declared_normalization": true,
+      "exact_difference_sequence_sha256": "9d6c54aff609ba04f19b2489b1cfd80b81a2a61cc67459acf944806e2c078b62",
+      "normalized_hashes_equal": true,
+      "rows": 256,
+      "total_scalar_differences": 860,
+      "unexpected_difference_paths": []
+    },
+    "committee_telemetry": {
+      "M_level_multipliers": {
+        "1.0": 243
+      },
+      "X_level_multipliers": {
+        "23.0": 243
+      },
+      "action6_coordinates": {
+        "ACTION6(39,21)": 14
+      },
+      "action6_steps": [
+        2,
+        21,
+        40,
+        59,
+        78,
+        97,
+        116,
+        135,
+        154,
+        173,
+        192,
+        211,
+        230,
+        249
+      ],
+      "action_varying_cost_steps": [
+        2,
+        21,
+        40,
+        59,
+        78,
+        97,
+        116,
+        135,
+        154,
+        173,
+        192,
+        211,
+        230,
+        249
+      ],
+      "agreement_not_exactly_one_rows": 0,
+      "all_evsi_effectively_zero": true,
+      "candidate_actions": 2916,
+      "candidate_count_distribution": {
+        "12": 243
+      },
+      "catastrophe_nonzero_rows": 0,
+      "disagreeing_candidate_actions": 2023,
+      "disagreeing_candidate_fraction": 0.693758573388203,
+      "disagreement_candidate_count_per_row": {
+        "8": 164,
+        "9": 79
+      },
+      "evsi_exact_zero_rows": 184,
+      "evsi_material_nonzero_rows": 0,
+      "evsi_positive_roundoff_rows": 59,
+      "evsi_tolerance": 1e-12,
+      "maximum_absolute_evsi": 8.881784197001252e-16,
+      "planning_rows": 243,
+      "probe_gate_reasons": {
+        "agreement_at_or_above_threshold": 243
+      },
+      "probes": 0,
+      "reset_rows": 13,
+      "reset_rows_labeled_exploit": 13,
+      "rows_with_action_varying_costs": 14,
+      "rows_with_prediction_signature_disagreement": 243,
+      "selected_action_disagreement_rows": [
+        2,
+        21,
+        40,
+        59,
+        78,
+        97,
+        116,
+        135,
+        154,
+        173,
+        192,
+        211,
+        230,
+        249
+      ],
+      "telemetry_findings": [
+        "positive EVSI below tolerance is floating-point cancellation",
+        "mandatory RESET lifecycle actions are labeled exploit",
+        "step elapsed_seconds excludes controller planning"
+      ]
+    },
+    "live_pool_grounding": {
+      "behavioral_dedup_eligibility_collisions": [
+        {
+          "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+          "candidate_indices": [
+            0,
+            3
+          ],
+          "eligible_ids": [
+            "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22"
+          ],
+          "selected_ids": [
+            "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a"
+          ]
+        }
+      ],
+      "claim_effect": "runtime validity is not role-gate eligibility; only one live committee member passed the WSL role-specific grounding gate",
+      "generated_candidate_ids": [
+        "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+        "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3",
+        "1388df24b485a1a0a7b6b42079672edb3b9d70e2991e765a3d17c047557e2137",
+        "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a"
+      ],
+      "grounding_eligible_ids": [
+        "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+        "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3"
+      ],
+      "grounding_eligible_ids_missing_from_live_pool": [
+        "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22"
+      ],
+      "grounding_eligible_live_programs": 1,
+      "grounding_programs": [
+        {
+          "action_sensitive": false,
+          "action_sensitivity_required": false,
+          "assigned_role": "Conservative evidence-first baseline; no effect is allowed only when best supported.",
+          "ast_nodes": 316,
+          "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+          "candidate_index": 0,
+          "eligible": true,
+          "goal_action_conditioned": false,
+          "goal_conditioning_required": false,
+          "hypothesis_id": "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+          "source_sha256": "7ab663dfc4b5cb6fbe31cf2a7d33cc69a2b8ffe39339fa051ec3e56336d9d413"
+        },
+        {
+          "action_sensitive": true,
+          "action_sensitivity_required": true,
+          "assigned_role": "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
+          "ast_nodes": 206,
+          "behavior_signature": "4312683ccca158b0c7558d6e00ea5311989d027cec96af78199d95af6350c1a4",
+          "candidate_index": 1,
+          "eligible": true,
+          "goal_action_conditioned": true,
+          "goal_conditioning_required": true,
+          "hypothesis_id": "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3",
+          "source_sha256": "ae1e66d63d1aaafbb8c6a339f1c5cf025c4043065bf435eb0a366786ed94b938"
+        },
+        {
+          "action_sensitive": true,
+          "action_sensitivity_required": true,
+          "assigned_role": "Object or agent motion with graded progress from normalized distance or alignment.",
+          "ast_nodes": 532,
+          "behavior_signature": "d6276c7ed44136d0a74a43c3cded39540d1fd80c8cfa9ef57c82697404b3a207",
+          "candidate_index": 2,
+          "eligible": false,
+          "goal_action_conditioned": false,
+          "goal_conditioning_required": true,
+          "hypothesis_id": "1388df24b485a1a0a7b6b42079672edb3b9d70e2991e765a3d17c047557e2137",
+          "source_sha256": "539567de7c90bec03724368c7f45244f6eb615722832d2501faff5a57b2168c2"
+        },
+        {
+          "action_sensitive": false,
+          "action_sensitivity_required": true,
+          "assigned_role": "Component-wide, toggle, selection, or global effects with graded component progress.",
+          "ast_nodes": 184,
+          "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+          "candidate_index": 3,
+          "eligible": false,
+          "goal_action_conditioned": false,
+          "goal_conditioning_required": true,
+          "hypothesis_id": "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a",
+          "source_sha256": "dfa14441a357ab780bf44d5200dd3f816fc5d2bd3356086170761ecd5628d91f"
+        }
+      ],
+      "grounding_selection_mismatch_detected": true,
+      "live_pool_matches_grounding_eligible_set": false,
+      "live_selected_grounding_eligible_ids": [
+        "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3"
+      ],
+      "live_selected_grounding_ineligible_ids": [
+        "1388df24b485a1a0a7b6b42079672edb3b9d70e2991e765a3d17c047557e2137",
+        "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a"
+      ],
+      "live_selected_ids": [
+        "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3",
+        "1388df24b485a1a0a7b6b42079672edb3b9d70e2991e765a3d17c047557e2137",
+        "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a"
+      ],
+      "mapping_method": "validate_program(source).sha256",
+      "runtime_valid_live_programs": 3
+    },
+    "mechanism_M_vs_S": {
+      "committee_best_loss": 0.0792989730834961,
+      "committee_program_calls": 3586728,
+      "decision_points": 256,
+      "passed": false,
+      "reasons": [
+        "best-committee prequential loss is not 15% below S"
+      ],
+      "relative_loss_improvement": 0.13291343837659156,
+      "single_program_calls": 1185732,
+      "single_program_loss": 0.09145450592041016,
+      "timeout_rate": 0.0,
+      "two_valid_fraction": 1.0,
+      "validity_scope": "runtime-valid hypotheses; see live-pool grounding mismatch"
+    },
+    "mechanism_X_vs_S": {
+      "committee_best_loss": 0.0792989730834961,
+      "committee_program_calls": 3586728,
+      "decision_points": 256,
+      "passed": false,
+      "reasons": [
+        "best-committee prequential loss is not 15% below S"
+      ],
+      "relative_loss_improvement": 0.13291343837659156,
+      "single_program_calls": 1185732,
+      "single_program_loss": 0.09145450592041016,
+      "timeout_rate": 0.0,
+      "two_valid_fraction": 1.0,
+      "validity_scope": "runtime-valid hypotheses; see live-pool grounding mismatch"
+    },
+    "runtime_ratios": {
+      "M_over_S": 2.853562536854419,
+      "M_over_S_is_diagnostic_not_a_preregistered_gate": true,
+      "X_over_M": 1.0013290124700576,
+      "X_over_M_formal_1_5x_condition_passed": true,
+      "X_over_S": 2.857354957049987
+    },
+    "score_gate_single_cell_proxy": {
+      "action_delta": 0,
+      "formal_development_gate": false,
+      "level_delta": 0,
+      "positive_game_fraction": 0.0,
+      "proxy_passed": false,
+      "reasons": [
+        "neither +0.5 RHAE points nor an action-neutral extra level",
+        "positive on fewer than 60% of development games"
+      ],
+      "rhae_delta": 0.0
+    }
+  },
+  "date": "2026-07-13",
+  "decision": {
+    "next_engineering_actions": [
+      "carry role-gate eligibility into live pool construction",
+      "prevent behavioral deduplication from replacing an eligible program with an ineligible one",
+      "clamp EVSI magnitudes within the declared numerical-zero tolerance",
+      "separate mandatory RESET and controller-planning latency in telemetry",
+      "rerun only the four-cell pilot from a clean commit after the live-pool fix"
+    ],
+    "reasons": [
+      "all D/S/M/X variants completed zero levels",
+      "the 15% mechanism-loss gate failed",
+      "M and X were semantically equivalent and selected no probes",
+      "the cross-level multiplier changed no action",
+      "only one live committee member passed its WSL role-specific grounding gate"
+    ],
+    "remaining_runs_locked": true
+  },
+  "matrix_progress": {
+    "completed": 4,
+    "completed_run_ids": [
+      "development-bp35-0a0ad940-11-D-18d8bbf7",
+      "development-bp35-0a0ad940-11-M-8054a950",
+      "development-bp35-0a0ad940-11-S-533bd834",
+      "development-bp35-0a0ad940-11-X-21a2fb16"
+    ],
+    "partial_rows": 0,
+    "remaining": 176,
+    "scaleup_unlocked": false,
+    "selected_variants": [
+      "D",
+      "S",
+      "M",
+      "X"
+    ],
+    "total": 180
+  },
+  "provenance": {
+    "development_matrix_snapshot": {
+      "bytes": 72723,
+      "canonical_sha256": "849cee59ec0274b4b3881d8e5ea8cd388e25db3618eba95bf1053617f4f7f79e",
+      "path": "artifacts/development_matrix_goal_v3_pilot.json",
+      "sha256": "7bf39d2c1ea7c986e7c473069a8647ae8d8677b66ab5a2a510576d00b4bd3816"
+    },
+    "git": {
+      "audit_commit": "608e926de52f220973ecf2c5f88d29cd0f5d4cec",
+      "audit_worktree_clean_before_output": true,
+      "launch_commit": "65836ce9944fd8cb4ec3a0a6043ebdbb90ee9ade",
+      "launch_commit_is_ancestor_of_audit_commit": true,
+      "launch_provenance_limit": "ancestry and artifact chronology support the launch commit, but the run schema does not independently prove command-time worktree cleanliness",
+      "launch_worktree_clean_not_embedded_in_run_schema": true,
+      "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "grounding": {
+      "windows": {
+        "bytes": 54584,
+        "canonical_sha256": "29ca75bc88d9e35a486a6954275a381e9b8e10900ca16c9550519145e25a9f68",
+        "git": {
+          "commit": "d280ac97f33332e43e6c6da1fb9169dc315c1bbd",
+          "dirty": false,
+          "repository_root": "D:/interviews/AIbuild/arc3-crosslevel-voi",
+          "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "passes": true,
+        "path": "artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json",
+        "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+        "prompt_contract_sha256": "391eadfb3bbf860cb8266fea6f4a3cd5855eb9ab60fc1610b37b66516a44b6de",
+        "prompt_contract_version": "grounded-actions-palette-graded-goals-v3",
+        "schema_version": 4,
+        "sha256": "3a64ac2598dcaa3326fc9b7dc71631e4b418bca9c74c29b777111643fbda90b4",
+        "summary": {
+          "action_sensitive_programs": 2,
+          "distinct_behavior_classes": 3,
+          "gate_reasons": [],
+          "goal_action_conditioned_programs": 2,
+          "graded_role_programs": 2,
+          "grounded_safe_programs": 3,
+          "hard_memory_limit_enforced_programs": 0,
+          "hard_memory_limit_required": false,
+          "palette_conflict_programs": 0,
+          "passes": true,
+          "sandbox_valid_programs": 4,
+          "unsafe_coordinate_programs": 0
+        },
+        "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+      },
+      "wsl": {
+        "bytes": 61633,
+        "canonical_sha256": "ab1c5dd7c3fe5a4b65fabee59c4faac1da3232059817bcb6b79162d110911ead",
+        "git": {
+          "commit": "cedf0268665e86e8487bccb05ecbe4e1b8880813",
+          "dirty": false,
+          "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
+          "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+        "passes": true,
+        "path": "artifacts/prompt_grounding_bp35_seed11_goal_v3_wsl.json",
+        "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+        "prompt_contract_sha256": "391eadfb3bbf860cb8266fea6f4a3cd5855eb9ab60fc1610b37b66516a44b6de",
+        "prompt_contract_version": "grounded-actions-palette-graded-goals-v3",
+        "schema_version": 4,
+        "sha256": "1ed7eca942e399fe1d37d6f730e9ec6f848264424dd27886ffd0617ee3b6611b",
+        "summary": {
+          "action_sensitive_programs": 1,
+          "distinct_behavior_classes": 2,
+          "gate_reasons": [],
+          "goal_action_conditioned_programs": 1,
+          "graded_role_programs": 1,
+          "grounded_safe_programs": 2,
+          "hard_memory_limit_enforced_programs": 2,
+          "hard_memory_limit_required": true,
+          "palette_conflict_programs": 0,
+          "passes": true,
+          "sandbox_valid_programs": 4,
+          "unsafe_coordinate_programs": 0
+        },
+        "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+      }
+    },
+    "model_profile": "local-bf16-fallback",
+    "model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "previous_pilot": {
+      "bytes": 12412,
+      "canonical_sha256": "6e17d057a7439403efca40ef9f17888ea99e4f750bcb85778ffb99634ddfe1f6",
+      "path": "artifacts/pilot_bp35_seed11_fair_v2.json",
+      "sha256": "da07107389c8656f6d035cbdf1256e895335ec0900c7f4a4efd913f275da98fb",
+      "status": "valid_negative_engineering_pilot_scaleup_locked"
+    },
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "runs": {
+    "D": {
+      "budget_audit": {
+        "action_budget_ok": true,
+        "environment_action_cap": 256,
+        "generated_token_cap": 12288,
+        "token_budget_ok": true,
+        "wall_budget_ok": true,
+        "wall_headroom_seconds": 758.600500629,
+        "wall_time_cap_seconds": 1200.0
+      },
+      "config_sha256": "18d8bbf79d3fc63b1f894fba0e9312e84687ba0fc37f1b55b385d029fdb4c7d6",
+      "metrics": {
+        "direct_fallbacks": 253,
+        "generated_tokens": 4044,
+        "levels_completed": 0,
+        "mean_best_hypothesis_transition_loss": null,
+        "mean_weighted_transition_loss": null,
+        "peak_vram_gib": 9.323947429656982,
+        "program_execution_error_fraction": 0.0,
+        "program_execution_errors": 0,
+        "program_goal_calls": 0,
+        "program_prediction_calls": 0,
+        "program_timeouts": 0,
+        "rhae": 0.0,
+        "termination_reason": "budget_exhausted",
+        "total_actions": 256,
+        "wall_seconds": 441.399499371
+      },
+      "run_id": "development-bp35-0a0ad940-11-D-18d8bbf7",
+      "summary": {
+        "bytes": 1334,
+        "canonical_sha256": "a5753cb4144416dcf6901d292bcd489e00b68242ac5fe945cc63fa5ca2779bad",
+        "path": "runs/development/development-bp35-0a0ad940-11-D-18d8bbf7.json",
+        "sha256": "322c4e55145525c6682f80d746397b58cfee091ae04b86fd7465a01e5a20029b"
+      },
+      "trace": {
+        "bytes": 24197434,
+        "canonical_bytes_equal_raw": true,
+        "canonical_sha256": "b163730c0f8860fac48f289d6b8274076b945b3dd4a924550f551614954351ff",
+        "path": "runs/development/development-bp35-0a0ad940-11-D-18d8bbf7.jsonl",
+        "records": 256,
+        "sha256": "b163730c0f8860fac48f289d6b8274076b945b3dd4a924550f551614954351ff"
+      },
+      "trace_audit": {
+        "action_counts": {
+          "ACTION3": 42,
+          "ACTION4": 3,
+          "ACTION6(1,15)": 1,
+          "ACTION6(1,2)": 1,
+          "ACTION6(12,44)": 1,
+          "ACTION6(15,31)": 2,
+          "ACTION6(15,33)": 7,
+          "ACTION6(15,38)": 1,
+          "ACTION6(15,39)": 6,
+          "ACTION6(15,43)": 1,
+          "ACTION6(15,45)": 6,
+          "ACTION6(15,50)": 1,
+          "ACTION6(15,51)": 3,
+          "ACTION6(15,53)": 1,
+          "ACTION6(3,13)": 2,
+          "ACTION6(3,15)": 13,
+          "ACTION6(3,20)": 1,
+          "ACTION6(3,21)": 2,
+          "ACTION6(31,58)": 1,
+          "ACTION6(37,15)": 1,
+          "ACTION6(37,35)": 1,
+          "ACTION6(38,14)": 5,
+          "ACTION6(38,15)": 14,
+          "ACTION6(38,21)": 4,
+          "ACTION6(39,15)": 5,
+          "ACTION6(39,21)": 1,
+          "ACTION6(42,34)": 1,
+          "ACTION6(55,32)": 1,
+          "ACTION6(55,63)": 1,
+          "ACTION6(58,1)": 1,
+          "ACTION6(60,32)": 3,
+          "ACTION6(63,10)": 1,
+          "ACTION6(63,13)": 1,
+          "ACTION6(63,14)": 1,
+          "ACTION6(63,15)": 2,
+          "ACTION6(63,16)": 1,
+          "ACTION6(63,18)": 1,
+          "ACTION6(63,19)": 1,
+          "ACTION6(63,21)": 1,
+          "ACTION6(63,22)": 3,
+          "ACTION6(63,23)": 1,
+          "ACTION6(63,24)": 1,
+          "ACTION6(63,28)": 1,
+          "ACTION6(63,29)": 2,
+          "ACTION6(63,3)": 1,
+          "ACTION6(63,30)": 2,
+          "ACTION6(63,31)": 1,
+          "ACTION6(63,33)": 1,
+          "ACTION6(63,34)": 2,
+          "ACTION6(63,35)": 2,
+          "ACTION6(63,36)": 1,
+          "ACTION6(63,37)": 2,
+          "ACTION6(63,38)": 3,
+          "ACTION6(63,39)": 3,
+          "ACTION6(63,40)": 3,
+          "ACTION6(63,42)": 1,
+          "ACTION6(63,43)": 2,
+          "ACTION6(63,46)": 1,
+          "ACTION6(63,49)": 2,
+          "ACTION6(63,50)": 1,
+          "ACTION6(63,53)": 1,
+          "ACTION6(63,56)": 2,
+          "ACTION6(63,57)": 1,
+          "ACTION6(63,58)": 1,
+          "ACTION6(63,59)": 2,
+          "ACTION6(63,62)": 1,
+          "ACTION6(63,8)": 3,
+          "ACTION6(63,9)": 2,
+          "ACTION7": 62,
+          "RESET": 3
+        },
+        "all_resets_legal": true,
+        "decision_mode_counts": {
+          "direct_fallback": 253,
+          "exploit": 3
+        },
+        "non_reset_actions_available": true,
+        "observed_game_over_steps": [
+          64,
+          129,
+          194
+        ],
+        "preceding_game_over_steps": [
+          64,
+          129,
+          194
+        ],
+        "reset_steps": [
+          65,
+          130,
+          195
+        ],
+        "step_elapsed_seconds_scope": "environment session.step only",
+        "step_elapsed_seconds_sum": 64.11631206499976
+      }
+    },
+    "M": {
+      "budget_audit": {
+        "action_budget_ok": true,
+        "environment_action_cap": 256,
+        "generated_token_cap": 12288,
+        "token_budget_ok": true,
+        "wall_budget_ok": true,
+        "wall_headroom_seconds": 105.37220697600014,
+        "wall_time_cap_seconds": 1200.0
+      },
+      "config_sha256": "8054a950f7215ba13c28628b45eac0b49e0f7bd9b513b4194dab416176155f16",
+      "metrics": {
+        "direct_fallbacks": 0,
+        "generated_tokens": 1701,
+        "levels_completed": 0,
+        "mean_best_hypothesis_transition_loss": 0.0792989730834961,
+        "mean_weighted_transition_loss": 0.07930686162939271,
+        "peak_vram_gib": 8.910474300384521,
+        "program_execution_error_fraction": 0.0,
+        "program_execution_errors": 0,
+        "program_goal_calls": 1793340,
+        "program_prediction_calls": 1793388,
+        "program_timeouts": 0,
+        "rhae": 0.0,
+        "termination_reason": "budget_exhausted",
+        "total_actions": 256,
+        "wall_seconds": 1094.6277930239999
+      },
+      "run_id": "development-bp35-0a0ad940-11-M-8054a950",
+      "summary": {
+        "bytes": 1380,
+        "canonical_sha256": "3b6da0ef952f1ffdd5c2107085689598a5d3669a6c83bda9376ca7c19f578314",
+        "path": "runs/development/development-bp35-0a0ad940-11-M-8054a950.json",
+        "sha256": "489bc4e25426837fba2e3d34c68a98471a0a871583ee66e55ca0f0816708341e"
+      },
+      "trace": {
+        "bytes": 25211357,
+        "canonical_bytes_equal_raw": true,
+        "canonical_sha256": "df588408f4e94e02bb62c90caba76e3faed0d78c14e98d2d0c60c7c93cd4d290",
+        "path": "runs/development/development-bp35-0a0ad940-11-M-8054a950.jsonl",
+        "records": 256,
+        "sha256": "df588408f4e94e02bb62c90caba76e3faed0d78c14e98d2d0c60c7c93cd4d290"
+      },
+      "trace_audit": {
+        "action_counts": {
+          "ACTION3": 229,
+          "ACTION6(39,21)": 14,
+          "RESET": 13
+        },
+        "all_resets_legal": true,
+        "decision_mode_counts": {
+          "exploit": 255,
+          "refresh": 1
+        },
+        "non_reset_actions_available": true,
+        "observed_game_over_steps": [
+          18,
+          37,
+          56,
+          75,
+          94,
+          113,
+          132,
+          151,
+          170,
+          189,
+          208,
+          227,
+          246
+        ],
+        "preceding_game_over_steps": [
+          18,
+          37,
+          56,
+          75,
+          94,
+          113,
+          132,
+          151,
+          170,
+          189,
+          208,
+          227,
+          246
+        ],
+        "reset_steps": [
+          19,
+          38,
+          57,
+          76,
+          95,
+          114,
+          133,
+          152,
+          171,
+          190,
+          209,
+          228,
+          247
+        ],
+        "step_elapsed_seconds_scope": "environment session.step only",
+        "step_elapsed_seconds_sum": 72.65977276800083
+      }
+    },
+    "S": {
+      "budget_audit": {
+        "action_budget_ok": true,
+        "environment_action_cap": 256,
+        "generated_token_cap": 12288,
+        "token_budget_ok": true,
+        "wall_budget_ok": true,
+        "wall_headroom_seconds": 816.3995781110001,
+        "wall_time_cap_seconds": 1200.0
+      },
+      "config_sha256": "533bd83496f475d022fdb13c6a29ec65550d02a6be36af39e2ba0d394ff6e446",
+      "metrics": {
+        "direct_fallbacks": 0,
+        "generated_tokens": 354,
+        "levels_completed": 0,
+        "mean_best_hypothesis_transition_loss": 0.09145450592041016,
+        "mean_weighted_transition_loss": 0.09145450592041016,
+        "peak_vram_gib": 8.89961862564087,
+        "program_execution_error_fraction": 0.0,
+        "program_execution_errors": 0,
+        "program_goal_calls": 592860,
+        "program_prediction_calls": 592872,
+        "program_timeouts": 0,
+        "rhae": 0.0,
+        "termination_reason": "budget_exhausted",
+        "total_actions": 256,
+        "wall_seconds": 383.6004218889999
+      },
+      "run_id": "development-bp35-0a0ad940-11-S-533bd834",
+      "summary": {
+        "bytes": 1374,
+        "canonical_sha256": "07fb3a76c069c59b0c54a08a4dcccce6cbbba1fe7950eb36470fce41ca27e05b",
+        "path": "runs/development/development-bp35-0a0ad940-11-S-533bd834.json",
+        "sha256": "4d674c57c905cef7895d710efdd40b5bf1afc4b56f13e3b0995a2b086af7a457"
+      },
+      "trace": {
+        "bytes": 24561561,
+        "canonical_bytes_equal_raw": true,
+        "canonical_sha256": "7437da634018e439c4d60c78799f387fc18766e4fa892a30bc9c465a444b46f8",
+        "path": "runs/development/development-bp35-0a0ad940-11-S-533bd834.jsonl",
+        "records": 256,
+        "sha256": "7437da634018e439c4d60c78799f387fc18766e4fa892a30bc9c465a444b46f8"
+      },
+      "trace_audit": {
+        "action_counts": {
+          "ACTION3": 241,
+          "RESET": 15
+        },
+        "all_resets_legal": true,
+        "decision_mode_counts": {
+          "exploit": 255,
+          "refresh": 1
+        },
+        "non_reset_actions_available": true,
+        "observed_game_over_steps": [
+          16,
+          33,
+          50,
+          67,
+          84,
+          101,
+          118,
+          135,
+          152,
+          169,
+          186,
+          203,
+          220,
+          237,
+          254
+        ],
+        "preceding_game_over_steps": [
+          16,
+          33,
+          50,
+          67,
+          84,
+          101,
+          118,
+          135,
+          152,
+          169,
+          186,
+          203,
+          220,
+          237,
+          254
+        ],
+        "reset_steps": [
+          17,
+          34,
+          51,
+          68,
+          85,
+          102,
+          119,
+          136,
+          153,
+          170,
+          187,
+          204,
+          221,
+          238,
+          255
+        ],
+        "step_elapsed_seconds_scope": "environment session.step only",
+        "step_elapsed_seconds_sum": 71.58696597300036
+      }
+    },
+    "X": {
+      "budget_audit": {
+        "action_budget_ok": true,
+        "environment_action_cap": 256,
+        "generated_token_cap": 12288,
+        "token_budget_ok": true,
+        "wall_budget_ok": true,
+        "wall_headroom_seconds": 103.91743298899974,
+        "wall_time_cap_seconds": 1200.0
+      },
+      "config_sha256": "21a2fb16fc2865527f50efa1cf7d729c46b9689bb4eda6d8daf1c1e18434cb3c",
+      "metrics": {
+        "direct_fallbacks": 0,
+        "generated_tokens": 1701,
+        "levels_completed": 0,
+        "mean_best_hypothesis_transition_loss": 0.0792989730834961,
+        "mean_weighted_transition_loss": 0.07930686162939271,
+        "peak_vram_gib": 8.910474300384521,
+        "program_execution_error_fraction": 0.0,
+        "program_execution_errors": 0,
+        "program_goal_calls": 1793340,
+        "program_prediction_calls": 1793388,
+        "program_timeouts": 0,
+        "rhae": 0.0,
+        "termination_reason": "budget_exhausted",
+        "total_actions": 256,
+        "wall_seconds": 1096.0825670110003
+      },
+      "run_id": "development-bp35-0a0ad940-11-X-21a2fb16",
+      "summary": {
+        "bytes": 1380,
+        "canonical_sha256": "d337096377ca24c7f638fb9924e7fa9837776c64abb4614fbf448870aec9aebd",
+        "path": "runs/development/development-bp35-0a0ad940-11-X-21a2fb16.json",
+        "sha256": "92f5d6d3b8223a3b8a7e74e92c316810f7d32dadfde033f2bce43c53591c6f86"
+      },
+      "trace": {
+        "bytes": 25211602,
+        "canonical_bytes_equal_raw": true,
+        "canonical_sha256": "a99c759b8ea95b5401447d23d8753621b77d7fa52b6cfd8acb90991b44178bd9",
+        "path": "runs/development/development-bp35-0a0ad940-11-X-21a2fb16.jsonl",
+        "records": 256,
+        "sha256": "a99c759b8ea95b5401447d23d8753621b77d7fa52b6cfd8acb90991b44178bd9"
+      },
+      "trace_audit": {
+        "action_counts": {
+          "ACTION3": 229,
+          "ACTION6(39,21)": 14,
+          "RESET": 13
+        },
+        "all_resets_legal": true,
+        "decision_mode_counts": {
+          "exploit": 255,
+          "refresh": 1
+        },
+        "non_reset_actions_available": true,
+        "observed_game_over_steps": [
+          18,
+          37,
+          56,
+          75,
+          94,
+          113,
+          132,
+          151,
+          170,
+          189,
+          208,
+          227,
+          246
+        ],
+        "preceding_game_over_steps": [
+          18,
+          37,
+          56,
+          75,
+          94,
+          113,
+          132,
+          151,
+          170,
+          189,
+          208,
+          227,
+          246
+        ],
+        "reset_steps": [
+          19,
+          38,
+          57,
+          76,
+          95,
+          114,
+          133,
+          152,
+          171,
+          190,
+          209,
+          228,
+          247
+        ],
+        "step_elapsed_seconds_scope": "environment session.step only",
+        "step_elapsed_seconds_sum": 72.17943218299297
+      }
+    }
+  },
+  "schema_version": 1,
+  "scope": {
+    "central_mechanism_exercised": false,
+    "claim_eligible": false,
+    "contract": "goal-v3-schema-v4",
+    "full_game_id": "bp35-0a0ad940",
+    "game_id": "bp35",
+    "game_version": "0a0ad940",
+    "interpretation": "one public game and one seed engineering pilot; not a development aggregate, private-score result, or generalization claim",
+    "phase": "development",
+    "seed": 11
+  },
+  "status": "valid_negative_engineering_pilot_live_grounding_mismatch_scaleup_locked"
+}
