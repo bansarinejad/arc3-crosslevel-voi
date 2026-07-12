@@ -1,6 +1,6 @@
 {
   "contract_status": "superseded-pre-grounding-diagnostic",
-  "replacement_pending": "artifacts/model_gate_live8_windows.json",
+  "superseded_by": "artifacts/model_gate_live8_windows.json",
   "date": "2026-07-12",
   "hardware": {
     "device": "NVIDIA GeForce RTX 4090 Laptop GPU",

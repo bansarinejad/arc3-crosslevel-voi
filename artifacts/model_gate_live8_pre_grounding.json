@@ -1,6 +1,6 @@
 {
   "contract_status": "superseded-pre-grounding-diagnostic",
-  "replacement_pending": "artifacts/model_gate_live8_windows.json",
+  "superseded_by": "artifacts/model_gate_live8_windows.json",
   "elapsed_seconds": 130.18610059999628,
   "fits_vram_gate": true,
   "hardware": {

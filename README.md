@@ -32,9 +32,14 @@ does not contain code from Duck or other competition entries.
   POSIX data-segment limits were enforced for all three. See
   `artifacts/model_gate_live8_wsl.json` and
   `artifacts/prompt_grounding_bp35_seed11_wsl.json`.
-- Preserved earlier official-palette Windows model and grounding checks as diagnostics only;
-  their artifacts predate contract-content fingerprints and the checked-in history fixture,
-  so they are explicitly marked superseded.
+- Passed the same fair-v2 gates on native Windows. The model preflight produced 2/4 valid
+  programs with no truncation at 21.40 tokens/s and 10.78 GiB peak. The frozen-history gate
+  produced 2 safe, 2 distinct, action-sensitive programs with no palette or coordinate
+  conflicts at 22.87 tokens/s and 8.98 GiB peak. Windows has no POSIX `RLIMIT_DATA`, so hard
+  data-segment enforcement is transparently reported as not required. The frozen contracts,
+  fixture, model revision, and weight manifest match WSL; generated source is not claimed to
+  be bit-identical across platforms. See `artifacts/model_gate_live8_windows.json` and
+  `artifacts/prompt_grounding_bp35_seed11_windows.json`.
 - The first D/S/M/X pilot is retained only as a pre-grounding diagnostic. Its renderer
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
@@ -44,7 +49,7 @@ does not contain code from Duck or other competition entries.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official
-The 4B BF16 fallback is the selected local model. There are deliberately no
+4B BF16 fallback is the selected local model. There are deliberately no
 corrected-contract controlled gameplay scores or positive cross-level performance claims
 until the controlled matrices are executed.
 

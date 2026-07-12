@@ -1,6 +1,6 @@
 {
   "contract_status": "superseded-pre-fixture-windows-diagnostic",
-  "replacement_pending": "artifacts/prompt_grounding_bp35_seed11_windows.json",
+  "superseded_by": "artifacts/prompt_grounding_bp35_seed11_windows.json",
   "base_config_sha256": "fe20760652d16d16a32c5e6f5a96c89fe4ce03b60eb7e871fc4f05df339c5cc4",
   "effective_offline_config_sha256": "fcb45fa280a5dfcca07ac4486226010aff1a6cbf8e6fdddfb8feded3d39c9c0c",
   "evaluation_actions": [

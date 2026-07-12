@@ -1,0 +1,510 @@
+{
+  "base_config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
+  "effective_offline_config_sha256": "2a2c4c534b64c39047288b24e84ca1d85f0186c9eb448928d9501b0cce80c1aa",
+  "evaluation_actions": [
+    "ACTION3",
+    "ACTION4",
+    "ACTION7",
+    "ACTION6(42,33)",
+    "ACTION6(5,42)",
+    "ACTION6(63,31)",
+    "ACTION6(3,15)",
+    "ACTION6(3,21)",
+    "ACTION6(3,27)",
+    "ACTION6(15,33)",
+    "ACTION6(15,39)",
+    "ACTION6(15,45)"
+  ],
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "generation": {
+    "elapsed_seconds": 97.58522559999255,
+    "output_tokens": 2232,
+    "peak_vram_gb": 8.983225345611572,
+    "requested": 4,
+    "sequence_token_counts": [
+      291,
+      329,
+      671,
+      941
+    ],
+    "tokens_per_second": 22.87231480254087,
+    "truncated_sequences": 0
+  },
+  "git": {
+    "commit": "4e9e3ab5afa701e79af8c0e1565e8a7f2e45b274",
+    "dirty": false,
+    "repository_root": "D:/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+  "history_frames": 1,
+  "latest_grid_int16_sha256": "92370b9db1c1b1f1570ec24487c8a1669fe3bf35572f0c3efa2bb084c5a1a634",
+  "latest_grid_uint8_sha256": "e673f0158ffbf5ffa45f3f32f30a91c9dc7f22ad41c8aaf3feeb8e7dda11fa31",
+  "latest_rendered_rgb_sha256": "eb0167dfb47c88a47d27b61891c62864267a32e2c672f8362ef6dff36925e2bf",
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "observed_palette_values": [
+    0,
+    3,
+    5,
+    9,
+    10,
+    11,
+    14
+  ],
+  "offline": true,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "programs": [
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION4",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION7",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        }
+      ],
+      "action_sensitive": false,
+      "all_actions_ok": false,
+      "ast_nodes": 122,
+      "behavior_signature": null,
+      "coordinate_read_lines": [
+        4,
+        5
+      ],
+      "eligible": false,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": false,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": false,
+      "source": "def predict(history, action):\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    else:\n        row = None\n        col = None\n    \n    current_grid = history.frames[-1]\n    current_values = history.levels[-1].get('grid_values', [])\n    \n    # Identify wall colors from history if needed, but we'll use a conservative baseline\n    # based on the instruction: \"A no-effect transition is acceptable when it is the \n    # best-supported hypothesis.\"\n    \n    next_grid = current_grid.copy()\n    \n    if kind == 6 and row is not None and col is not None:\n        # ACTION6 with coordinates - check if it's a wall\n        # In the provided image, ACTION6 coordinates would be checked against\n        # wall colors (10, 13, 14, 15 based on the palette)\n        # For a conservative baseline with no evidence of specific wall detection,\n        # we assume the action has no effect\n        pass\n    \n    return {\"next_grid\": next_grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.0",
+      "source_length": 1088,
+      "source_sha256": "f156185ce0362240781e6d395e89b9befefccecd585a692056b1a37ac9001cff",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "23f376d2c9bcec32a9a77b808670c56f81c44bca54a4239ab503498929ec8863"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "23f376d2c9bcec32a9a77b808670c56f81c44bca54a4239ab503498929ec8863"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "694fa108bbaca2c04515ed8d37acc9ac2749475f688ec3ecdd1933c630588d8b"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "8dce9488f64812ff984b82c03d1f97ad3ca96e79c9bedc6ad787893b30938684"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "a09debeb49dd70c0b44cf064170ec9f474527c99bdd851c23ee13711c819617a"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "0dd99b7e3027b0cbaac4bfa8db2e1517f2a2c7a5de888a7afd83ae8cbe028dea"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "bb9b4b1222d4589fb6187c1193d238c802a114b182f1dabcf2dbab4957efa043"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "01ac8ed3d2f94fddc3eb87324792409db82ac830a2243d6b85198ba501fa594e"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "96f7bbf7f95f9cbfbd196bb0ae2802ce5d2c69fbab400da4e667096884f2ea02"
+        }
+      ],
+      "action_sensitive": true,
+      "all_actions_ok": true,
+      "ast_nodes": 208,
+      "behavior_signature": "4b8de803c7179f8f92fb0236103742dabf8361984bf9d2b6038853015e3fa258",
+      "coordinate_read_lines": [
+        5,
+        6,
+        22
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": false,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # ACTION6: Interact with the grid at (row, col)\n        # Check if the cell is empty (0) or a wall (5) or player (9) or goal (14)\n        val = grid[row, col]\n        if val == 0:\n            # Move into empty space\n            grid[row, col] = 9\n        elif val == 5:\n            # Hit a wall, stay put\n            pass\n        elif val == 9:\n            # Stay on player\n            pass\n        elif val == 14:\n            # Reached goal\n            grid[row, col] = 0\n    return {\"next_grid\": grid, \"game_state\": \"WIN\" if kind == 6 and action.row is not None and action.col is not None else \"NOT_FINISHED\", \"level_delta\": 1 if kind == 6 and action.row is not None and action.col is not None else 0, \"memory\": {}}\n\ndef goal_value(history):\n    last_frame = history.frames[-1]\n    # Check for presence of goal value 14 (green)\n    if 14 in last_frame:\n        return 1.0\n    return 0.0",
+      "source_length": 1087,
+      "source_sha256": "6a9e3d051e56039a1e85b6bde2fdbc58ef4d3883f4b6056bf65f5a0c690a28bd",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "16d73369873b42e50130bcc38c84a8f8bc1c6d88e0f0bac63f24a29a192eed01"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "f70c672fd80ce37fdfd3e35da41135a98224c3cbc119a69030e60bd5e81cf0d2"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "8f508f9ff618daad01219d09197e08a4fa315a769c3fce47783c5e78651636c1"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "ee497fa5980f9a5585258f754d42df896e768bf40bf25b7305f77c72ae1a79f9"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "bb78a90e9571b2ab0fb9b3c99879a87fb937c699054ecb2345bf3dc930ab0239"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "296c56aeb6674fa7f57a1b7a34448f19c58722f8ca37a751903990ac93ca88c8"
+        }
+      ],
+      "action_sensitive": true,
+      "all_actions_ok": true,
+      "ast_nodes": 623,
+      "behavior_signature": "9d6511c0275bfebb634e609e1cda1b9fd1610ffd101a93084c4d20fd0f9f9868",
+      "coordinate_read_lines": [
+        7,
+        8
+      ],
+      "eligible": false,
+      "goal_value_error": "ProgramExecutionError: execution: AttributeError: 'numpy.ndarray' object has no attribute 'get'",
+      "goal_value_ok": false,
+      "hard_memory_limit_enforced": false,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    kind = int(action.kind)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    next_grid = grid.copy()\n    \n    if kind == 6:\n        if action.row is not None and action.col is not None:\n            row, col = action.row, action.col\n            if grid[row, col] == 14:\n                next_grid[row, col] = 0\n                next_grid[row, col+1] = 14\n                next_grid[row+1, col] = 14\n    elif kind == 1:\n        # ACTION1: Move left\n        if np.any(grid == 14):\n            pos = np.argwhere(grid == 14)\n            if len(pos) > 0:\n                r, c = pos[0]\n                if c > 0 and grid[r, c-1] != 14:\n                    next_grid[r, c] = 0\n                    next_grid[r, c-1] = 14\n    elif kind == 2:\n        # ACTION2: Move up\n        if np.any(grid == 14):\n            pos = np.argwhere(grid == 14)\n            if len(pos) > 0:\n                r, c = pos[0]\n                if r > 0 and grid[r-1, c] != 14:\n                    next_grid[r, c] = 0\n                    next_grid[r-1, c] = 14\n    elif kind == 3:\n        # ACTION3: Move right\n        if np.any(grid == 14):\n            pos = np.argwhere(grid == 14)\n            if len(pos) > 0:\n                r, c = pos[0]\n                if c < 63 and grid[r, c+1] != 14:\n                    next_grid[r, c] = 0\n                    next_grid[r, c+1] = 14\n    elif kind == 4:\n        # ACTION4: Move down\n        if np.any(grid == 14):\n            pos = np.argwhere(grid == 14)\n            if len(pos) > 0:\n                r, c = pos[0]\n                if r < 63 and grid[r+1, c] != 14:\n                    next_grid[r, c] = 0\n                    next_grid[r+1, c] = 14\n    \n    game_state = \"WIN\" if np.sum(next_grid) == 0 else \"NOT_FINISHED\"\n    return {\"next_grid\": next_grid, \"game_state\": game_state, \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    last_frame = history.frames[-1]\n    if last_frame is None:\n        return 0.0\n    grid_values = last_frame.get(\"grid_values\", [])\n    return 0.0 if len(grid_values) == 0 else 1.0",
+      "source_length": 2064,
+      "source_sha256": "e6181cdaa2191e0b9e384f05c293766a6051b175225bfd79566ff1884433e434",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "6b3053ff99b6ba6139d461c25b9bb68bdd354679df390e6f493978e7b20291de"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "0c78147a8f6b9f24532d3d2b50a4653e01c044b5f65019c9fb098aa4a8392d41"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "dd3a6b09eef272b0ec005afad2b0ace213daffd1d9bd938da01b532092b1606c"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "2a42dc33b0670057f600bde0375e8362e9de25007f93a4ae69603c26b7e6ca7c"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "cfd62a4143ee5716bb75121d3c6f8318b5ce8919694a4933344dbc87c4259f23"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "dc82b16d02c43d087dcffcfa92e0066a9c529bdb8b9e9ba27b5de334fd1fb9fd"
+        }
+      ],
+      "action_sensitive": true,
+      "all_actions_ok": true,
+      "ast_nodes": 222,
+      "behavior_signature": "0b8d96864de628fb29d54ff6fff2f10ede2d905f1d1e7b7d839cd6d04c7e84e3",
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": false,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    # Role: Prioritize component-wide, toggle, selection, or global action effects.\n    # Analyze history for a pattern of 4 green pixels (value 14) acting as a component.\n    # If the action is ACTION6 and the coordinates target one of the green pixels,\n    # we simulate a \"selection\" or \"component activation\" effect by making that pixel\n    # light magenta (7) or changing its state significantly, indicating interaction.\n    # If no ACTION6 is provided, we look for a general \"toggle\" or \"global\" effect.\n    # Based on the image, there is a large blue area (10) and green pixels (14).\n    # Let's assume the action targets the green component to trigger a global selection.\n    # We will check if the action is ACTION6 and targets a green pixel.\n    # If so, we change that pixel to 7 (light magenta) to show selection.\n    # If not, we leave the grid as is or perform a minor global change like highlighting the path.\n    # Given the instruction \"Predictions should differ for at least two currently valid actions\",\n    # we will ensure ACTION6 on a green pixel has a specific effect, while ACTION1-5 or ACTION7\n    # might have different effects or no effect.\n    # Let's implement: If ACTION6 targets a green pixel (14), change it to 7.\n    # Otherwise, if ACTION6 targets the large blue area (10), maybe change it to something else?\n    # Let's stick to the green pixel interaction as the primary \"component\" effect.\n    \n    # Check if action is ACTION6 and targets a green pixel\n    if kind == 6 and row is not None and col is not None:\n        if grid[row, col] == 14:\n            # Toggle/Select the component\n            grid[row, col] = 7\n    # If ACTION6 targets the blue area, maybe it's a \"path\" effect?\n    elif kind == 6 and row is not None and col is not None:\n        if grid[row, col] == 10:\n            # Change blue to a darker shade or keep it? Let's change to 10->11 (yellow) for variety?\n            # Or maybe keep it as is. The prompt says \"small plausible action-dependent effect\".\n            # Let's assume ACTION6 on blue does nothing or a very subtle change.\n            # Let's change it to 10->10 (no change) or maybe 10->11.\n            # Let's try changing it to 11.\n            grid[row, col] = 11\n    \n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Goal value based on component completion or progress.\n    # If the green component (14) has been interacted with (e.g., changed to 7), return high value.\n    # Since we don't have access to the modified grid in this function, we look at history.\n    # Check if the last frame has any 7s where there were 14s in previous frames.\n    # Or simply check if the game state implies progress.\n    # A simple heuristic: if the grid has changed from initial state, value > 0.\n    # But we don't know initial state.\n    # Let's assume the goal is to interact with the green component.\n    # If the last frame has 7s, it means interaction happened.\n    # However, goal_value only takes history.\n    # We can check if the last frame has 7s.\n    if len(history) > 0:\n        last_frame = history.frames[-1]\n        if last_frame is not None:\n            grid = np.array(last_frame, dtype=np.int8)\n            if np.any(grid == 7):\n                return 0.9\n    return 0.0",
+      "source_length": 3519,
+      "source_sha256": "d3aa2840efe5c2de9430ec24ee8821c643726cb4c4fe4d81c6fdae366f1bf5a8",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    }
+  ],
+  "prompt_contract_sha256": "2850bc72cf42c42e2c813962aa7fb413d74f3ff65789719ac76dd32e26157b96",
+  "prompt_contract_version": "grounded-actions-palette-diverse-v2",
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "11",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "schema_version": 2,
+  "seed": 11,
+  "source_input": "fixtures/grounding/bp35_seed11_initial_history.json",
+  "source_input_kind": "history_fixture",
+  "source_input_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+  "source_trace_canonical_sha256": "c6fd2d38f937d9c5f5a1e7f8e0d5b366db005ebd8a8ae155c21f7e1c34a3e5e8",
+  "summary": {
+    "action_sensitive_programs": 2,
+    "distinct_behavior_classes": 2,
+    "gate_reasons": [],
+    "grounded_safe_programs": 2,
+    "hard_memory_limit_enforced_programs": 0,
+    "hard_memory_limit_required": false,
+    "palette_conflict_programs": 0,
+    "passes": true,
+    "sandbox_valid_programs": 4,
+    "unsafe_coordinate_programs": 0
+  },
+  "system_prompt_sha256": "d70743071154406a43bec797dae1761c69cea01f1b12cd8e45265f6212698d5c",
+  "user_prompt_sha256": [
+    "4438b0af7b9d38b0799b5e66de0e3199ed5ea61f183500132627273d3f9709be",
+    "0ed073003210e2066bddff04b78a5824e5241f3a31b697a8d9b51eec041def0e",
+    "83355169c438409426393ceebafaf0f08a91f234f1c22c9d0a443a77c912861f",
+    "b911fb8beeabea0d0714b7980d915ed70ba8e5798c2580391840bd78f70591f7"
+  ]
+}
