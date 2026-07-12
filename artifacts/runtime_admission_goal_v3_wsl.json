@@ -1,0 +1,410 @@
+{
+  "contract": {
+    "admission_rule": "at least two eligible distinct selected programs, no selected grounding failures or planner invalids, and either agreement below threshold with material EVSI and positive cross-level utility, or differing optimal action sets with material EVSI",
+    "agreement_threshold": 0.8,
+    "beam_width": 8,
+    "initial_cross_level_persistence": 0.5,
+    "material_evsi_threshold_actions": 0.05,
+    "planning_depth": 4,
+    "role_policy": "candidate 0 is conservative; every later candidate must be action-sensitive and goal-conditioned"
+  },
+  "contract_version": "runtime-admission-v1",
+  "gate": {
+    "passes": false,
+    "reasons": [
+      "no material decision diversity: require low agreement with positive cross-level utility, or differing optimal sets with material EVSI"
+    ]
+  },
+  "git": {
+    "commit": "c6b9f5429cd098e29fcd981f8a22ad2f348b27aa",
+    "dirty": false,
+    "repository_root": "D:/kaggle competitions/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "history": {
+    "actions": [
+      "ACTION3",
+      "ACTION4",
+      "ACTION7",
+      "ACTION6(42,33)",
+      "ACTION6(5,42)",
+      "ACTION6(63,31)",
+      "ACTION6(3,15)",
+      "ACTION6(3,21)",
+      "ACTION6(3,27)",
+      "ACTION6(15,33)",
+      "ACTION6(15,39)",
+      "ACTION6(15,45)"
+    ],
+    "frames": 1,
+    "level": 1,
+    "win_levels": 9
+  },
+  "inputs": {
+    "current_config_sha256": "5e8515c81db38475798a15d76f4379dd8a524d87a753d8bc972f6df364158c4a",
+    "fixture": "fixtures/grounding/bp35_seed11_initial_history.json",
+    "fixture_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+    "grounding_artifact": "artifacts/prompt_grounding_bp35_seed11_goal_v3_wsl.json",
+    "grounding_artifact_schema": 4,
+    "grounding_artifact_sha256": "1ed7eca942e399fe1d37d6f730e9ec6f848264424dd27886ffd0617ee3b6611b",
+    "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+    "source_base_config_sha256": "21a2fb16fc2865527f50efa1cf7d729c46b9689bb4eda6d8daf1c1e18434cb3c",
+    "source_prompt_contract_version": "grounded-actions-palette-graded-goals-v3"
+  },
+  "offline": true,
+  "planner_error": null,
+  "planning": {
+    "actions": [
+      {
+        "action": "ACTION3",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION4",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION7",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION6(42,33)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "1007a088e58697a6c6b7fc569a9604b05bf7b06b3318e3155af7e6cd8e852852"
+        ]
+      },
+      {
+        "action": "ACTION6(5,42)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "9c0aec8cc9d41b5a64c3a09fc9ef0d0236966fddf2d8385275cd36f0a37cdac2"
+        ]
+      },
+      {
+        "action": "ACTION6(63,31)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION6(3,15)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "aa6b57520501ada1329ef684580f5b0477e5d281be42b9b65ac0df57d620be8c"
+        ]
+      },
+      {
+        "action": "ACTION6(3,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "031cb106b9b2f79cfbfdd9e59ec62229e2de158c510dcf209e94150af1fed5e3"
+        ]
+      },
+      {
+        "action": "ACTION6(3,27)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "6633b90a22c4b26b969f2ef87f2f650fe6251c245ddf91aa600468402cff7096"
+        ]
+      },
+      {
+        "action": "ACTION6(15,33)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "e258bc030988725e1d6f4db4e7d3c6197ac7a9c1c987fc1709d4ec28546a0569"
+        ]
+      },
+      {
+        "action": "ACTION6(15,39)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "ba5e7eb95add62ba54cfdc0c0c89f954b4afe827a576e5a936ce621f3f2cc4a2"
+        ]
+      },
+      {
+        "action": "ACTION6(15,45)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          7.072265625,
+          7.8544921875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "6e4adc74194e2754b4003ed411e424476d7b640dad82c6c3a16ac1cafe08faf7"
+        ]
+      }
+    ],
+    "agreement": 1.0,
+    "cross_level_multiplier": 23.0,
+    "differing_optimal_sets": false,
+    "hypothesis_ids": [
+      "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+      "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3"
+    ],
+    "indifference": 1.0,
+    "invalid_hypothesis_ids": [],
+    "maximum_cross_level_utility": -1.0,
+    "maximum_evsi": 0.0,
+    "maximum_myopic_utility": -1.0,
+    "myopic_multiplier": 1.0,
+    "optimal_action_sets": {
+      "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(42,33)",
+        "ACTION6(5,42)",
+        "ACTION6(63,31)",
+        "ACTION6(3,15)",
+        "ACTION6(3,21)",
+        "ACTION6(3,27)",
+        "ACTION6(15,33)",
+        "ACTION6(15,39)",
+        "ACTION6(15,45)"
+      ],
+      "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(42,33)",
+        "ACTION6(5,42)",
+        "ACTION6(63,31)",
+        "ACTION6(3,15)",
+        "ACTION6(3,21)",
+        "ACTION6(3,27)",
+        "ACTION6(15,33)",
+        "ACTION6(15,39)",
+        "ACTION6(15,45)"
+      ]
+    },
+    "per_hypothesis_cost_variation": {
+      "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 7.072265625,
+        "minimum": 7.072265625,
+        "range": 0.0
+      },
+      "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 7.8544921875,
+        "minimum": 7.8544921875,
+        "range": 0.0
+      }
+    },
+    "weights": [
+      0.4452207648927853,
+      0.5547792351072148
+    ]
+  },
+  "programs": [
+    {
+      "assigned_role": "Conservative evidence-first baseline; no effect is allowed only when best supported.",
+      "ast_nodes": 316,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "candidate_index": 0,
+      "eligibility": {
+        "action_sensitive": false,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": false,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+      "raw_source_sha256": "7ab663dfc4b5cb6fbe31cf2a7d33cc69a2b8ffe39339fa051ec3e56336d9d413",
+      "requirements": {
+        "action_sensitivity": false,
+        "goal_conditioning": false
+      }
+    },
+    {
+      "assigned_role": "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
+      "ast_nodes": 206,
+      "behavior_signature": "4312683ccca158b0c7558d6e00ea5311989d027cec96af78199d95af6350c1a4",
+      "candidate_index": 1,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3",
+      "raw_source_sha256": "ae1e66d63d1aaafbb8c6a339f1c5cf025c4043065bf435eb0a366786ed94b938",
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      }
+    },
+    {
+      "assigned_role": "Object or agent motion with graded progress from normalized distance or alignment.",
+      "ast_nodes": 532,
+      "behavior_signature": "d6276c7ed44136d0a74a43c3cded39540d1fd80c8cfa9ef57c82697404b3a207",
+      "candidate_index": 2,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": false,
+        "goal_action_conditioned": false,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "1388df24b485a1a0a7b6b42079672edb3b9d70e2991e765a3d17c047557e2137",
+      "raw_source_sha256": "539567de7c90bec03724368c7f45244f6eb615722832d2501faff5a57b2168c2",
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      }
+    },
+    {
+      "assigned_role": "Component-wide, toggle, selection, or global effects with graded component progress.",
+      "ast_nodes": 184,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "candidate_index": 3,
+      "eligibility": {
+        "action_sensitive": false,
+        "all_actions_ok": true,
+        "eligible": false,
+        "goal_action_conditioned": false,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a",
+      "raw_source_sha256": "dfa14441a357ab780bf44d5200dd3f816fc5d2bd3356086170761ecd5628d91f",
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      }
+    }
+  ],
+  "schema_version": 1,
+  "selection": {
+    "behavioral_deduplicated_ids": [],
+    "distinct_selected_behavior_classes": 2,
+    "eligible_ids": [
+      "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+      "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3"
+    ],
+    "filter_precedes_persistent_worker_construction": true,
+    "ineligible_ids": [
+      "1388df24b485a1a0a7b6b42079672edb3b9d70e2991e765a3d17c047557e2137",
+      "c9398dfa8b0e1bca6d21afcb4f1f3d6f58c071d6a8af20daab2b52bf4f36357a"
+    ],
+    "ineligible_selected_ids": [],
+    "selected_ids": [
+      "0b1ff307ad3a10db4074a2c589ef8877c356a24dae3e4b32683394a2da95cb22",
+      "98bab11563072bd625fef5a666992cfa3756c6f5290d489994f9354b18548dc3"
+    ]
+  },
+  "status": "pilot_blocked"
+}
