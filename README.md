@@ -38,7 +38,7 @@ does not contain code from Duck or other competition entries.
 - Passed the same fair-v2 gates on native Windows. The model preflight produced 2/4 valid
   programs with no truncation at 21.40 tokens/s and 10.78 GiB peak. The frozen-history gate
   produced 2 safe, 2 distinct, action-sensitive programs with no palette or coordinate
-  conflicts at 22.87 tokens/s and 8.98 GiB peak. Windows has no POSIX `RLIMIT_DATA`, so hard
+  conflicts at 22.81 tokens/s and 8.98 GiB peak. Windows has no POSIX `RLIMIT_DATA`, so hard
   data-segment enforcement is transparently reported as not required. The frozen contracts,
   fixture, model revision, and weight manifest match WSL; generated source is not claimed to
   be bit-identical across platforms. See `artifacts/model_gate_live8_windows.json` and

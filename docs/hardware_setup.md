@@ -66,7 +66,7 @@ program records an enforced ceiling exactly 256 MiB above its measured baseline.
 The fair-v2 native-Windows remeasurement also passes. Its model gate has 2/4 statically valid
 programs, no truncation, 21.40 generated tokens/s, and 10.78 GiB peak VRAM. Its grounding gate
 has two safe, behaviorally distinct, action-sensitive programs, no palette or coordinate
-conflicts, 22.87 generated tokens/s, and 8.98 GiB peak VRAM. Native Windows cannot provide
+conflicts, 22.81 generated tokens/s, and 8.98 GiB peak VRAM. Native Windows cannot provide
 the POSIX `RLIMIT_DATA` data-segment limit, so the artifact records that limit as not required
 instead of claiming enforcement. Prompt and perception contract hashes, the compact fixture,
 model revision, and weight manifest match the WSL evidence; platform generation itself is not
