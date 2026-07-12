@@ -90,8 +90,19 @@ clamps EVSI magnitudes at or below `1e-12` to zero, labels mandatory RESET decis
 lifecycle, and separates controller-decision latency from environment latency. Its active
 `development_matrix.json` has 180 pending rows with new content-addressed IDs under
 implementation contract `crosslevel-voi-runtime-v1`. No row in that active matrix has
-run. Scale-up remains locked pending an offline runtime admission gate and, only if it
-passes, a fresh four-run pilot. No current-runtime gate or pilot pass is claimed.
+run.
+
+The deterministic offline runtime-admission audit then re-evaluated both historical
+schema-v4 source batches under the corrected ordering. In both audits every selected
+program was role-eligible and planning-valid, but agreement remained 1.0, maximum EVSI
+was 0.0, and maximum cross-level probe utility was -1.0. The WSL-source programs had flat
+costs over all twelve candidates. The Windows-source pool contained one program with a
+small 0.02246-action cost range and differing optimal sets, but no observation partition
+changed the weighted optimal action, so EVSI was still zero. The gate blocked a fresh pilot. See
+`artifacts/runtime_admission_goal_v3_wsl.json` and
+`artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked while the
+prompt/grounding contract is revised to require decision-relevant alternatives; no
+current-runtime gameplay-pilot pass is claimed.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no

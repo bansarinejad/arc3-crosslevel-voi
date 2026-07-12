@@ -91,5 +91,10 @@ The subsequent historical goal-v3 pilot exposed an admission-order defect: behav
 deduplication could replace a role-eligible program with a smaller behaviorally equivalent
 but role-ineligible program. The current runtime filters role grounding before starting
 persistent workers or deduplicating candidates. This source-level correction has not yet passed a
-fresh WSL/Windows runtime admission gate and does not authorize gameplay by itself. Scale-up
-remains locked pending that offline gate and then a fresh four-run pilot.
+fresh gameplay pilot and does not authorize gameplay by itself. Deterministic offline
+admission audits over the historical WSL and Windows source batches verified clean
+eligible-only selection and zero planner failures, but both blocked on decision diversity:
+agreement was 1.0, EVSI was 0.0, and cross-level probe utility was -1.0. See
+`artifacts/runtime_admission_goal_v3_wsl.json` and
+`artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked pending a
+decision-relevant prompt/grounding gate and then a fresh four-run pilot.

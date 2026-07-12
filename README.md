@@ -69,8 +69,16 @@ does not contain code from Duck or other competition entries.
   action sensitivity and goal conditioning before worker admission and behavioral
   deduplication; EVSI magnitudes at or below `1e-12` are clamped to zero; mandatory
   `RESET` is labeled as lifecycle rather than exploit; and controller-decision latency
-  is recorded separately from environment latency. These changes have not yet passed a
-  fresh runtime admission gate or gameplay pilot.
+  is recorded separately from environment latency.
+- Ran the corrected runtime through a deterministic offline admission gate using both
+  historical schema-v4 source batches. In each case every selected program was eligible
+  and planning-valid, so the admission-order fix worked. Both committees still failed the
+  decision-diversity gate: WSL-source costs were flat for both selected programs; the
+  Windows-source pool had one weakly action-varying program but maximum EVSI was still
+  exactly zero. Agreement was 1.0 and maximum cross-level probe utility was -1.0 in both
+  audits. No fresh gameplay pilot is authorized. See
+  `artifacts/runtime_admission_goal_v3_wsl.json` and
+  `artifacts/runtime_admission_goal_v3_windows.json`.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
@@ -94,16 +102,16 @@ does not contain code from Duck or other competition entries.
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
   matrix and gate are preserved with `_pre_grounding` suffixes.
-- Not yet completed: the current runtime admission gate, a fresh four-run pilot, all
-  180 active development runs, locked confirmation,
+- Not yet completed: a decision-relevant prompt/grounding gate, a fresh four-run pilot,
+  all 180 active development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official
 4B BF16 fallback is the selected local model. There are deliberately no
-development aggregate or positive cross-level performance claim. Scale-up remains locked
-until the current runtime passes its offline admission gate and then a fresh four-run pilot
-passes the preregistered scale-up gates.
+development aggregate or positive cross-level performance claim. Scale-up remains locked;
+the corrected admission ordering passed structurally, but both source committees failed
+the decision-diversity gate before a fresh pilot could be authorized.
 
 ## Quick start
 
