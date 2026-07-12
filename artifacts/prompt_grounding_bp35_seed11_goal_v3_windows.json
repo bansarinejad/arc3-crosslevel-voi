@@ -1,0 +1,1764 @@
+{
+  "base_config_sha256": "21a2fb16fc2865527f50efa1cf7d729c46b9689bb4eda6d8daf1c1e18434cb3c",
+  "effective_offline_config_sha256": "023d5648f22b88be130ebbc6a266bb63cb712d1bc0cb1d26548bd795eb5c9614",
+  "evaluation_actions": [
+    "ACTION3",
+    "ACTION4",
+    "ACTION7",
+    "ACTION6(42,33)",
+    "ACTION6(5,42)",
+    "ACTION6(63,31)",
+    "ACTION6(3,15)",
+    "ACTION6(3,21)",
+    "ACTION6(3,27)",
+    "ACTION6(15,33)",
+    "ACTION6(15,39)",
+    "ACTION6(15,45)"
+  ],
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "generation": {
+    "elapsed_seconds": 76.11486020000302,
+    "output_tokens": 1729,
+    "peak_vram_gb": 9.164392471313477,
+    "requested": 4,
+    "sequence_token_counts": [
+      303,
+      372,
+      721,
+      333
+    ],
+    "tokens_per_second": 22.71566939040284,
+    "truncated_sequences": 0
+  },
+  "git": {
+    "commit": "d280ac97f33332e43e6c6da1fb9169dc315c1bbd",
+    "dirty": false,
+    "repository_root": "D:/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "grounding_evaluation": {
+    "candidate_roles": [
+      "Conservative evidence-first baseline; no effect is allowed only when best supported.",
+      "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
+      "Object or agent motion with graded progress from normalized distance or alignment.",
+      "Component-wide, toggle, selection, or global effects with graded component progress."
+    ],
+    "goal_action_spread_threshold": 1e-06,
+    "goal_metric_scope": "same-depth action-conditioned variation; not semantic alignment evidence",
+    "rollout_depth": 4,
+    "rollout_paths": "repeat each root candidate action",
+    "terminal_policy": "stop before goal_value after WIN, GAME_OVER, or positive level_delta"
+  },
+  "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+  "history_frames": 1,
+  "latest_grid_int16_sha256": "92370b9db1c1b1f1570ec24487c8a1669fe3bf35572f0c3efa2bb084c5a1a634",
+  "latest_grid_uint8_sha256": "e673f0158ffbf5ffa45f3f32f30a91c9dc7f22ad41c8aaf3feeb8e7dda11fa31",
+  "latest_rendered_rgb_sha256": "eb0167dfb47c88a47d27b61891c62864267a32e2c672f8362ef6dff36925e2bf",
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "observed_palette_values": [
+    0,
+    3,
+    5,
+    9,
+    10,
+    11,
+    14
+  ],
+  "offline": true,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "programs": [
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        }
+      ],
+      "action_sensitive": false,
+      "action_sensitivity_required": false,
+      "all_actions_ok": true,
+      "assigned_role": "Conservative evidence-first baseline; no effect is allowed only when best supported.",
+      "ast_nodes": 269,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "candidate_index": 0,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_action_conditioned": false,
+      "goal_conditioning_required": false,
+      "goal_results": [
+        {
+          "action": "ACTION3",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION3",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION3",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION3",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.47705078125
+        }
+      ],
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "goal_value_range": 0.0,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": 0.0,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": 0.47705078125,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        r, c = divmod(row, 8)\n        c_idx, r_idx = divmod(c, 8)\n        if 0 <= r_idx < 8 and 0 <= c_idx < 8:\n            target_r, target_c = r_idx, c_idx\n            if grid[target_r, target_c] == 14:\n                grid[target_r, target_c] = 10\n                grid[r, c] = 0\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    counts = np.bincount(grid.flatten(), minlength=16)\n    total = grid.size\n    if total == 0:\n        return 0.0\n    score = (counts[10] + counts[11] + counts[14] + counts[15]) / total\n    return float(np.clip(score, 0.0, 1.0))",
+      "source_length": 876,
+      "source_sha256": "7fba09cb127008eec16cd1f2b89a1a1c303443cad51c01684bb2dd591c7e2b47",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "892ebbcf2f37a71860beeb9fd866893f599ccf5753ea58a3a1ec9dac2ee0a1be"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "d25bc9b8a57fb1534738263a6ed5ca76b94235f5a9cd2aa95f7c203c48f7b5e7"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "a61c4af1c22d10b0909b0ea3281019775446d6d40792110fa072d2d1bb9f1c8d"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        }
+      ],
+      "action_sensitive": true,
+      "action_sensitivity_required": true,
+      "all_actions_ok": true,
+      "assigned_role": "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
+      "ast_nodes": 254,
+      "behavior_signature": "9a8bcdbb5fa8e07617e0aaf3d55a7bf3ec3b130f4b3562ff957eab7b7ef7dea8",
+      "candidate_index": 1,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_action_conditioned": true,
+      "goal_conditioning_required": true,
+      "goal_results": [
+        {
+          "action": "ACTION3",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION3",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION3",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION3",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036865234375
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036376953125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036376953125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036376953125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.036376953125
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.035888671875
+        }
+      ],
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "goal_value_range": 0.0009765625,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": 0.0009765625,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": 0.035888671875,
+      "palette_claims": [
+        {
+          "claimed_value": 14,
+          "color": "green",
+          "conflict": false,
+          "expected_value": 14,
+          "line": 27
+        }
+      ],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Identify the 2x2 block at the target location\n        # Check if the block is currently monochromatic (single value)\n        block = grid[row:row+2, col:col+2]\n        unique_vals = np.unique(block)\n        if len(unique_vals) == 1:\n            # If monochromatic, change it to a different color (e.g., 14=green)\n            grid[row:row+2, col:col+2] = 14\n        else:\n            # If mixed, change one of the distinct values to a new color\n            if len(unique_vals) > 1:\n                target_color = 14\n                if target_color not in unique_vals:\n                    grid[row:row+2, col:col+2] = target_color\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Calculate progress based on the number of green cells (14) relative to total cells\n    # This satisfies the action-sensitive role by being observable and graded\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    total_cells = grid.size\n    green_cells = np.sum(grid == 14)\n    progress = green_cells / total_cells\n    return float(np.clip(progress, 0.0, 1.0))",
+      "source_length": 1322,
+      "source_sha256": "dc31a25b54fb8d4621b71eb1a51b94028d6b28f14a7e0e4e583e0f5ede3863c9",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "15d67fe9c1e70b623cc178f54cbf0edb19cc784a5e6141a49e977566d05ae5c8"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "ee85ff7205b6a712f4f441c0516adcc8535e21e72da62eddbe3db0f09569ad88"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "15d67fe9c1e70b623cc178f54cbf0edb19cc784a5e6141a49e977566d05ae5c8"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "15d67fe9c1e70b623cc178f54cbf0edb19cc784a5e6141a49e977566d05ae5c8"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "15d67fe9c1e70b623cc178f54cbf0edb19cc784a5e6141a49e977566d05ae5c8"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "9b6fe6adb606fde5c44f0581317d9c2710a5bd77278c898d2c65a96975aa3885"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "5242821cc9e2f26700805deb9e11ac290d10e1b26d6d66dd1861b15f664dd8a7"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "f3164e11467993a797df2c27ff3c7c2cd140784fd6df72e5a5fe65fb21747fe9"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "034848dfce16242b175562940a9710ad7d3b160409ee34ede2810161f5e27b52"
+        }
+      ],
+      "action_sensitive": true,
+      "action_sensitivity_required": true,
+      "all_actions_ok": true,
+      "assigned_role": "Object or agent motion with graded progress from normalized distance or alignment.",
+      "ast_nodes": 580,
+      "behavior_signature": "9e5825770a6badb6acf0950243ae81f657bb33d385124645b707f0a761923f91",
+      "candidate_index": 2,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_action_conditioned": true,
+      "goal_conditioning_required": true,
+      "goal_results": [
+        {
+          "action": "ACTION3",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION3",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION3",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION3",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION4",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION7",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99951171875
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.999267578125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.99462890625
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.999267578125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.999267578125
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.999267578125
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.998291015625
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.996826171875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.995361328125
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.993896484375
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.0
+        }
+      ],
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "goal_value_range": 0.99951171875,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": 0.99951171875,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": 0.99951171875,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Attempt to move agent (blue 9) and place item (yellow 11)\n        agent_pos = np.where(grid == 9)\n        item_pos = np.where(grid == 11)\n        if len(agent_pos[0]) > 0 and len(item_pos[0]) > 0:\n            agent_r, agent_c = agent_pos[0][0], agent_pos[1][0]\n            item_r, item_c = item_pos[0][0], item_pos[1][0]\n            # Move agent towards item\n            if row >= agent_r and col >= agent_c:\n                new_agent_r = min(row, agent_r)\n                new_agent_c = min(col, agent_c)\n            elif row <= agent_r and col <= agent_c:\n                new_agent_r = max(row, agent_r)\n                new_agent_c = max(col, agent_c)\n            elif row >= agent_r and col <= agent_c:\n                new_agent_r = row\n                new_agent_c = max(col, agent_c)\n            elif row <= agent_r and col >= agent_c:\n                new_agent_r = max(row, agent_r)\n                new_agent_c = col\n            else:\n                # Fallback if row/col don't align with agent\n                new_agent_r = agent_r\n                new_agent_c = agent_c\n            # Place item at target\n            new_grid = grid.copy()\n            new_grid[item_r, item_c] = 0\n            new_grid[new_agent_r, new_agent_c] = 9\n            new_grid[new_agent_r, new_agent_c] = 11\n            # Update agent position\n            new_grid[agent_r, agent_c] = 0\n            new_grid[new_agent_r, new_agent_c] = 9\n            return {\"next_grid\": new_grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    # Calculate normalized distance to goal (item 11)\n    agent_pos = np.where(grid == 9)\n    item_pos = np.where(grid == 11)\n    if len(agent_pos[0]) > 0 and len(item_pos[0]) > 0:\n        agent_r, agent_c = agent_pos[0][0], agent_pos[1][0]\n        item_r, item_c = item_pos[0][0], item_pos[1][0]\n        dist = abs(item_r - agent_r) + abs(item_c - agent_c)\n        grid_size = grid.size\n        norm_dist = dist / max(grid_size, 1)\n        # Goal value decreases with distance\n        goal_val = max(0.0, 1.0 - norm_dist)\n        return goal_val\n    return 0.0",
+      "source_length": 2461,
+      "source_sha256": "ebd3827509677704e6f1963ac3e52e7e108c0cd5c8b16955b6b6260eea1e1642",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": "ProgramExecutionError: execution: TypeError: '<=' not supported between instances of 'int' and 'tuple'",
+          "ok": false,
+          "prediction_sha256": null
+        }
+      ],
+      "action_sensitive": false,
+      "action_sensitivity_required": true,
+      "all_actions_ok": false,
+      "assigned_role": "Component-wide, toggle, selection, or global effects with graded component progress.",
+      "ast_nodes": 291,
+      "behavior_signature": null,
+      "candidate_index": 3,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": false,
+      "goal_action_conditioned": false,
+      "goal_conditioning_required": true,
+      "goal_results": [
+        {
+          "action": "ACTION3",
+          "depth": 1,
+          "error": "ProgramExecutionError: execution: IndexError: index 0 is out of bounds for axis 0 with size 0",
+          "ok": false,
+          "terminal": false,
+          "value": null
+        },
+        {
+          "action": "ACTION4",
+          "depth": 1,
+          "error": "ProgramExecutionError: execution: IndexError: index 0 is out of bounds for axis 0 with size 0",
+          "ok": false,
+          "terminal": false,
+          "value": null
+        },
+        {
+          "action": "ACTION7",
+          "depth": 1,
+          "error": "ProgramExecutionError: execution: IndexError: index 0 is out of bounds for axis 0 with size 0",
+          "ok": false,
+          "terminal": false,
+          "value": null
+        }
+      ],
+      "goal_value_error": "ProgramExecutionError: execution: IndexError: index 0 is out of bounds for axis 0 with size 0",
+      "goal_value_ok": false,
+      "goal_value_range": null,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": null,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": null,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        r, c = divmod(row, 8)\n        c_idx, r_idx = divmod(col, 8), divmod(r, 8)\n        if 0 <= r_idx < 8 and 0 <= c_idx < 8:\n            cell = grid[r_idx * 8 + c_idx]\n            if cell == 9:\n                grid[r_idx * 8 + c_idx] = 14\n            elif cell == 14:\n                grid[r_idx * 8 + c_idx] = 9\n        return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    counts = np.unique(history.frames[-1], return_counts=True)[1]\n    green = counts[np.where(counts == 14)][0]\n    blue = counts[np.where(counts == 9)][0]\n    norm = grid_size = 64\n    score = (green + blue) / norm\n    return float(np.clip(score, 0.0, 1.0))",
+      "source_length": 980,
+      "source_sha256": "0d489ba90d3cd681a9e4d9428358b1bb3c1c009436f169c59dc20a9ace83415b",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    }
+  ],
+  "prompt_contract_sha256": "391eadfb3bbf860cb8266fea6f4a3cd5855eb9ab60fc1610b37b66516a44b6de",
+  "prompt_contract_version": "grounded-actions-palette-graded-goals-v3",
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "11",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "schema_version": 4,
+  "seed": 11,
+  "source_input": "fixtures/grounding/bp35_seed11_initial_history.json",
+  "source_input_kind": "history_fixture",
+  "source_input_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+  "source_trace_canonical_sha256": "c6fd2d38f937d9c5f5a1e7f8e0d5b366db005ebd8a8ae155c21f7e1c34a3e5e8",
+  "summary": {
+    "action_sensitive_programs": 2,
+    "distinct_behavior_classes": 3,
+    "gate_reasons": [],
+    "goal_action_conditioned_programs": 2,
+    "graded_role_programs": 2,
+    "grounded_safe_programs": 3,
+    "hard_memory_limit_enforced_programs": 0,
+    "hard_memory_limit_required": false,
+    "palette_conflict_programs": 0,
+    "passes": true,
+    "sandbox_valid_programs": 4,
+    "unsafe_coordinate_programs": 0
+  },
+  "system_prompt_sha256": "42a8c845f4588cc095928d309e9a1bff6853ffee34de0813c3f93aeaef9bd88b",
+  "user_prompt_sha256": [
+    "ac792fffcdbc6823c5f5cd2a6e05738ea71e6c55061ab764e33cd9ca6e7f749c",
+    "8cd943af3d5e64a19a8502773362c49b0586371017683bd1ec61a11c188c7eb4",
+    "ce998c098d8844c4cb34b7afc8b6186ad35bcdcf89885ca36228958027e95626",
+    "ac41dfaaac6aa22f0a1ace361ddfaf4c6c88ac13a32738d715615b7b5ac4cfe6"
+  ]
+}
