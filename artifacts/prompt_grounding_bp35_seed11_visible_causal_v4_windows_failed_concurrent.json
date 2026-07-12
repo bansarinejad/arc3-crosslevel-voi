@@ -1,0 +1,1288 @@
+{
+  "base_config_sha256": "8b7bc51de6d6fd306141e16c76c1487ae5ec44a542dc5e48556634fe37edfede",
+  "effective_offline_config_sha256": "72c2705ddc463edd7dec7f046a5c188319c4eec23098ad6e060a9705b943f673",
+  "evaluation_actions": [
+    "ACTION3",
+    "ACTION4",
+    "ACTION7",
+    "ACTION6(42,33)",
+    "ACTION6(5,42)",
+    "ACTION6(63,31)",
+    "ACTION6(3,15)",
+    "ACTION6(3,21)",
+    "ACTION6(3,27)",
+    "ACTION6(15,33)",
+    "ACTION6(15,39)",
+    "ACTION6(15,45)"
+  ],
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "generation": {
+    "elapsed_seconds": 228.16278979998606,
+    "output_tokens": 1761,
+    "peak_vram_gb": 9.447896957397461,
+    "requested": 4,
+    "sequence_token_counts": [
+      452,
+      215,
+      460,
+      634
+    ],
+    "tokens_per_second": 7.718173509114884,
+    "truncated_sequences": 0
+  },
+  "git": {
+    "commit": "8eec775b6c74bb054ac4cf4199dd14f81d773417",
+    "dirty": true,
+    "repository_root": "D:/kaggle competitions/arc3-crosslevel-voi",
+    "status_sha256": "6729560591a6341984d9bb5a0ca748675c7d25ef4051d9376c285c528af251f4",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "grounding_evaluation": {
+    "candidate_roles": [
+      "Conservative evidence-first baseline; reproduce observed transitions and otherwise prefer no effect.",
+      "Local contact alternative: a currently valid action affects a visible cell or connected component at a visually derived target.",
+      "Object-motion alternative: a currently valid action displaces or aligns a visible connected component relative to visible geometry.",
+      "Component-state alternative: a currently valid action selects, toggles, or transforms an existing visible component or palette state."
+    ],
+    "goal_action_spread_threshold": 0.0125,
+    "goal_metric_scope": "same-depth action-conditioned variation; not semantic alignment evidence",
+    "rollout_depth": 4,
+    "rollout_paths": "repeat each root candidate action",
+    "terminal_policy": "stop before goal_value after WIN, GAME_OVER, or positive level_delta"
+  },
+  "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+  "history_frames": 1,
+  "latest_grid_int16_sha256": "92370b9db1c1b1f1570ec24487c8a1669fe3bf35572f0c3efa2bb084c5a1a634",
+  "latest_grid_uint8_sha256": "e673f0158ffbf5ffa45f3f32f30a91c9dc7f22ad41c8aaf3feeb8e7dda11fa31",
+  "latest_rendered_rgb_sha256": "eb0167dfb47c88a47d27b61891c62864267a32e2c672f8362ef6dff36925e2bf",
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "observed_palette_values": [
+    0,
+    3,
+    5,
+    9,
+    10,
+    11,
+    14
+  ],
+  "offline": true,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "programs": [
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION4",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION7",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": "ProgramExecutionError: execution: KeyError: 1",
+          "ok": false,
+          "prediction_sha256": null
+        }
+      ],
+      "action_sensitive": false,
+      "action_sensitivity_required": false,
+      "all_actions_ok": false,
+      "assigned_role": "Conservative evidence-first baseline; reproduce observed transitions and otherwise prefer no effect.",
+      "ast_nodes": 258,
+      "behavior_signature": null,
+      "candidate_index": 0,
+      "coordinate_read_lines": [
+        4,
+        5
+      ],
+      "eligible": false,
+      "goal_action_conditioned": false,
+      "goal_conditioning_required": false,
+      "goal_results": [],
+      "goal_value_error": "ProgramExecutionError: execution: KeyError: -1",
+      "goal_value_ok": false,
+      "goal_value_range": null,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": null,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": null,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": false,
+      "source": "def predict(history, action):\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    else:\n        row, col = None, None\n\n    # Conservative evidence-first baseline: reproduce observed transitions if any, else no effect\n    if len(history) > 1 and len(history[1].get('grid_values', [])) == len(history[0].get('grid_values', [])):\n        # If we have previous state, try to match previous transition if action is similar\n        pass\n\n    # No-effect baseline for this context: return current grid unchanged\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Evaluate progress based on visible objects and their states\n    if len(history) == 0:\n        return 0.0\n\n    last_frame = history[-1]\n    grid_values = last_frame.get('grid_values', [])\n    if not grid_values:\n        return 0.0\n\n    # Count presence of key objects: blue (9), yellow (11), green (14)\n    counts = {9: 0, 11: 0, 14: 0}\n    for v in grid_values:\n        if v in counts:\n            counts[v] += 1\n\n    # Normalize by total unique values present\n    unique_vals = set(grid_values)\n    if not unique_vals:\n        return 0.0\n\n    # Weighted progress: more blue/yellow/green cells = higher goal value\n    # Use a simple sum of counts for relevant colors divided by max possible\n    progress = (counts[9] + counts[11] + counts[14]) / (len(unique_vals) * 3)\n    return min(1.0, max(0.0, progress))",
+      "source_length": 1551,
+      "source_sha256": "e8cedb2ebe9725ca81c165223f86491ee2190fb1eb5bde329564aee967bce352",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "dadd0de7ea90c2666507f6291d67cc0ad367b9006f916d155c72ec62d61de67d"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "ce5a25c0433ecc1f9d31d2217367f6e99e3667c11efad194d9a92915fbb1515b"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "b79bbe565b8ad0a9209508f116a270fc43f4b0995989e313bff3ff0edc84d894"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "13337aeee79339cd8f9b7c652a010f9523423744b5aada962a4bc4f2277dd092"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "bd890724251a191367312d83970143ee2b002b948398876a9046eae8a8ee2774"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "50136e65606a54adbba1e5cd7896724558d54e34827d25f2ec6fda8daf70d3ad"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "187b1309e26ea61a4bc41dee97ab9e4fea36fefbccfb0bde8e129115a4aeac4c"
+        }
+      ],
+      "action_sensitive": true,
+      "action_sensitivity_required": true,
+      "all_actions_ok": true,
+      "assigned_role": "Local contact alternative: a currently valid action affects a visible cell or connected component at a visually derived target.",
+      "ast_nodes": 195,
+      "behavior_signature": "dce84d4c13d57168786cf40c574215c9e5397fd68960e21570b1d920745f28dc",
+      "candidate_index": 1,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": false,
+      "goal_action_conditioned": false,
+      "goal_conditioning_required": true,
+      "goal_results": [
+        {
+          "action": "ACTION3",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION3",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION3",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION3",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION4",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION7",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.440673828125
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.44091796875
+        }
+      ],
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "goal_value_range": 0.000244140625,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": 0.000244140625,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": 0.440673828125,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    kind = int(action.kind)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        if 0 <= row < grid.shape[0] and 0 <= col < grid.shape[1]:\n            grid[row, col] = 10\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    target_values = [10]\n    mask = grid == target_values\n    if not np.any(mask):\n        return 0.0\n    count = np.count_nonzero(mask)\n    total = grid.size\n    return min(count / total, 1.0)",
+      "source_length": 656,
+      "source_sha256": "52c64d37eb5f06d3497f621bd5894a536a9aaf8e7950caac2e25a2bec9f59fe9",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        }
+      ],
+      "action_sensitive": false,
+      "action_sensitivity_required": true,
+      "all_actions_ok": true,
+      "assigned_role": "Object-motion alternative: a currently valid action displaces or aligns a visible connected component relative to visible geometry.",
+      "ast_nodes": 330,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "candidate_index": 2,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": false,
+      "goal_action_conditioned": false,
+      "goal_conditioning_required": true,
+      "goal_results": [
+        {
+          "action": "ACTION3",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION3",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION3",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION3",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION4",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION4",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION4",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION4",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION7",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION7",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION7",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION7",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 1,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 2,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 3,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "depth": 4,
+          "error": null,
+          "ok": true,
+          "terminal": false,
+          "value": 0.06
+        }
+      ],
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "goal_value_range": 0.0,
+      "hard_memory_limit_enforced": false,
+      "max_action_goal_spread": 0.0,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": "hard per-process memory limits are unavailable on this platform",
+      "memory_limit_kind": null,
+      "observed_goal_value": 0.06,
+      "palette_claims": [
+        {
+          "claimed_value": 9,
+          "color": "blue",
+          "conflict": false,
+          "expected_value": 9,
+          "line": 10
+        }
+      ],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Check if ACTION6 coordinates are within grid bounds (8x8 based on visual)\n        if 0 <= row < 8 and 0 <= col < 8:\n            # Simulate displacement of a connected component\n            # Identify the largest connected component of a specific color (e.g., blue=9)\n            target_color = 9\n            mask = grid == target_color\n            coords = np.argwhere(mask)\n            if len(coords) > 0:\n                # Pick a component and shift it slightly\n                # Simple shift: move up-left if possible\n                new_coords = []\n                for r, c in coords:\n                    nr, nc = r - 1, c - 1\n                    if 0 <= nr < 8 and 0 <= nc < 8:\n                        new_coords.append((nr, nc))\n                    else:\n                        new_coords.append((r, c))\n                grid = grid.copy()\n                # Clear old positions\n                for r, c in coords:\n                    grid[r, c] = 0\n                # Set new positions\n                for r, c in new_coords:\n                    grid[r, c] = target_color\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Identify the blue component (color 9)\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    target_color = 9\n    mask = grid == target_color\n    if np.any(mask):\n        coords = np.argwhere(mask)\n        count = len(coords)\n        # Normalize progress by component size\n        if count > 0:\n            return min(1.0, count / 100.0)\n    return 0.0",
+      "source_length": 1759,
+      "source_sha256": "17382459b7c74cd18ff2b31264e53e804dc6a63337dd766a954a25ba3900bc64",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [],
+      "action_sensitive": false,
+      "action_sensitivity_required": true,
+      "all_actions_ok": false,
+      "assigned_role": "Component-state alternative: a currently valid action selects, toggles, or transforms an existing visible component or palette state.",
+      "ast_nodes": null,
+      "behavior_signature": null,
+      "candidate_index": 3,
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": false,
+      "goal_action_conditioned": false,
+      "goal_conditioning_required": true,
+      "goal_results": [],
+      "goal_value_error": null,
+      "goal_value_ok": false,
+      "goal_value_range": null,
+      "hard_memory_limit_enforced": null,
+      "max_action_goal_spread": null,
+      "memory_baseline_bytes": null,
+      "memory_ceiling_bytes": null,
+      "memory_limit_diagnostic": null,
+      "memory_limit_kind": null,
+      "observed_goal_value": null,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": false,
+      "simple_action_contract_ok": false,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Toggle the target cell with ACTION6\n        grid[row, col] = (grid[row, col] + 1) % 16\n    else:\n        # For other actions, we infer from the context\n        # Since no recorded transitions exist, we assume no effect for now\n        # but we need to differentiate actions. \n        # Let's check available actions to infer meaning.\n        avail = history.available_action_sets[-1] if hasattr(history, 'available_action_sets') else []\n        if kind == 3: # ACTION3\n            # Based on typical patterns, ACTION3 might be a movement or interaction\n            # Since we have no history, we assume it affects the current position or a default\n            # Let's try to toggle a nearby cell or the same cell\n            # Without coordinates, we assume it's a toggle of the first available cell or similar\n            # For simplicity, we'll assume it toggles the cell at (0,0) if it exists\n            if len(grid) > 0 and len(grid[0]) > 0:\n                grid[0, 0] = (grid[0, 0] + 1) % 16\n        elif kind == 4: # ACTION4\n            # Similar to ACTION3, but different effect\n            # Let's toggle a different cell, e.g., (1, 1)\n            if len(grid) > 1 and len(grid[1]) > 1:\n                grid[1, 1] = (grid[1, 1] + 1) % 16\n        elif kind == 7: # ACTION7\n            # Another different effect\n            # Let's toggle the last cell\n            if len(grid) > 0 and len(grid[-1]) > 0:\n                grid[-1, -1] = (grid[-1, -1] + 1) % 16\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Calculate progress based on the most relevant visible object or connected component\n    # For this task, we'll use the number of unique colors in the grid as a proxy for progress\n    # Normalize by the maximum possible unique colors (16)\n    grid = history.frames[-1] if hasattr(history, 'frames') and len(history.frames) > 0 else np.zeros((0, 0), dtype=np.int8)\n    unique_colors = np.unique(grid)\n    progress = len(unique_colors) / 16.0\n    return float(progress)",
+      "source_length": 2260,
+      "source_sha256": "92b203b59440cdb7798bdd9e1b65b0d5d4f4ea300e415fbe96f28b856d5ef754",
+      "unsafe_coordinate_use": false,
+      "validation_error": "SandboxValidationError: call to 'hasattr' is not allowed; call to 'hasattr' is not allowed"
+    }
+  ],
+  "prompt_contract_sha256": "e045cc2481eaaf11e2dcfaa0470d1844958a173cd9bac308eded27f896a68de3",
+  "prompt_contract_version": "evidence-first-visible-causal-alternatives-v4",
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "11",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Windows-11-10.0.26200-SP0",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "schema_version": 4,
+  "seed": 11,
+  "source_input": "fixtures/grounding/bp35_seed11_initial_history.json",
+  "source_input_kind": "history_fixture",
+  "source_input_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+  "source_trace_canonical_sha256": "c6fd2d38f937d9c5f5a1e7f8e0d5b366db005ebd8a8ae155c21f7e1c34a3e5e8",
+  "summary": {
+    "action_sensitive_programs": 0,
+    "distinct_behavior_classes": 0,
+    "gate_reasons": [
+      "fewer than two grounded-safe programs",
+      "fewer than two eligible graded-role programs",
+      "fewer than two distinct grounded behavior classes",
+      "no grounded-safe program is action-sensitive",
+      "no grounded-safe program has action-conditioned counterfactual goal variation",
+      "throughput gate failed"
+    ],
+    "goal_action_conditioned_programs": 0,
+    "graded_role_programs": 0,
+    "grounded_safe_programs": 0,
+    "hard_memory_limit_enforced_programs": 0,
+    "hard_memory_limit_required": false,
+    "palette_conflict_programs": 0,
+    "passes": false,
+    "sandbox_valid_programs": 3,
+    "unsafe_coordinate_programs": 0
+  },
+  "system_prompt_sha256": "a10fb006f1ce205804f0ce4027b0c53e59a0b8306b3f85ae2dc67194fbef744f",
+  "user_prompt_sha256": [
+    "b824ca8f15d1d438074529e51aa1df5ec46d93f3462ed3b47f216d88d17961c1",
+    "4fa0ef442fa6c113f89690463052572c4a2828c3cfdc530658d8f78ead3c49d2",
+    "f57ad07dbbaba301a88e5d42ff58182dd085a59452148b28f1b680bfc9b527ad",
+    "00dd3296918e8a3545adff43e598dda61c1991a497d0c1694ef47f9829174825"
+  ]
+}
