@@ -12,7 +12,9 @@ from dataclasses import dataclass
 
 from .program import ExecutableHypothesis
 from .rendering import ARC_COLOR_NAMES
-from .types import Action, ActionKind, History, Observation, Prediction
+from .types import Action, ActionKind, GameState, History, Observation, Prediction
+
+GOAL_ACTION_SPREAD_THRESHOLD = 1e-6
 
 
 @dataclass(frozen=True, slots=True)
@@ -39,6 +41,7 @@ class GoalResult:
     ok: bool
     value: float | None = None
     error: str | None = None
+    terminal: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,11 +57,11 @@ class ProgramGroundingResult:
     goal_value_error: str | None
     observed_goal_value: float | None
     goal_results: tuple[GoalResult, ...]
-    goal_sensitive: bool
+    goal_action_conditioned: bool
     goal_value_range: float | None
     max_action_goal_spread: float | None
     action_sensitivity_required: bool
-    goal_sensitivity_required: bool
+    goal_conditioning_required: bool
     action_results: tuple[ActionResult, ...]
     simple_action_contract_ok: bool
     all_actions_ok: bool
@@ -83,7 +86,7 @@ class ProgramGroundingResult:
             and self.all_actions_ok
             and not self.palette_conflicts
             and (not self.action_sensitivity_required or self.action_sensitive)
-            and (not self.goal_sensitivity_required or self.goal_sensitive)
+            and (not self.goal_conditioning_required or self.goal_action_conditioned)
         )
 
 
@@ -193,7 +196,7 @@ def evaluate_program_grounding(
     memory_limit_mb: int = 256,
     rollout_depth: int = 4,
     require_action_sensitivity: bool = False,
-    require_goal_sensitivity: bool = False,
+    require_goal_conditioning: bool = False,
 ) -> ProgramGroundingResult:
     """Execute a program on root actions and bounded counterfactual rollouts."""
 
@@ -221,11 +224,11 @@ def evaluate_program_grounding(
             goal_value_error=None,
             observed_goal_value=None,
             goal_results=(),
-            goal_sensitive=False,
+            goal_action_conditioned=False,
             goal_value_range=None,
             max_action_goal_spread=None,
             action_sensitivity_required=require_action_sensitivity,
-            goal_sensitivity_required=require_goal_sensitivity,
+            goal_conditioning_required=require_goal_conditioning,
             action_results=(),
             simple_action_contract_ok=False,
             all_actions_ok=False,
@@ -296,6 +299,16 @@ def evaluate_program_grounding(
                             )
                         )
                         break
+                if _terminal_prediction(prediction):
+                    goal_results.append(
+                        GoalResult(
+                            _action_label(action),
+                            depth,
+                            True,
+                            terminal=True,
+                        )
+                    )
+                    break
                 rollout_history = _advance_history(
                     rollout_history,
                     action,
@@ -349,12 +362,12 @@ def evaluate_program_grounding(
         >= 2
     ]
     max_action_goal_spread = max(depth_spreads) if depth_spreads else None
-    goal_sensitive = (
-        max_action_goal_spread is not None and max_action_goal_spread > 1e-6
+    goal_action_conditioned = (
+        max_action_goal_spread is not None
+        and max_action_goal_spread > GOAL_ACTION_SPREAD_THRESHOLD
     )
     goal_ok = (
         observed_goal_ok
-        and bool(goal_results)
         and all(result.ok for result in goal_results)
     )
     if observed_goal_ok and not goal_ok and goal_error is None:
@@ -385,11 +398,11 @@ def evaluate_program_grounding(
         goal_value_error=goal_error,
         observed_goal_value=observed_goal_value,
         goal_results=tuple(goal_results),
-        goal_sensitive=goal_sensitive,
+        goal_action_conditioned=goal_action_conditioned,
         goal_value_range=goal_range,
         max_action_goal_spread=max_action_goal_spread,
         action_sensitivity_required=require_action_sensitivity,
-        goal_sensitivity_required=require_goal_sensitivity,
+        goal_conditioning_required=require_goal_conditioning,
         action_results=tuple(results),
         simple_action_contract_ok=simple_ok,
         all_actions_ok=all_ok,
@@ -429,8 +442,10 @@ def grounding_gate_reasons(
         reasons.append("fewer than two distinct grounded behavior classes")
     if not any(program.action_sensitive for program in eligible):
         reasons.append("no grounded-safe program is action-sensitive")
-    if not any(program.goal_sensitive for program in eligible):
-        reasons.append("no grounded-safe program has graded counterfactual goal variation")
+    if not any(program.goal_action_conditioned for program in eligible):
+        reasons.append(
+            "no grounded-safe program has action-conditioned counterfactual goal variation"
+        )
     if peak_vram_gb is None or peak_vram_gb > max_peak_vram_gb:
         reasons.append("peak VRAM gate failed")
     if tokens_per_second < min_tokens_per_second:
@@ -457,6 +472,14 @@ def _advance_history(
         win_levels=level,
     )
     return history.append(observation, action, prediction.level_delta)
+
+
+def _terminal_prediction(prediction: Prediction) -> bool:
+    return (
+        prediction.level_delta > 0
+        or prediction.game_state is GameState.WIN
+        or prediction.game_state is GameState.GAME_OVER
+    )
 
 
 def _collect_comment_claims(

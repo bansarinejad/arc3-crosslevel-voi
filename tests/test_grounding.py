@@ -43,6 +43,23 @@ TIME_ONLY_GOAL_PROGRAM = SAFE_PROGRAM.replace(
     "return min(1.0, float(len(history.frames)) / 8.0)",
 )
 
+TERMINAL_PROGRAM_TEMPLATE = """
+def predict(history, action):
+    grid = np.array(history.frames[-1], dtype=np.int8)
+    kind = int(action.kind)
+    state = "NOT_FINISHED"
+    level_delta = 0
+    if kind == 6:
+        grid[int(action.row), int(action.col)] = 1
+        state = "{state}"
+        level_delta = {level_delta}
+    return {{"next_grid": grid, "game_state": state, "level_delta": level_delta, "memory": {{}}}}
+def goal_value(history):
+    if history.game_states[-1] != "NOT_FINISHED" or history.levels[-1] > 1:
+        return 2.0
+    return 0.0
+"""
+
 UNSAFE_PROGRAM = """
 def predict(history, action):
     grid = np.array(history.frames[-1], dtype=np.int8)
@@ -113,7 +130,7 @@ def test_action_matrix_accepts_action6_guard_and_distinct_gate() -> None:
     )
     assert first.eligible and second.eligible
     assert first.action_sensitive and second.action_sensitive
-    assert first.goal_sensitive and second.goal_sensitive
+    assert first.goal_action_conditioned and second.goal_action_conditioned
     assert not grounding_gate_reasons(
         (first, second),
         truncated_sequences=0,
@@ -149,12 +166,12 @@ def test_action_sensitive_role_requires_graded_counterfactual_goal() -> None:
         timeout_seconds=1.0,
         rollout_depth=4,
         require_action_sensitivity=True,
-        require_goal_sensitivity=True,
+        require_goal_conditioning=True,
     )
 
     assert result.eligible
     assert result.goal_value_ok
-    assert result.goal_sensitive
+    assert result.goal_action_conditioned
     assert result.goal_value_range == 1 / 16
     assert result.max_action_goal_spread == 1 / 16
     assert len(result.goal_results) == len(actions) * 4
@@ -171,14 +188,14 @@ def test_constant_or_unreachable_goal_fails_graded_role_gate(source: str) -> Non
         timeout_seconds=1.0,
         rollout_depth=4,
         require_action_sensitivity=True,
-        require_goal_sensitivity=True,
+        require_goal_conditioning=True,
     )
 
     assert result.sandbox_valid
     assert result.all_actions_ok
     assert result.action_sensitive
     assert result.goal_value_ok
-    assert not result.goal_sensitive
+    assert not result.goal_action_conditioned
     assert result.goal_value_range == 0.0
     assert not result.eligible
 
@@ -192,14 +209,47 @@ def test_depth_only_goal_does_not_count_as_action_sensitive_progress() -> None:
         timeout_seconds=1.0,
         rollout_depth=4,
         require_action_sensitivity=True,
-        require_goal_sensitivity=True,
+        require_goal_conditioning=True,
     )
 
     assert result.goal_value_ok
     assert result.goal_value_range is not None and result.goal_value_range > 0
     assert result.max_action_goal_spread == 0.0
-    assert not result.goal_sensitive
+    assert not result.goal_action_conditioned
     assert not result.eligible
+
+
+@pytest.mark.parametrize(
+    ("state", "level_delta"),
+    [("WIN", 0), ("GAME_OVER", 0), ("NOT_FINISHED", 1)],
+)
+def test_goal_rollout_stops_at_planner_terminal_prediction(
+    state: str,
+    level_delta: int,
+) -> None:
+    actions = (Action(ActionKind.ACTION3), Action(ActionKind.ACTION6, row=1, col=2))
+    source = TERMINAL_PROGRAM_TEMPLATE.format(state=state, level_delta=level_delta)
+
+    result = evaluate_program_grounding(
+        source,
+        _history(),
+        actions,
+        timeout_seconds=1.0,
+        rollout_depth=4,
+    )
+
+    terminal = [
+        item
+        for item in result.goal_results
+        if item.action == "ACTION6(1,2)"
+    ]
+    assert result.goal_value_ok
+    assert result.eligible
+    assert len(terminal) == 1
+    assert terminal[0].depth == 1
+    assert terminal[0].ok
+    assert terminal[0].terminal
+    assert terminal[0].value is None
 
 
 def test_palette_audit_flags_explicit_conflicts_only() -> None:

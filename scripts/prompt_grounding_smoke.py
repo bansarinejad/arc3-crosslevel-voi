@@ -15,10 +15,15 @@ import numpy as np
 from arc3_voi.candidates import candidates_from_history
 from arc3_voi.config import load_config
 from arc3_voi.experiment import stable_config_hash
-from arc3_voi.grounding import evaluate_program_grounding, grounding_gate_reasons
+from arc3_voi.grounding import (
+    GOAL_ACTION_SPREAD_THRESHOLD,
+    evaluate_program_grounding,
+    grounding_gate_reasons,
+)
 from arc3_voi.model import backend_from_config
 from arc3_voi.preflight import detect_runtime
 from arc3_voi.prompts import (
+    HYPOTHESIS_DIVERSITY_ROLES,
     PROGRAM_SYSTEM_PROMPT,
     PROMPT_CONTRACT_SHA256,
     PROMPT_CONTRACT_VERSION,
@@ -104,7 +109,7 @@ def main() -> int:
             memory_limit_mb=config.sandbox.memory_mb,
             rollout_depth=config.planning.depth,
             require_action_sensitivity=index > 0,
-            require_goal_sensitivity=index > 0,
+            require_goal_conditioning=index > 0,
         )
         for index, source in enumerate(generation.texts)
     )
@@ -123,9 +128,15 @@ def main() -> int:
         "utf-8"
     )
     program_payloads = []
-    for source_text, program in zip(generation.texts, programs, strict=True):
+    for index, (source_text, program) in enumerate(
+        zip(generation.texts, programs, strict=True)
+    ):
         value = asdict(program)
         value["source"] = source_text
+        value["candidate_index"] = index
+        value["assigned_role"] = HYPOTHESIS_DIVERSITY_ROLES[
+            index % len(HYPOTHESIS_DIVERSITY_ROLES)
+        ]
         value["palette_conflicts"] = len(program.palette_conflicts)
         value["eligible"] = program.eligible
         program_payloads.append(value)
@@ -158,6 +169,18 @@ def main() -> int:
         "history_frames": len(history.frames),
         "observed_palette_values": [int(value) for value in np.unique(history.latest_grid)],
         "evaluation_actions": [_action_label(action) for action in actions],
+        "grounding_evaluation": {
+            "rollout_depth": config.planning.depth,
+            "rollout_paths": "repeat each root candidate action",
+            "goal_action_spread_threshold": GOAL_ACTION_SPREAD_THRESHOLD,
+            "goal_metric_scope": (
+                "same-depth action-conditioned variation; not semantic alignment evidence"
+            ),
+            "terminal_policy": (
+                "stop before goal_value after WIN, GAME_OVER, or positive level_delta"
+            ),
+            "candidate_roles": list(HYPOTHESIS_DIVERSITY_ROLES),
+        },
         "system_prompt_sha256": hashlib.sha256(
             PROGRAM_SYSTEM_PROMPT.encode("utf-8")
         ).hexdigest(),
@@ -200,12 +223,12 @@ def main() -> int:
             "action_sensitive_programs": sum(
                 program.action_sensitive for program in eligible
             ),
-            "goal_sensitive_programs": sum(
-                program.goal_sensitive for program in eligible
+            "goal_action_conditioned_programs": sum(
+                program.goal_action_conditioned for program in eligible
             ),
             "graded_role_programs": sum(
                 program.action_sensitivity_required
-                and program.goal_sensitivity_required
+                and program.goal_conditioning_required
                 and program.eligible
                 for program in programs
             ),
