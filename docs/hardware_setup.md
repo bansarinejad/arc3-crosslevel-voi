@@ -99,3 +99,13 @@ agreement was 1.0, EVSI was 0.0, and cross-level probe utility was -1.0. See
 `artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked pending a
 new Windows/WSL grounding smoke and runtime-admission v2 pass for the repair-enabled evidence-first v5
 prompt contract, and then a fresh four-run pilot.
+
+The repair-enabled v5 native-Windows gates separate compute capacity from program quality.
+Qwen3.5-4B BF16 used two batches, 3,665 output tokens, 163.17 generation seconds,
+22.46 tokens/s, and 9.65 GiB peak; repair improved the pool to two safe distinct programs,
+but neither was an eligible graded role. The current serial Qwen3.5-9B NF4 path used two
+batches, 1,933 tokens, 136.09 seconds, 14.20 tokens/s, and 8.58 GiB peak. This supersedes
+the old 9B four-simultaneous-sequence compute rejection for the serial profile, but all
+eight 9B candidates failed grounding. Neither result authorizes gameplay. See
+`artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_windows.json` and
+`artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_9b_windows.json`.

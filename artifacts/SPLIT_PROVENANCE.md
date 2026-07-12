@@ -57,6 +57,8 @@ The active matrix freezes prompt contract `evidence-first-visible-causal-alterna
 perception contract `arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
 `crosslevel-voi-runtime-v2`. It contains 180 pending rows: 15 development games, seeds
 `11`, `23`, and `47`, and variants D/S/M/X. No active-matrix gameplay has run. The active
+matrix is locked: repair-enabled v5 grounding rejected both the 4B and serial 9B local
+profiles on program quality, despite both passing their current compute limits. The active
 variant configuration hashes are D
 `e56fe0e2a55e344edc53bd0d5f09c448305da3b07825c8d12798c935e51a68e6`, S
 `e254bbf925180ac197696913250cbbbab1b454a3f163391b470912e270bb0ded`, M

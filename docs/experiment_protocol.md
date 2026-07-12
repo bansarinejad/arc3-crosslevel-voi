@@ -107,8 +107,11 @@ gate requires at least one material low-agreement probe with positive X utility 
 non-positive M utility. The v5/runtime-v2 path adds at most one grounding-repair batch with
 source-free categorical feedback. Both calls share the frozen token, wall-time, and game
 batch budgets; candidate roles reset within the repair batch before admission and dedup.
-These are pre-pilot diagnostics, not performance claims. No v5 model gate,
-runtime-admission pass, or gameplay-pilot pass is claimed.
+These are pre-pilot diagnostics, not performance claims. No v5 model-gate pass,
+runtime-admission pass, or gameplay-pilot pass is claimed. Native Windows v5 measurements
+then rejected both local backbones on grounding: 4B retained two safe distinct programs
+but no eligible graded role after repair; serial 9B NF4 passed compute at 14.20 tokens/s
+and 8.58 GiB but retained zero grounded-safe programs. The active matrix remains locked.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no

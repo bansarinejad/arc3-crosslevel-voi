@@ -96,6 +96,14 @@ does not contain code from Duck or other competition entries.
   one additional source-free grounding-repair call, charged to the same token, wall, and
   three-batch game caps; it preserves batch-local roles and rejects backend over-reporting.
   No v5 model or runtime gate pass is yet claimed; the 180-row active matrix remains locked.
+- Ran clean repair-enabled v5 model gates on both local backbones. The 4B produced two
+  safe, behaviorally distinct programs after repair and passed compute at 22.46 tokens/s
+  and 9.65 GiB, but produced zero eligible graded roles. The serial 9B NF4 profile now
+  passes its compute limits at 14.20 tokens/s and 8.58 GiB—superseding its obsolete
+  four-simultaneous-sequence capacity rejection—but produced zero grounded-safe programs.
+  Both gates fail, so neither backbone authorizes gameplay. See
+  `artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_windows.json` and
+  `artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_9b_windows.json`.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
@@ -123,9 +131,11 @@ does not contain code from Duck or other competition entries.
   all 180 active development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
-The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
-gate and must not be substituted by an earlier single-sequence measurement. The official
-4B BF16 fallback is the selected local model. There are deliberately no
+The old four-simultaneous-sequence 9B NF4 artifact remains a valid historical rejection
+of that execution profile, but the current serial 9B profile now passes compute and fails
+grounding instead. The official 4B BF16 fallback remains the selected local engineering
+model because it retains two safe programs after repair, though it also fails the graded-role
+gate. There are deliberately no
 development aggregate or positive cross-level performance claim. Scale-up remains locked;
 the corrected admission ordering passed structurally, but both source committees failed
 the decision-diversity gate before a fresh pilot could be authorized.
