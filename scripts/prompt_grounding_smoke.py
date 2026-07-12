@@ -158,9 +158,16 @@ def main() -> int:
         "system_prompt_sha256": hashlib.sha256(
             PROGRAM_SYSTEM_PROMPT.encode("utf-8")
         ).hexdigest(),
-        "user_prompt_sha256": hashlib.sha256(
-            program_prompt(history).encode("utf-8")
-        ).hexdigest(),
+        "user_prompt_sha256": [
+            hashlib.sha256(
+                program_prompt(
+                    history,
+                    candidate_index=index,
+                    candidate_count=config.hypotheses.max_hypotheses,
+                ).encode("utf-8")
+            ).hexdigest()
+            for index in range(config.hypotheses.max_hypotheses)
+        ],
         "prompt_contract_version": PROMPT_CONTRACT_VERSION,
         "perception_contract_version": PERCEPTION_CONTRACT_VERSION,
         "prompt_contract_sha256": PROMPT_CONTRACT_SHA256,

@@ -35,9 +35,11 @@ grounding gate artifacts are regenerated separately before gameplay. The machine
 stack evidence is `artifacts/wsl_stack_check.json`. Close GPU-heavy desktop applications
 because the 4090 Laptop GPU has only 16 GiB physical VRAM.
 
-The exact WSL eight-frame preflight passes with 4/4 statically valid programs, no
-truncation, 9.35 GiB peak VRAM, and 26.64 generated tokens/s. Loading the model directly
+The v1 WSL eight-frame capacity preflight passed with 4/4 statically valid programs, no
+truncation, 9.35 GiB peak VRAM, and 26.64 generated tokens/s, but its grounding gate failed
+on behavioral diversity. It is retained as `artifacts/model_gate_live8_wsl_v1.json`; the v2
+contract must be remeasured. Loading the model directly
 from `/mnt/d` was aborted after three minutes at 6% because safetensors tensor mappings were
 dominated by the `p9` bridge. Copying the manifest-verified snapshot to
 `/home/bansarinejad/models/Qwen3.5-4B` reduced weight loading to about one second. See
-`artifacts/model_gate_live8_wsl.json`.
+`artifacts/model_gate_live8_wsl_v1.json`.

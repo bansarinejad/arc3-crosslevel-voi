@@ -29,10 +29,10 @@ def _non_negative_float(name: str, value: float) -> None:
 class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
-    prompt_contract_version: str = "grounded-actions-palette-v1"
+    prompt_contract_version: str = "grounded-actions-palette-diverse-v2"
     perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
     prompt_contract_sha256: str = (
-        "b405470f41323c27d94f4f19d9860a0473e43b18c80100b6e66b83b1b129aad9"
+        "2850bc72cf42c42e2c813962aa7fb413d74f3ff65789719ac76dd32e26157b96"
     )
     perception_contract_sha256: str = (
         "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0"
@@ -156,7 +156,6 @@ class ModelConfig:
     min_tokens_per_second: float | None = None
     max_runtime_fraction: float | None = None
     offline: bool = False
-    max_batch_sequences: int = 4
 
     def __post_init__(self) -> None:
         if not self.id.strip() or not self.profile.strip():
@@ -187,7 +186,6 @@ class ModelConfig:
             raise ConfigError("quantization must be none, nf4, or fp8")
         if self.compute_dtype not in {"bfloat16", "float16", "float32"}:
             raise ConfigError("unsupported compute_dtype")
-        _positive_int("max_batch_sequences", self.max_batch_sequences)
         if self.max_peak_vram_gb is not None:
             _non_negative_float("max_peak_vram_gb", self.max_peak_vram_gb)
         if self.min_tokens_per_second is not None:
@@ -263,7 +261,6 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                     "min_tokens_per_second",
                     "max_runtime_fraction",
                     "offline",
-                    "max_batch_sequences",
                 }
             ),
         )

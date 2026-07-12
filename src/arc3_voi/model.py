@@ -16,6 +16,7 @@ import numpy as np
 
 from .prompts import (
     DIRECT_SYSTEM_PROMPT,
+    HYPOTHESIS_DIVERSITY_ROLES,
     PROGRAM_SYSTEM_PROMPT,
     PROMPT_CONTRACT_SHA256,
     PROMPT_CONTRACT_VERSION,
@@ -48,7 +49,6 @@ class ModelProfile:
     offline: bool = False
     device_map: str = "auto"
     seed: int = 20_260_712
-    max_batch_sequences: int = 4
     max_peak_vram_gb: float | None = None
     settings: GenerationSettings = field(default_factory=GenerationSettings)
 
@@ -214,12 +214,12 @@ class TransformersQwenBackend:
         max_new_tokens: int | None = None,
         max_wall_seconds: float | None = None,
     ) -> GenerationResult:
-        prompt = program_prompt(history, feedback=feedback)
         started = time.perf_counter()
         chunks: list[GenerationResult] = []
-        remaining_count = count
-        while remaining_count > 0:
-            chunk_count = min(remaining_count, self.profile.max_batch_sequences)
+        prompt_candidate_count = max(count, len(HYPOTHESIS_DIVERSITY_ROLES))
+        # Candidate-specific prompts cannot share a model batch without losing slot identity.
+        # Serial calls also keep S slot 0 byte-identical to committee slot 0.
+        for candidate_index in range(count):
             wall_remaining = (
                 None
                 if max_wall_seconds is None
@@ -230,14 +230,18 @@ class TransformersQwenBackend:
             chunks.append(
                 self._generate(
                     PROGRAM_SYSTEM_PROMPT,
-                    prompt,
+                    program_prompt(
+                        history,
+                        feedback=feedback,
+                        candidate_index=candidate_index,
+                        candidate_count=prompt_candidate_count,
+                    ),
                     history,
-                    count=chunk_count,
+                    count=1,
                     max_new_tokens=max_new_tokens,
                     max_wall_seconds=wall_remaining,
                 )
             )
-            remaining_count -= chunk_count
         result = GenerationResult(
             texts=tuple(text for chunk in chunks for text in chunk.texts),
             output_tokens=sum(chunk.output_tokens for chunk in chunks),
@@ -426,7 +430,6 @@ def backend_from_config(
         compute_dtype=config.model.compute_dtype,
         offline=config.model.offline,
         seed=config.experiment.seed,
-        max_batch_sequences=config.model.max_batch_sequences,
         max_peak_vram_gb=config.model.max_peak_vram_gb,
         settings=GenerationSettings(
             temperature=config.generation.temperature,

@@ -24,9 +24,11 @@ does not contain code from Duck or other competition entries.
 - Verified the WSL reference stack: Ubuntu 24.04.1, Python 3.12.3, Torch 2.11.0+cu130,
   CUDA 13.0, driver 581.15, `sm_89`, bitsandbytes 0.49.2, and Transformers 5.13.1.
   Dependency consistency and a BF16 CUDA operation pass. See `artifacts/wsl_stack_check.json`.
-- Passed the WSL eight-frame 4B model gate from the manifest-verified native model copy:
+- The v1 WSL eight-frame capacity gate passed from the manifest-verified native model copy:
   4/4 programs statically valid, no truncation, 9.35 GiB peak VRAM, and 26.64 generated
-  tokens/s. See `artifacts/model_gate_live8_wsl.json`.
+  tokens/s. Its grounding gate then failed because all three safe programs were behavioral
+  no-ops. Both artifacts are retained as diagnostics; the v2 diversity contract is pending
+  remeasurement before gameplay.
 - Preserved earlier official-palette Windows model and grounding checks as diagnostics only;
   their artifacts predate contract-content fingerprints and the checked-in history fixture,
   so they are explicitly marked superseded.

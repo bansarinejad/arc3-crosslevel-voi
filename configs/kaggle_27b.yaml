@@ -7,4 +7,3 @@ model:
   compute_dtype: bfloat16
   max_runtime_fraction: 0.8
   offline: true
-  max_batch_sequences: 1

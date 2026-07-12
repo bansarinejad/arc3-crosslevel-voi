@@ -10,7 +10,13 @@ from typing import Any
 
 from .rendering import ARC_PALETTE_LEGEND, GRID_LINE_RGB
 
-PROMPT_CONTRACT_VERSION = "grounded-actions-palette-v1"
+PROMPT_CONTRACT_VERSION = "grounded-actions-palette-diverse-v2"
+HYPOTHESIS_DIVERSITY_ROLES = (
+    "Conservative evidence-first baseline; a no-effect transition is allowed when best supported.",
+    "Prioritize local coordinate-dependent interaction caused by ACTION6.",
+    "Prioritize action-dependent object or agent motion caused by exposed simple actions.",
+    "Prioritize component-wide, toggle, selection, or global action effects.",
+)
 PROGRAM_ACTION_CONTRACT = """Action kinds are opaque numeric labels: RESET=0,
 ACTION1=1, ACTION2=2, ACTION3=3, ACTION4=4, ACTION5=5, ACTION6=6, ACTION7=7.
 Only ACTION6 carries coordinates. For ACTION6, row and col are integers in [0,63].
@@ -58,7 +64,10 @@ append, extend, add, and discard. Prefer short, general rules.
 Never read files, use the network, or execute code. Do not use imports, classes,
 decorators, type annotations, exceptions, context managers, or markdown. Keep the
 whole program below 120 logical lines and define both required functions completely
-before the token limit. You may optionally add a top-level literal
+before the token limit. Do not use pass statements. A conservative no-effect baseline is
+allowed when evidence supports it; candidates assigned an action-sensitive role should encode
+one small plausible action-dependent effect rather than manufacture arbitrary disagreement.
+You may optionally add a top-level literal
 CANDIDATE_POINTS = [(row, col), ...] with promising ACTION6 coordinates from the
 latest frame. A minimal contract-valid shape is:
 
@@ -173,11 +182,35 @@ def _grid_values(grid: Any) -> list[int]:
     return sorted({int(value) for row in rows for value in row})
 
 
-def program_prompt(history: Any, *, feedback: str | None = None) -> str:
+def program_prompt(
+    history: Any,
+    *,
+    feedback: str | None = None,
+    candidate_index: int = 0,
+    candidate_count: int = 1,
+) -> str:
+    if candidate_count < 1 or not 0 <= candidate_index < candidate_count:
+        raise ValueError("candidate_index must identify one candidate in candidate_count")
+    role = HYPOTHESIS_DIVERSITY_ROLES[candidate_index % len(HYPOTHESIS_DIVERSITY_ROLES)]
+    action_sensitive_role = candidate_index % len(HYPOTHESIS_DIVERSITY_ROLES) != 0
+    instruction = (
+        "Infer one conservative behaviorally plausible transition-and-goal program. A no-effect "
+        "transition is acceptable when it is the best-supported hypothesis. Do not import or "
+        "use pass."
+        if not action_sensitive_role
+        else "Infer one behaviorally plausible transition-and-goal program with one small "
+        "action-dependent effect supported by the assigned role. Predictions should differ for "
+        "at least two currently valid actions. Do not import or use pass."
+    )
     request = {
+        "committee_candidate": {
+            "index": candidate_index,
+            "role": role,
+            "requires_action_sensitivity": action_sensitive_role,
+        },
         "frame_encoding": "grid_image_index refers to ordered images, oldest first",
         "history": history_payload(history, include_grid_ascii=False),
-        "instruction": "Infer one behaviorally plausible transition-and-goal program.",
+        "instruction": instruction,
     }
     if feedback:
         request["contradiction_feedback"] = feedback
@@ -285,7 +318,14 @@ _REFERENCE_HISTORY = tuple(
     for index in range(10)
 )
 PROMPT_REFERENCE_PROGRAM_SHA256 = hashlib.sha256(
-    program_prompt(_REFERENCE_HISTORY).encode("utf-8")
+    "\n".join(
+        program_prompt(
+            _REFERENCE_HISTORY,
+            candidate_index=index,
+            candidate_count=len(HYPOTHESIS_DIVERSITY_ROLES),
+        )
+        for index in range(len(HYPOTHESIS_DIVERSITY_ROLES))
+    ).encode("utf-8")
 ).hexdigest()
 PROMPT_REFERENCE_DIRECT_SHA256 = hashlib.sha256(
     direct_prompt(

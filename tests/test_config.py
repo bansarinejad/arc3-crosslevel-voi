@@ -8,7 +8,7 @@ from arc3_voi.rendering import PERCEPTION_CONTRACT_SHA256
 def test_inherited_local_model_config_loads() -> None:
     config = load_config("configs/local_9b.yaml")
     assert config.experiment.max_environment_actions == 256
-    assert config.experiment.prompt_contract_version == "grounded-actions-palette-v1"
+    assert config.experiment.prompt_contract_version == "grounded-actions-palette-diverse-v2"
     assert (
         config.experiment.perception_contract_version
         == "arc-agi-0.9.9-color-map-scale8-grid-v1"
@@ -40,10 +40,3 @@ def test_kaggle_bf16_fallback_is_offline_and_unquantized() -> None:
     assert config.model.quantization == "none"
     assert config.model.compute_dtype == "bfloat16"
     assert config.model.offline
-
-
-def test_local_4b_fallback_microbatches_the_logical_four_candidate_batch() -> None:
-    config = load_config("configs/local_4b.yaml")
-
-    assert config.model is not None
-    assert config.model.max_batch_sequences == 1

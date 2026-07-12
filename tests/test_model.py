@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 from types import SimpleNamespace
 
@@ -8,7 +9,10 @@ import pytest
 
 from arc3_voi.config import load_config
 from arc3_voi.model import (
+    GenerationResult,
+    ModelProfile,
     ScriptedBackend,
+    TransformersQwenBackend,
     _count_generated_tokens,
     _cuda_memory_fraction,
     _history_grids,
@@ -32,6 +36,57 @@ def test_scripted_direct_policy() -> None:
     action, result = backend.direct_action([], ["ACTION1", "ACTION2"])
     assert action == {"kind": "ACTION2"}
     assert result.output_tokens == 1
+
+
+def test_program_generation_serializes_distinct_slots_and_aggregates_metrics() -> None:
+    class RecordingBackend(TransformersQwenBackend):
+        def __init__(self) -> None:
+            super().__init__(ModelProfile("test"))
+            self.calls: list[tuple[int, int, int | None, float | None]] = []
+
+        def _generate(
+            self,
+            system_prompt: str,
+            text_prompt: str,
+            history: object,
+            *,
+            count: int,
+            max_new_tokens: int | None = None,
+            max_wall_seconds: float | None = None,
+        ) -> GenerationResult:
+            del system_prompt, history
+            index = int(json.loads(text_prompt)["committee_candidate"]["index"])
+            self.calls.append((index, count, max_new_tokens, max_wall_seconds))
+            return GenerationResult(
+                (f"candidate_{index}",),
+                index + 1,
+                0.25 * (index + 1),
+                5.0 + index,
+                (index + 1,),
+                (index == 3,),
+            )
+
+    backend = RecordingBackend()
+
+    result = backend.generate_programs(
+        [], 4, max_new_tokens=77, max_wall_seconds=10.0
+    )
+
+    assert result.texts == ("candidate_0", "candidate_1", "candidate_2", "candidate_3")
+    assert result.output_tokens == 10
+    assert result.elapsed_seconds == pytest.approx(2.5)
+    assert result.peak_vram_gb == 8.0
+    assert result.sequence_token_counts == (1, 2, 3, 4)
+    assert result.hit_token_limit == (False, False, False, True)
+    assert [(index, count, limit) for index, count, limit, _ in backend.calls] == [
+        (0, 1, 77),
+        (1, 1, 77),
+        (2, 1, 77),
+        (3, 1, 77),
+    ]
+    remaining = [value for *_, value in backend.calls]
+    assert all(value is not None and 0 < value <= 10 for value in remaining)
+    assert remaining == sorted(remaining, reverse=True)
 
 
 def test_count_generated_tokens_stops_at_eos_or_padding() -> None:

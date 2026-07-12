@@ -14,6 +14,7 @@ from arc3_voi.prompts import (
     extract_python,
     history_payload,
     parse_action_json,
+    program_prompt,
 )
 from arc3_voi.rendering import ARC_PALETTE_LEGEND
 
@@ -124,3 +125,30 @@ def test_prompts_share_exact_palette_and_action_contracts() -> None:
     int(PROMPT_CONTRACT_SHA256, 16)
     assert len(PROMPT_REFERENCE_PROGRAM_SHA256) == 64
     assert len(PROMPT_REFERENCE_DIRECT_SHA256) == 64
+
+
+def test_program_prompt_assigns_distinct_action_sensitive_committee_roles() -> None:
+    entry = SimpleNamespace(
+        grid=np.zeros((64, 64), dtype=np.int8),
+        action=None,
+        available_actions=("ACTION7", "ACTION3", "ACTION6"),
+        game_state="NOT_FINISHED",
+        level_delta=0,
+        level=1,
+    )
+
+    prompts = [
+        program_prompt([entry], candidate_index=index, candidate_count=4)
+        for index in range(4)
+    ]
+
+    assert len(set(prompts)) == 4
+    assert "no-effect transition is acceptable" in prompts[0]
+    assert all("Predictions should differ" in prompt for prompt in prompts[1:])
+    assert '"index":0' in prompts[0]
+    assert '"index":3' in prompts[3]
+    assert '"requires_action_sensitivity":false' in prompts[0]
+    assert '"requires_action_sensitivity":true' in prompts[1]
+    assert program_prompt([entry], candidate_index=0, candidate_count=1) == program_prompt(
+        [entry], candidate_index=0, candidate_count=4
+    )

@@ -1,0 +1,436 @@
+{
+  "contract_status": "failed-v1-noop-collapse-diagnostic",
+  "replacement_pending": "artifacts/prompt_grounding_bp35_seed11_wsl.json",
+  "base_config_sha256": "11b42cf6d1adc3c6e4f0771705723c4f376d174e77d9c8f1d620e8f1bc04b514",
+  "effective_offline_config_sha256": "5fe7254b96441e1a6eec3bbd34bccb2822782a2d177245f3ea39abe9a6c3f5ad",
+  "evaluation_actions": [
+    "ACTION3",
+    "ACTION4",
+    "ACTION7",
+    "ACTION6(42,33)",
+    "ACTION6(5,42)",
+    "ACTION6(63,31)",
+    "ACTION6(3,15)",
+    "ACTION6(3,21)",
+    "ACTION6(3,27)",
+    "ACTION6(15,33)",
+    "ACTION6(15,39)",
+    "ACTION6(15,45)"
+  ],
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "generation": {
+    "elapsed_seconds": 44.71369491199994,
+    "output_tokens": 1336,
+    "peak_vram_gb": 8.819275856018066,
+    "requested": 4,
+    "sequence_token_counts": [
+      426,
+      238,
+      307,
+      365
+    ],
+    "tokens_per_second": 29.878989035224063,
+    "truncated_sequences": 0
+  },
+  "git": {
+    "commit": "1c5e309b72e48ec68e3c2f714a47f3a62f1c350c",
+    "dirty": false,
+    "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+  "history_frames": 1,
+  "latest_grid_int16_sha256": "92370b9db1c1b1f1570ec24487c8a1669fe3bf35572f0c3efa2bb084c5a1a634",
+  "latest_grid_uint8_sha256": "e673f0158ffbf5ffa45f3f32f30a91c9dc7f22ad41c8aaf3feeb8e7dda11fa31",
+  "latest_rendered_rgb_sha256": "eb0167dfb47c88a47d27b61891c62864267a32e2c672f8362ef6dff36925e2bf",
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "observed_palette_values": [
+    0,
+    3,
+    5,
+    9,
+    10,
+    11,
+    14
+  ],
+  "offline": true,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "programs": [
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        }
+      ],
+      "action_sensitive": false,
+      "all_actions_ok": true,
+      "ast_nodes": 319,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    \n    # Attempt to move the agent (kind 1) towards green objects (kind 14)\n    # Simple heuristic: try moving one step if within bounds and not hitting walls (0 or 3)\n    if kind == 1:\n        r, c = row, col\n        new_r, new_c = r + 1, c\n        if 0 <= new_r < 64 and 0 <= new_c < 64 and grid[new_r, new_c] not in (0, 3):\n            grid = grid.copy()\n            grid[new_r, new_c] = grid[r, c]\n            grid[r, c] = 0\n            return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n    elif kind == 2:\n        r, c = row, col\n        new_r, new_c = r, c + 1\n        if 0 <= new_r < 64 and 0 <= new_c < 64 and grid[new_r, new_c] not in (0, 3):\n            grid = grid.copy()\n            grid[new_r, new_c] = grid[r, c]\n            grid[r, c] = 0\n            return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n    # Default action if no move\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.0",
+      "source_length": 1252,
+      "source_sha256": "8a733f3719b7a08a9fe0a3571f99ac9ea7a893893c7300b5cd95b536078a1815",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [],
+      "action_sensitive": false,
+      "all_actions_ok": false,
+      "ast_nodes": null,
+      "behavior_signature": null,
+      "coordinate_read_lines": [
+        6,
+        7
+      ],
+      "eligible": false,
+      "goal_value_error": null,
+      "goal_value_ok": false,
+      "hard_memory_limit_enforced": null,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": false,
+      "simple_action_contract_ok": false,
+      "source": "def predict(history, action):\n    import numpy as np\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    # Simple heuristic: if ACTION6 is provided, simulate a move to that cell\n    # Otherwise, default to a safe move or no-op\n    if kind == 6:\n        # Simulate move to (row, col)\n        # In ARC-AGI, often moving to a new cell or interacting is the goal\n        # We'll assume the agent just moves to that cell\n        pass\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Infer goal value based on history\n    # If the game state is WIN or GAME_OVER, return 1.0\n    # Otherwise, return 0.0 as a placeholder\n    return 0.0",
+      "source_length": 816,
+      "source_sha256": "678b96edbd52bcc2021a852ee72f2c951bbdcd5210a9dd8f8e60a76efc0e0811",
+      "unsafe_coordinate_use": false,
+      "validation_error": "SandboxValidationError: Import is not allowed in generated programs"
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        }
+      ],
+      "action_sensitive": false,
+      "all_actions_ok": true,
+      "ast_nodes": 80,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Simple heuristic: if action is a direct click, simulate it by copying\n        # In this specific ARC context, often the agent is already \"in\" the action or the action is a move.\n        # We will assume the provided action coordinates are the target for an ACTION6.\n        # However, without a clear \"move\" logic in history, we simulate a standard \"click\" or \"activate\"\n        # by potentially changing the state if we had logic.\n        # Given the instruction \"Infer one behaviorally plausible transition\", and the provided image\n        # shows a character (yellow/blue) near a green block (14), let's assume ACTION6 is a move/click.\n        # Since we cannot execute the move, we return the current grid as the next state (simulation of state persistence)\n        # and mark it as NOT_FINISHED.\n        pass \n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Goal value is 0.0 as per minimal contract.\n    return 0.0",
+      "source_length": 1198,
+      "source_sha256": "146f25bbf5e944b50895fcfc82d20a7a53a1c550fa68101bc7be73138b86c84e",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        }
+      ],
+      "action_sensitive": false,
+      "all_actions_ok": true,
+      "ast_nodes": 76,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "coordinate_read_lines": [
+        4,
+        5
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    # Default next grid is copy of current\n    grid = history.frames[-1]\n    # If action is ACTION6, we assume it's a move to the clicked cell\n    if kind == 6:\n        # Simulate moving the player to the clicked cell\n        # We assume the player is currently at a specific location, but we don't have it explicitly.\n        # However, we can infer the player's location from the history or grid if possible.\n        # Looking at the image, the player (yellow) is at a specific location.\n        # Let's assume the player moves to the clicked cell.\n        # We'll just return the grid as is for now, as we don't have explicit player position.\n        # But to be more interesting, let's try to find the player in the last frame.\n        # Player is likely 11 (yellow) based on the palette.\n        # Let's assume the player moves to the clicked cell.\n        # For simplicity, we'll just return the grid as is.\n        pass\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # The goal is to reach a certain state, which is not explicitly defined.\n    # We'll assume the goal is to reach a certain level or score.\n    # Without more information, we'll return 0.0.\n    return 0.0",
+      "source_length": 1389,
+      "source_sha256": "91893c01ab4024150cff9fc55e09db5abf14038ecf3661fed910ccef69e4cae0",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    }
+  ],
+  "prompt_contract_sha256": "b405470f41323c27d94f4f19d9860a0473e43b18c80100b6e66b83b1b129aad9",
+  "prompt_contract_version": "grounded-actions-palette-v1",
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "5.15.167.4-microsoft-standard-WSL2",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "schema_version": 2,
+  "seed": 11,
+  "source_input": "fixtures/grounding/bp35_seed11_initial_history.json",
+  "source_input_kind": "history_fixture",
+  "source_input_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+  "source_trace_canonical_sha256": "c6fd2d38f937d9c5f5a1e7f8e0d5b366db005ebd8a8ae155c21f7e1c34a3e5e8",
+  "summary": {
+    "action_sensitive_programs": 0,
+    "distinct_behavior_classes": 1,
+    "gate_reasons": [
+      "fewer than two distinct grounded behavior classes",
+      "no grounded-safe program is action-sensitive"
+    ],
+    "grounded_safe_programs": 3,
+    "hard_memory_limit_enforced_programs": 3,
+    "hard_memory_limit_required": true,
+    "palette_conflict_programs": 0,
+    "passes": false,
+    "sandbox_valid_programs": 3,
+    "unsafe_coordinate_programs": 0
+  },
+  "system_prompt_sha256": "d028f0f55620d6cf2e0533f7a0dd3a8b9ae780174e211758fb4f1c5a96ba3fbf",
+  "user_prompt_sha256": "2002a1e1b76af4f6618357afad48682ca7b28c94cba7fd895b39e4f4b613b61b"
+}
