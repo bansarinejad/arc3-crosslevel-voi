@@ -207,6 +207,9 @@ class _HypothesisGenerator:
         for hypothesis in self._owned.values():
             self._retire(hypothesis)
         self._owned.clear()
+        close_backend = getattr(self.backend, "close", None)
+        if callable(close_backend):
+            close_backend()
 
     def telemetry(self) -> dict[str, int | bool]:
         return {

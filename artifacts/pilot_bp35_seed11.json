@@ -1,0 +1,99 @@
+{
+  "date": "2026-07-12",
+  "game_id": "bp35-0a0ad940",
+  "engineering_correction": {
+    "corrected_behavior": "All eight frames are ordered image blocks with aligned metadata-only text",
+    "failed_prompt_tokens": 18558,
+    "failed_row_peak_cuda_allocated_gib": 45.77019214630127,
+    "failure": "Pre-fix ASCII serialization duplicated full grids and caused WDDM shared-memory spill",
+    "post_fix_eight_frame_peak_cuda_allocated_gib": 10.11571216583252,
+    "post_fix_eight_frame_tokens_per_second": 22.805814033269268,
+    "tests_passed": 137
+  },
+  "interpretation": {
+    "central_mechanism_exercised": false,
+    "development_gate_evidence": false,
+    "reason": "M and X had agreement 1.0, issued zero probes, and selected identical actions",
+    "score_claim": "No variant completed a level; this is engineering evidence only"
+  },
+  "matrix": {
+    "completed": 4,
+    "remaining": 176,
+    "total": 180
+  },
+  "mechanism_diagnostics": {
+    "M_best_loss_reduction_vs_S": 0.24556555470974062,
+    "M_two_valid_fraction": 0.99609375,
+    "M_wall_ratio_vs_S": 1.3827426894263926,
+    "X_actions_identical_to_M": true,
+    "X_minimum_agreement": 1.0,
+    "X_probe_count": 0,
+    "X_two_valid_fraction": 0.99609375,
+    "X_wall_ratio_vs_M": 0.9084337804764994
+  },
+  "preflight_artifact": "artifacts/model_gate_live8.json",
+  "seed": 11,
+  "variants": {
+    "D": {
+      "actions": 256,
+      "direct_fallbacks": 253,
+      "generated_tokens": 3759,
+      "levels_completed": 0,
+      "peak_vram_gib": 9.970883846282959,
+      "rhae": 0.0,
+      "termination_reason": "budget_exhausted",
+      "canonical_trace_sha256": "86d811d132960709009f1b54faa67f93a3eb7a3761d7b3e9029f3dc2ff6b66c7",
+      "wall_seconds": 507.39199460000236
+    },
+    "M": {
+      "actions": 256,
+      "direct_fallbacks": 92,
+      "generated_tokens": 5583,
+      "invalid_programs": 3,
+      "levels_completed": 0,
+      "mean_best_hypothesis_transition_loss": 0.06899642944335938,
+      "mean_weighted_transition_loss": 0.0690134394970235,
+      "peak_vram_gib": 9.972523212432861,
+      "program_execution_errors": 0,
+      "program_timeouts": 0,
+      "rhae": 0.0,
+      "termination_reason": "budget_exhausted",
+      "canonical_trace_sha256": "c6fd2d38f937d9c5f5a1e7f8e0d5b366db005ebd8a8ae155c21f7e1c34a3e5e8",
+      "two_valid_decision_points": 255,
+      "wall_seconds": 817.7058591000023
+    },
+    "S": {
+      "actions": 256,
+      "direct_fallbacks": 0,
+      "generated_tokens": 315,
+      "levels_completed": 0,
+      "mean_best_hypothesis_transition_loss": 0.09145450592041016,
+      "mean_weighted_transition_loss": 0.09145450592041016,
+      "peak_vram_gib": 8.71580982208252,
+      "program_execution_errors": 0,
+      "program_timeouts": 0,
+      "rhae": 0.0,
+      "termination_reason": "budget_exhausted",
+      "canonical_trace_sha256": "0c11555e8b9bc14079c105282c368973b555c3afa959e9d4b7fbd06923f370dd",
+      "two_valid_decision_points": 0,
+      "wall_seconds": 591.3651652999979
+    },
+    "X": {
+      "actions": 256,
+      "direct_fallbacks": 92,
+      "generated_tokens": 5583,
+      "invalid_programs": 3,
+      "levels_completed": 0,
+      "mean_best_hypothesis_transition_loss": 0.06899642944335938,
+      "mean_weighted_transition_loss": 0.0690134394970235,
+      "peak_vram_gib": 9.972523212432861,
+      "program_execution_errors": 0,
+      "program_timeouts": 0,
+      "rhae": 0.0,
+      "termination_reason": "budget_exhausted",
+      "canonical_trace_sha256": "34572d349aebf4d2b73d40445840a22c72a9616c0dfac6b62d4a3edece11a99d",
+      "two_valid_decision_points": 255,
+      "wall_seconds": 742.8316253000012
+    }
+  }
+}

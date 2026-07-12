@@ -130,8 +130,7 @@ def main(argv: list[str] | None = None) -> int:
         _preflight_command(args)
         return 0
     if args.command == "run":
-        _run_command(args)
-        return 0
+        return _run_command(args)
     if args.command == "run-matrix":
         return _run_matrix_command(args)
     if args.command == "analyze":
@@ -207,20 +206,24 @@ def _preflight_command(args: argparse.Namespace) -> None:
     if args.durations:
         value = json.loads(args.durations.read_text(encoding="utf-8"))
         durations = [float(item) for item in value]
-    report = run_model_preflight(
-        _model_backend(config, args.model_path),
-        model_id=config.model.id,
-        max_peak_vram_gb=config.model.max_peak_vram_gb or float("inf"),
-        min_tokens_per_second=config.model.min_tokens_per_second or 0.0,
-        observed_game_seconds=durations,
-        hidden_game_count=args.hidden_game_count,
-        runtime_limit_seconds=args.runtime_limit_seconds,
-        program_count=config.hypotheses.max_hypotheses,
-    )
+    backend = _model_backend(config, args.model_path)
+    try:
+        report = run_model_preflight(
+            backend,
+            model_id=config.model.id,
+            max_peak_vram_gb=config.model.max_peak_vram_gb or float("inf"),
+            min_tokens_per_second=config.model.min_tokens_per_second or 0.0,
+            observed_game_seconds=durations,
+            hidden_game_count=args.hidden_game_count,
+            runtime_limit_seconds=args.runtime_limit_seconds,
+            program_count=config.hypotheses.max_hypotheses,
+        )
+    finally:
+        backend.close()
     _emit(report.as_dict(), args.out)
 
 
-def _run_command(args: argparse.Namespace) -> None:
+def _run_command(args: argparse.Namespace) -> int:
     config = load_config(args.config)
     experiment = replace(config.experiment, seed=args.seed)
     if args.variant:
@@ -250,6 +253,7 @@ def _run_command(args: argparse.Namespace) -> None:
         )
     paths = write_run(metrics, args.output)
     _emit({"summary": str(paths[0]), "trace": str(paths[1]), **metrics.summary()})
+    return 2 if metrics.error is not None or metrics.termination_reason is None else 0
 
 
 def _run_matrix_command(args: argparse.Namespace) -> int:
@@ -343,6 +347,9 @@ def _execute_manifest_row(
             baseline_actions=baselines[row.game_id],
         )
     write_run(metrics, output)
+    if metrics.error is not None or metrics.termination_reason is None:
+        detail = metrics.error or "missing termination reason"
+        raise RuntimeError(f"run did not complete cleanly: {detail}")
 
 
 def _analyze_command(args: argparse.Namespace) -> None:

@@ -20,6 +20,8 @@ def goal_value(history):
 history is a read-only record with aligned tuple fields: frames, actions,
 available_action_sets, game_states, level_deltas, and levels. The newest frame is
 history.frames[-1]. action is a read-only record with integer kind and optional row/col.
+History images are ordered oldest to newest; grid_image_index is zero based and the
+final image is the latest frame.
 Copy a frame before changing it. Return a grid with the same shape and values in [0,15].
 game_state must be exactly "NOT_FINISHED", "WIN", or "GAME_OVER". Available NumPy
 operations include array/asarray, copy, zeros_like/ones_like/full_like, where, nonzero,
@@ -46,6 +48,8 @@ DIRECT_SYSTEM_PROMPT = """You control a novel ARC-AGI-3 grid game.
 Choose exactly one currently valid action. Return only compact JSON:
 {"kind":"ACTION1"} or {"kind":"ACTION6","row":12,"col":34}.
 Rows and columns are zero based in [0, 63]. Do not include markdown.
+History images are ordered oldest to newest; grid_image_index is zero based and the
+final image is the latest frame.
 """
 
 _FENCE_RE = re.compile(r"```(?:python)?\s*(.*?)```", re.DOTALL | re.IGNORECASE)
@@ -59,8 +63,15 @@ def grid_to_ascii(grid: Any) -> str:
     return "\n".join("".join(format(int(value), "x") for value in row) for row in rows)
 
 
-def history_payload(history: Any) -> list[dict[str, Any]]:
-    """Convert domain history entries to a stable JSON-compatible prompt payload."""
+def history_payload(
+    history: Any, *, include_grid_ascii: bool = True
+) -> list[dict[str, Any]]:
+    """Convert history to stable metadata, optionally embedding exact ASCII grids.
+
+    Model prompts use ordered image blocks and therefore disable the ASCII grids.
+    Keeping the explicit option preserves a dependency-free exact serialization for
+    diagnostics without paying for every 64x64 frame twice in the live prompt.
+    """
 
     payload: list[dict[str, Any]] = []
     if hasattr(history, "frames") and hasattr(history, "available_action_sets"):
@@ -71,43 +82,50 @@ def history_payload(history: Any) -> list[dict[str, Any]]:
                 available_actions=actions,
                 game_state=state,
                 level_delta=delta,
+                level=level,
             )
-            for grid, action, actions, state, delta in zip(
+            for grid, action, actions, state, delta, level in zip(
                 history.frames,
                 history.actions,
                 history.available_action_sets,
                 history.game_states,
                 history.level_deltas,
+                history.levels,
                 strict=True,
             )
         )
     else:
         entries = iter(history)
-    for entry in entries:
+    bounded_entries = tuple(entries)[-8:]
+    for image_index, entry in enumerate(bounded_entries):
         grid = getattr(entry, "grid", None)
         action = getattr(entry, "action", None)
-        payload.append(
-            {
-                "grid": grid_to_ascii(grid),
-                "action": None if action is None else _action_payload(action),
-                "available_actions": [
-                    getattr(action_kind, "name", str(action_kind))
-                    for action_kind in getattr(entry, "available_actions", ())
-                ],
-                "game_state": getattr(
-                    getattr(entry, "game_state", "NOT_FINISHED"),
-                    "value",
-                    str(getattr(entry, "game_state", "NOT_FINISHED")),
-                ),
-                "level_delta": int(getattr(entry, "level_delta", 0)),
-            }
-        )
+        entry_payload = {
+            "action": None if action is None else _action_payload(action),
+            "available_actions": [
+                getattr(action_kind, "name", str(action_kind))
+                for action_kind in getattr(entry, "available_actions", ())
+            ],
+            "game_state": getattr(
+                getattr(entry, "game_state", "NOT_FINISHED"),
+                "value",
+                str(getattr(entry, "game_state", "NOT_FINISHED")),
+            ),
+            "level_delta": int(getattr(entry, "level_delta", 0)),
+            "level": int(getattr(entry, "level", 1)),
+        }
+        if include_grid_ascii:
+            entry_payload["grid"] = grid_to_ascii(grid)
+        else:
+            entry_payload["grid_image_index"] = image_index
+        payload.append(entry_payload)
     return payload
 
 
 def program_prompt(history: Any, *, feedback: str | None = None) -> str:
     request = {
-        "history": history_payload(history),
+        "frame_encoding": "grid_image_index refers to ordered images, oldest first",
+        "history": history_payload(history, include_grid_ascii=False),
         "instruction": "Infer one behaviorally plausible transition-and-goal program.",
     }
     if feedback:
@@ -117,7 +135,8 @@ def program_prompt(history: Any, *, feedback: str | None = None) -> str:
 
 def direct_prompt(history: Any, valid_actions: Iterable[str]) -> str:
     request = {
-        "history": history_payload(history),
+        "frame_encoding": "grid_image_index refers to ordered images, oldest first",
+        "history": history_payload(history, include_grid_ascii=False),
         "valid_actions": list(valid_actions),
         "instruction": "Choose the safest action that advances or disambiguates the goal.",
     }
@@ -180,9 +199,11 @@ class _HistoryEntry:
         available_actions: Any,
         game_state: Any,
         level_delta: int,
+        level: int,
     ) -> None:
         self.grid = grid
         self.action = action
         self.available_actions = available_actions
         self.game_state = game_state
         self.level_delta = level_delta
+        self.level = level

@@ -72,16 +72,23 @@ def run_model_preflight(
     runtime_limit_seconds: float | None = None,
     program_count: int = 1,
 ) -> PreflightReport:
-    blank = SimpleNamespace(
-        grid=np.zeros((64, 64), dtype=np.int8),
-        action=None,
-        available_actions=("ACTION1", "ACTION2"),
-        game_state="NOT_FINISHED",
-        level_delta=0,
-    )
+    history = []
+    for index in range(8):
+        grid = np.zeros((64, 64), dtype=np.int8)
+        grid[index * 8 : (index + 1) * 8, :] = index % 10
+        history.append(
+            SimpleNamespace(
+                grid=grid,
+                action=None if index == 0 else SimpleNamespace(kind="ACTION1"),
+                available_actions=("ACTION1", "ACTION2"),
+                game_state="NOT_FINISHED",
+                level_delta=0,
+                level=1,
+            )
+        )
     if program_count < 1:
         raise ValueError("program_count must be positive")
-    result: GenerationResult = backend.generate_programs([blank], program_count)
+    result: GenerationResult = backend.generate_programs(history, program_count)
     from .runtime.sandbox import SandboxValidationError, validate_program
 
     valid_programs = 0

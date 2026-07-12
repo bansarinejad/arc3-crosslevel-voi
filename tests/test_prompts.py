@@ -52,7 +52,31 @@ def test_history_payload_is_compact_and_stable() -> None:
         available_actions=("ACTION1", "ACTION6"),
         game_state="NOT_FINISHED",
         level_delta=0,
+        level=1,
     )
     payload = history_payload([entry])
     assert payload[0]["action"] == {"kind": "ACTION6", "row": 2, "col": 3}
     assert len(payload[0]["grid"].splitlines()) == 64
+
+
+def test_image_backed_history_payload_preserves_eight_aligned_frames() -> None:
+    entries = [
+        SimpleNamespace(
+            grid=np.full((64, 64), index % 10, dtype=np.int8),
+            action=None if index == 0 else SimpleNamespace(kind="ACTION1"),
+            available_actions=("ACTION1", "ACTION6"),
+            game_state="NOT_FINISHED",
+            level_delta=index % 2,
+            level=1 + index // 5,
+        )
+        for index in range(10)
+    ]
+
+    payload = history_payload(entries, include_grid_ascii=False)
+
+    assert len(payload) == 8
+    assert [entry["grid_image_index"] for entry in payload] == list(range(8))
+    assert all("grid" not in entry for entry in payload)
+    assert payload[0]["level_delta"] == 0  # Original entry 2.
+    assert payload[-1]["level"] == 2
+    assert payload[-1]["action"] == {"kind": "ACTION1"}

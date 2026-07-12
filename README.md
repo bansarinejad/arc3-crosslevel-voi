@@ -21,12 +21,18 @@ does not contain code from Duck or other competition entries.
   the selected 4B committee on frozen `ls20-9607627b`, with two-or-more valid programs,
   no fallback/timeouts/errors, and 12.43 GiB peak. This is neither a game result nor
   leaderboard evidence; see `artifacts/official_model_smoke.json`.
-- Passed local model gate: official Qwen3.5-4B revision
-  `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` in BF16, with four logical candidates
-  generated as deterministic single-sequence microbatches (12.52 GiB peak, 15.80
-  tokens/s, and 3/4 statically valid programs). See `artifacts/model_gate.json`.
-- Not yet completed: the controlled development and locked-confirmation runs, the
-  Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
+- Passed the corrected eight-frame local model gate: official Qwen3.5-4B revision
+  `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` in BF16 generated four logical candidates
+  as deterministic single-sequence microbatches (10.12 GiB peak, 22.81 tokens/s, and
+  2/4 statically valid programs). See `artifacts/model_gate_live8.json`.
+- Completed the first frozen paired pilot cell (`bp35-0a0ad940`, seed 11): all D/S/M/X
+  rows terminated cleanly under their shared budgets, but every variant completed zero
+  levels. M and X maintained at least two valid programs at 255/256 decision points and
+  improved best-program prequential loss by 24.6% versus S. M and X nevertheless chose
+  identical actions with zero probes because agreement stayed at 1.0, so this cell is not
+  evidence for cross-level VOI. See `artifacts/pilot_bp35_seed11.json`.
+- Not yet completed: the remaining 176 controlled development runs, locked confirmation,
+  the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official

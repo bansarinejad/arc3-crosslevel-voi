@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import gc
 import json
 import random
 import time
 from collections.abc import Callable, Sequence
+from contextlib import suppress
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Protocol
@@ -40,6 +42,7 @@ class ModelProfile:
     device_map: str = "auto"
     seed: int = 20_260_712
     max_batch_sequences: int = 4
+    max_peak_vram_gb: float | None = None
     settings: GenerationSettings = field(default_factory=GenerationSettings)
 
 
@@ -90,6 +93,10 @@ class ScriptedBackend:
     ) -> None:
         self._programs = tuple(programs)
         self._action_policy = action_policy or (lambda _history, actions: {"kind": actions[0]})
+        self.closed = False
+
+    def close(self) -> None:
+        self.closed = True
 
     def generate_programs(
         self,
@@ -144,11 +151,19 @@ class TransformersQwenBackend:
         except ImportError as exc:  # pragma: no cover - optional heavy dependencies
             raise RuntimeError("install the 'model' optional dependencies to load Qwen") from exc
 
+        self._torch = torch
         dtype = getattr(torch, self.profile.compute_dtype)
         random.seed(self.profile.seed)
         np.random.seed(self.profile.seed % (2**32))
         torch.manual_seed(self.profile.seed)
         if torch.cuda.is_available():
+            fraction = _cuda_memory_fraction(
+                self.profile.max_peak_vram_gb,
+                int(torch.cuda.get_device_properties(0).total_memory),
+            )
+            if fraction is not None and fraction < 1.0:
+                torch.cuda.set_per_process_memory_fraction(fraction, device=0)
+            torch.cuda.reset_peak_memory_stats()
             torch.cuda.manual_seed_all(self.profile.seed)
         kwargs: dict[str, Any] = {
             "device_map": self.profile.device_map,
@@ -167,7 +182,21 @@ class TransformersQwenBackend:
         )
         self._model = AutoModelForMultimodalLM.from_pretrained(self.model_path, **kwargs)
         self._model.eval()
-        self._torch = torch
+
+    def close(self) -> None:
+        """Release model references and CUDA caches between experimental rows."""
+
+        torch = self._torch
+        self._model = None
+        self._processor = None
+        self._torch = None
+        gc.collect()
+        if torch is not None and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            ipc_collect = getattr(torch.cuda, "ipc_collect", None)
+            if callable(ipc_collect):
+                with suppress(RuntimeError):
+                    ipc_collect()
 
     def generate_programs(
         self,
@@ -222,6 +251,8 @@ class TransformersQwenBackend:
             output_tokens=result.output_tokens,
             elapsed_seconds=result.elapsed_seconds,
             peak_vram_gb=result.peak_vram_gb,
+            sequence_token_counts=result.sequence_token_counts,
+            hit_token_limit=result.hit_token_limit,
         )
 
     def direct_action(
@@ -261,14 +292,7 @@ class TransformersQwenBackend:
         assert self._torch is not None
         assert self._processor is not None
         assert self._model is not None
-        if hasattr(history, "frames"):
-            latest_grid = history.frames[-1] if history.frames else None
-        else:
-            latest_grid = getattr(history[-1], "grid", None) if history else None
-        content: list[dict[str, Any]] = []
-        if latest_grid is not None:
-            content.append({"type": "image", "image": render_grid_pil(latest_grid)})
-        content.append({"type": "text", "text": text_prompt})
+        content = _multimodal_content(history, text_prompt)
         messages = [
             {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
             {"role": "user", "content": content},
@@ -281,24 +305,21 @@ class TransformersQwenBackend:
             return_dict=True,
             return_tensors="pt",
         )
-        device = next(self._model.parameters()).device
-        inputs = {key: value.to(device) for key, value in inputs.items()}
         input_length = int(inputs["input_ids"].shape[-1])
         generation_limit = (
             self.profile.settings.max_new_tokens
             if max_new_tokens is None
             else max_new_tokens
         )
-        if generation_limit < 1:
-            raise ValueError("max_new_tokens must be positive")
-        if input_length + generation_limit > self.profile.settings.context_length:
-            raise RuntimeError(
-                f"prompt ({input_length}) plus output budget ({generation_limit}) exceeds "
-                f"context budget {self.profile.settings.context_length}"
-            )
+        _validate_context_budget(
+            input_length,
+            generation_limit,
+            self.profile.settings.context_length,
+        )
 
-        if self._torch.cuda.is_available():
-            self._torch.cuda.reset_peak_memory_stats()
+        device = next(self._model.parameters()).device
+        inputs = {key: value.to(device) for key, value in inputs.items()}
+
         stopping_criteria = None
         if max_wall_seconds is not None:
             remaining = max_wall_seconds - (time.perf_counter() - total_started)
@@ -308,16 +329,25 @@ class TransformersQwenBackend:
 
             stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(remaining)])
         started = time.perf_counter()
-        with self._torch.inference_mode():
-            outputs = self._model.generate(
-                **inputs,
-                do_sample=True,
-                temperature=self.profile.settings.temperature,
-                top_p=self.profile.settings.top_p,
-                max_new_tokens=generation_limit,
-                num_return_sequences=count,
-                stopping_criteria=stopping_criteria,
-            )
+        try:
+            with self._torch.inference_mode():
+                outputs = self._model.generate(
+                    **inputs,
+                    do_sample=True,
+                    temperature=self.profile.settings.temperature,
+                    top_p=self.profile.settings.top_p,
+                    max_new_tokens=generation_limit,
+                    num_return_sequences=count,
+                    stopping_criteria=stopping_criteria,
+                )
+        except self._torch.OutOfMemoryError as exc:
+            if self._torch.cuda.is_available():
+                self._torch.cuda.empty_cache()
+            limit = self.profile.max_peak_vram_gb
+            detail = "available CUDA memory" if limit is None else f"{limit:.3f} GiB budget"
+            raise RuntimeError(f"CUDA allocation exceeded the configured {detail}") from exc
+        if self._torch.cuda.is_available():
+            self._torch.cuda.synchronize()
         elapsed = max(time.perf_counter() - started, 1e-9)
         generated = outputs[:, input_length:]
         texts = tuple(self._processor.batch_decode(generated, skip_special_tokens=True))
@@ -330,6 +360,14 @@ class TransformersQwenBackend:
         peak = None
         if self._torch.cuda.is_available():
             peak = self._torch.cuda.max_memory_allocated() / 1024**3
+            if (
+                self.profile.max_peak_vram_gb is not None
+                and peak > self.profile.max_peak_vram_gb
+            ):
+                raise RuntimeError(
+                    f"CUDA peak {peak:.3f} GiB exceeded configured "
+                    f"{self.profile.max_peak_vram_gb:.3f} GiB budget"
+                )
         return GenerationResult(
             texts,
             sum(token_counts),
@@ -354,6 +392,7 @@ def backend_from_config(
         offline=config.model.offline,
         seed=config.experiment.seed,
         max_batch_sequences=config.model.max_batch_sequences,
+        max_peak_vram_gb=config.model.max_peak_vram_gb,
         settings=GenerationSettings(
             temperature=config.generation.temperature,
             top_p=config.generation.top_p,
@@ -362,6 +401,59 @@ def backend_from_config(
         ),
     )
     return TransformersQwenBackend(profile, model_path=model_path)
+
+
+def _history_grids(history: Any) -> tuple[Any, ...]:
+    """Return every available frame oldest-to-newest without duplicating the latest."""
+
+    if hasattr(history, "frames"):
+        return tuple(history.frames)[-8:]
+    entries = tuple(history)[-8:]
+    grids = tuple(getattr(entry, "grid", None) for entry in entries)
+    if any(grid is None for grid in grids):
+        raise ValueError("every prompt history entry must contain a grid")
+    return grids
+
+
+def _multimodal_content(history: Any, text_prompt: str) -> list[dict[str, Any]]:
+    """Build ordered image blocks followed by exactly one textual request."""
+
+    content = [
+        {"type": "image", "image": render_grid_pil(grid)}
+        for grid in _history_grids(history)
+    ]
+    content.append({"type": "text", "text": text_prompt})
+    return content
+
+
+def _validate_context_budget(
+    input_tokens: int, output_tokens: int, context_length: int
+) -> None:
+    """Fail before CUDA transfer when a request cannot fit the declared context."""
+
+    if input_tokens < 0:
+        raise ValueError("input token count cannot be negative")
+    if output_tokens < 1:
+        raise ValueError("max_new_tokens must be positive")
+    if context_length < 1:
+        raise ValueError("context length must be positive")
+    if input_tokens + output_tokens > context_length:
+        raise RuntimeError(
+            f"prompt ({input_tokens}) plus output budget ({output_tokens}) exceeds "
+            f"context budget {context_length}"
+        )
+
+
+def _cuda_memory_fraction(max_peak_vram_gb: float | None, total_memory: int) -> float | None:
+    """Translate an explicit GiB cap into PyTorch's per-process allocator fraction."""
+
+    if max_peak_vram_gb is None:
+        return None
+    if max_peak_vram_gb <= 0:
+        raise ValueError("max_peak_vram_gb must be positive when supplied")
+    if total_memory <= 0:
+        raise ValueError("total CUDA memory must be positive")
+    return min(1.0, max_peak_vram_gb * 1024**3 / total_memory)
 
 
 def _count_generated_tokens(

@@ -47,6 +47,7 @@ def test_build_agent_wires_generation_pool_planner_and_controller() -> None:
         assert decision.action.kind in {ActionKind.ACTION1, ActionKind.ACTION2}
         assert agent.controller.pool is not None
         assert len(agent.controller.pool.weighted_hypotheses) == 2
+    assert backend.closed
 
 
 def test_direct_variant_uses_same_backend_without_program_generation() -> None:
