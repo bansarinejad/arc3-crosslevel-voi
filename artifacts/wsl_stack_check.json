@@ -1,0 +1,46 @@
+{
+  "bf16_cuda_smoke": {
+    "dtype": "torch.bfloat16",
+    "mean_checksum": 63.99876022338867,
+    "passed": true,
+    "shape": [
+      256,
+      256
+    ]
+  },
+  "dependency_check": {
+    "passed": true,
+    "returncode": 0,
+    "stderr": "Using Python 3.12.3 environment at: /home/bansarinejad/.venvs/arc3-crosslevel-voi\nChecked 94 packages in 8ms\nAll installed packages are compatible",
+    "stdout": ""
+  },
+  "git": {
+    "commit": "cebead562d8077cfe571744ed272244a44b75a15",
+    "dirty": false,
+    "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "total_vram_gb": 15.99169921875
+  },
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "5.15.167.4-microsoft-standard-WSL2",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "schema_version": 1
+}

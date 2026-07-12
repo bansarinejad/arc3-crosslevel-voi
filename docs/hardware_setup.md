@@ -31,5 +31,6 @@ and 5.32 tokens/s. These numbers are diagnostic only; see `artifacts/model_gate.
 The WSL stack check passes with Python 3.12.3, Torch 2.11.0+cu130, CUDA runtime 13.0,
 bitsandbytes 0.49.2, Transformers 5.13.1, driver 581.15, and compute capability `sm_89`.
 Dependency consistency and a BF16 CUDA matrix multiplication both pass. The model and
-grounding gate artifacts are regenerated separately before gameplay. Close GPU-heavy desktop
-applications because the 4090 Laptop GPU has only 16 GiB physical VRAM.
+grounding gate artifacts are regenerated separately before gameplay. The machine-readable
+stack evidence is `artifacts/wsl_stack_check.json`. Close GPU-heavy desktop applications
+because the 4090 Laptop GPU has only 16 GiB physical VRAM.
