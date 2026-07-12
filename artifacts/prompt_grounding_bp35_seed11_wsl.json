@@ -1,0 +1,538 @@
+{
+  "base_config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
+  "effective_offline_config_sha256": "2a2c4c534b64c39047288b24e84ca1d85f0186c9eb448928d9501b0cce80c1aa",
+  "evaluation_actions": [
+    "ACTION3",
+    "ACTION4",
+    "ACTION7",
+    "ACTION6(42,33)",
+    "ACTION6(5,42)",
+    "ACTION6(63,31)",
+    "ACTION6(3,15)",
+    "ACTION6(3,21)",
+    "ACTION6(3,27)",
+    "ACTION6(15,33)",
+    "ACTION6(15,39)",
+    "ACTION6(15,45)"
+  ],
+  "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+  "expected_weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9",
+  "generation": {
+    "elapsed_seconds": 47.31631105500037,
+    "output_tokens": 1433,
+    "peak_vram_gb": 8.842219352722168,
+    "requested": 4,
+    "sequence_token_counts": [
+      363,
+      248,
+      478,
+      344
+    ],
+    "tokens_per_second": 30.285539342538435,
+    "truncated_sequences": 0
+  },
+  "git": {
+    "commit": "28aa6712a7deb4db89d2b40c2b1b3ed4a843e5c7",
+    "dirty": false,
+    "repository_root": "/mnt/d/interviews/AIbuild/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+  "history_frames": 1,
+  "latest_grid_int16_sha256": "92370b9db1c1b1f1570ec24487c8a1669fe3bf35572f0c3efa2bb084c5a1a634",
+  "latest_grid_uint8_sha256": "e673f0158ffbf5ffa45f3f32f30a91c9dc7f22ad41c8aaf3feeb8e7dda11fa31",
+  "latest_rendered_rgb_sha256": "eb0167dfb47c88a47d27b61891c62864267a32e2c672f8362ef6dff36925e2bf",
+  "model_artifact": {
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "weight_files": [
+      {
+        "etag_sha256": "26a93f066e1916adb13453dae5a0c707c0fbc71299ed98779571a907b8e74c61",
+        "filename": "model.safetensors-00001-of-00002.safetensors",
+        "size_bytes": 5329398688
+      },
+      {
+        "etag_sha256": "cb544bd9bfae93dc59b0f22b292f5933573854a7f9b97835c67060d7d910e188",
+        "filename": "model.safetensors-00002-of-00002.safetensors",
+        "size_bytes": 3990429408
+      }
+    ],
+    "weight_manifest_sha256": "c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9"
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "observed_palette_values": [
+    0,
+    3,
+    5,
+    9,
+    10,
+    11,
+    14
+  ],
+  "offline": true,
+  "perception_contract_sha256": "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0",
+  "perception_contract_version": "arc-agi-0.9.9-color-map-scale8-grid-v1",
+  "perception_reference_render_sha256": "aaf4aaee89c07acf9acc3c8a706c76efe57189eae40eca598d9af6b14da7bb08",
+  "programs": [
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION4",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION7",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": "ProgramExecutionError: execution: AttributeError: 'int' object has no attribute 'get'",
+          "ok": false,
+          "prediction_sha256": null
+        }
+      ],
+      "action_sensitive": false,
+      "all_actions_ok": false,
+      "ast_nodes": 160,
+      "behavior_signature": null,
+      "coordinate_read_lines": [
+        4,
+        5
+      ],
+      "eligible": false,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": false,
+      "source": "def predict(history, action):\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n    else:\n        row = None\n        col = None\n    \n    current_grid = history.frames[-1]\n    current_values = history.levels[-1].get('grid_values', [])\n    \n    # Identify the player (blue 9) and goal (yellow 11) based on previous frame if available\n    if len(history.frames) > 0:\n        last_frame = history.frames[-2]\n        last_values = history.levels[-2].get('grid_values', [])\n        if 9 in last_values and 11 in last_values:\n            # Find positions of player and goal\n            # Since we can't easily find exact pixel positions without more info,\n            # we assume the action is a conservative no-op if not clear\n            pass\n    \n    # Conservative behavior: if ACTION6 (move) is specified, check if it's a valid move\n    # Otherwise, do nothing (no-effect transition)\n    \n    if kind == 6:\n        # For ACTION6, we need to check if the move is valid\n        # Without explicit rules, we'll assume it's valid if within bounds\n        # This is a conservative assumption\n        pass\n    \n    # Return conservative no-effect transition\n    return {\"next_grid\": current_grid.copy(), \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Conservative baseline: return 0.0\n    return 0.0",
+      "source_length": 1394,
+      "source_sha256": "a746cf709c32adc56401648a9a03db750e1000820f2aaba94083c3b7b5b12d42",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "8279cebadd0b034e7e2b7a0286ea357009c3fae05316d8ee8d621f9077cec473"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "16d73369873b42e50130bcc38c84a8f8bc1c6d88e0f0bac63f24a29a192eed01"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "f70c672fd80ce37fdfd3e35da41135a98224c3cbc119a69030e60bd5e81cf0d2"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "8f508f9ff618daad01219d09197e08a4fa315a769c3fce47783c5e78651636c1"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "ee497fa5980f9a5585258f754d42df896e768bf40bf25b7305f77c72ae1a79f9"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "bb78a90e9571b2ab0fb9b3c99879a87fb937c699054ecb2345bf3dc930ab0239"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "296c56aeb6674fa7f57a1b7a34448f19c58722f8ca37a751903990ac93ca88c8"
+        }
+      ],
+      "action_sensitive": true,
+      "all_actions_ok": true,
+      "ast_nodes": 191,
+      "behavior_signature": "ffa3cccbb1ae0fcd6b93c45a0dad8936f38437fc96428a8a7577e7333257a440",
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # ACTION6 interacts locally with cell contents\n        current_val = grid[row, col]\n        if current_val == 0:\n            grid[row, col] = 14 # Green\n        elif current_val == 14:\n            grid[row, col] = 0 # White\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Check if the grid is full or has a specific pattern\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    if np.all(grid == 14):\n        return 1.0\n    if np.sum(grid == 14) > np.sum(grid == 0) * 10:\n        return 0.9\n    return 0.0",
+      "source_length": 786,
+      "source_sha256": "b122a5838da9f1bd3dc781b99b6a0c0b0612747825b9423c89ee953a52e71135",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "0f2502f13ecc04f67e0da1c1ab3a737e74834922b779450a543bdf22fe93794d"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "b40d4480bf2e4dc8c18c134e2cc747a9f3ee51a642b7fe89a2146efb63853a7f"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "e6631cd5d291311bfdfc8f41d8852e3fbc94882d7c3b1e9da5ffaa49235f82c0"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "a8575fc9ca8f8e25576c225e4eb7474364b5ddaf6b1f84fac8cd8dc67f708b2c"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "4f0a0857515b045169788a97c9bb350a9147443efd82d15ec0ad623bf9b06849"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1671470463abff0b3f2252507754a1c6f60af650578ff151938500d39fafcbc2"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "fc3f709d47da1242a15d350113c766f1641939ef7efe76d311d89885cf285340"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "a80eb4bab16e8bb2ed88d3981c03d152553a51576e74d9d56d8617e029708cb5"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "01c3a93daa6bab0c53658ef0e5170c204827a2cd1a7d22596f5bbe3f9c35a6b2"
+        }
+      ],
+      "action_sensitive": true,
+      "all_actions_ok": true,
+      "ast_nodes": 340,
+      "behavior_signature": "7ea7c80047a77c4ae548f3456b174ddcbe3e93c88ea57acedcc72e10d080480c",
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [
+        {
+          "claimed_value": 9,
+          "color": "blue",
+          "conflict": false,
+          "expected_value": 9,
+          "line": 10
+        },
+        {
+          "claimed_value": 11,
+          "color": "yellow",
+          "conflict": false,
+          "expected_value": 11,
+          "line": 18
+        },
+        {
+          "claimed_value": 9,
+          "color": "blue",
+          "conflict": false,
+          "expected_value": 9,
+          "line": 29
+        },
+        {
+          "claimed_value": 14,
+          "color": "green",
+          "conflict": false,
+          "expected_value": 14,
+          "line": 30
+        }
+      ],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Check if the target cell is accessible (not black)\n        if grid[row, col] != 5:\n            # Move the agent (blue) to the target if it's not already there\n            blue_pos = np.argwhere(grid == 9)\n            if len(blue_pos) > 0:\n                current_r, current_c = blue_pos[0]\n                if (current_r, current_c) != (row, col):\n                    # Swap colors: move blue to target, yellow to blue's old spot\n                    grid[row, col] = 9\n                    grid[current_r, current_c] = 11\n                    # Move the yellow object to the blue's old spot\n                    yellow_pos = np.argwhere(grid == 11)\n                    if len(yellow_pos) > 0:\n                        yellow_r, yellow_c = yellow_pos[0]\n                        grid[yellow_r, yellow_c] = 9\n                        grid[current_r, current_c] = 11\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    # Check for win condition: agent (blue) should be near or on a specific target\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    # Simple heuristic: check if blue is adjacent to green blocks\n    blue_pos = np.argwhere(grid == 9)\n    green_pos = np.argwhere(grid == 14)\n    \n    if len(blue_pos) > 0:\n        blue_r, blue_c = blue_pos[0]\n        if len(green_pos) > 0:\n            for gr, gc in green_pos:\n                if abs(blue_r - gr) <= 1 and abs(blue_c - gc) <= 1:\n                    return 0.9\n    return 0.5",
+      "source_length": 1708,
+      "source_sha256": "26bc0cad281bcffe84d49ac90e95454085d569dd97b51f29f8bcde01d80b38d6",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    },
+    {
+      "action_results": [
+        {
+          "action": "ACTION3",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "03c76506bbd85329068ba9a238c544bec72fd57ee22c615a24a5decc003c523e"
+        },
+        {
+          "action": "ACTION4",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "03c76506bbd85329068ba9a238c544bec72fd57ee22c615a24a5decc003c523e"
+        },
+        {
+          "action": "ACTION7",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "1b95b69c1dba9aed6c4121ccfe5e6995fe43d996aa08892f2a39919a7dbc8a73"
+        },
+        {
+          "action": "ACTION6(42,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "bea8f02dbf2f02cc1ccf64a790d0c3a07ca41c3d47557461573bbdae7308f2bb"
+        },
+        {
+          "action": "ACTION6(5,42)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "cf28fd5ab652825009f7e15cbae426bdf9f1d95897c94f643a93b333bb3992cc"
+        },
+        {
+          "action": "ACTION6(63,31)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "8279cebadd0b034e7e2b7a0286ea357009c3fae05316d8ee8d621f9077cec473"
+        },
+        {
+          "action": "ACTION6(3,15)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "16d73369873b42e50130bcc38c84a8f8bc1c6d88e0f0bac63f24a29a192eed01"
+        },
+        {
+          "action": "ACTION6(3,21)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "f70c672fd80ce37fdfd3e35da41135a98224c3cbc119a69030e60bd5e81cf0d2"
+        },
+        {
+          "action": "ACTION6(3,27)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "8f508f9ff618daad01219d09197e08a4fa315a769c3fce47783c5e78651636c1"
+        },
+        {
+          "action": "ACTION6(15,33)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "ee497fa5980f9a5585258f754d42df896e768bf40bf25b7305f77c72ae1a79f9"
+        },
+        {
+          "action": "ACTION6(15,39)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "bb78a90e9571b2ab0fb9b3c99879a87fb937c699054ecb2345bf3dc930ab0239"
+        },
+        {
+          "action": "ACTION6(15,45)",
+          "error": null,
+          "ok": true,
+          "prediction_sha256": "296c56aeb6674fa7f57a1b7a34448f19c58722f8ca37a751903990ac93ca88c8"
+        }
+      ],
+      "action_sensitive": true,
+      "all_actions_ok": true,
+      "ast_nodes": 268,
+      "behavior_signature": "048fe9ae01d5b4a02f96f206e5605a2f84769a3faa7c3354f974724db76f2d06",
+      "coordinate_read_lines": [
+        5,
+        6
+      ],
+      "eligible": true,
+      "goal_value_error": null,
+      "goal_value_ok": true,
+      "hard_memory_limit_enforced": true,
+      "palette_claims": [],
+      "palette_conflicts": 0,
+      "sandbox_valid": true,
+      "simple_action_contract_ok": true,
+      "source": "def predict(history, action):\n    grid = np.array(history.frames[-1], dtype=np.int8)\n    kind = int(action.kind)\n    if kind == 6:\n        row = int(action.row)\n        col = int(action.col)\n        # Toggle the target cell based on its current value\n        if grid[row, col] == 0:\n            grid[row, col] = 14 # Place green (goal-like)\n        elif grid[row, col] == 14:\n            grid[row, col] = 0 # Remove green\n        else:\n            grid[row, col] = 0 # Clear other colors\n    elif kind in [3, 4]:\n        # Component-wide toggle: clear all non-background non-goal cells\n        mask = (grid > 0) & (grid != 14)\n        grid[mask] = 0\n    elif kind == 5:\n        # Selection: highlight the largest contiguous component\n        flat = grid.flatten()\n        flat[flat == 0] = -1\n        flat[flat == 14] = -1\n        components = np.unique(flat[flat != -1], return_counts=True)\n        if len(components) > 1:\n            max_val = components[1][0]\n            grid[grid == max_val] = 14\n    return {\"next_grid\": grid, \"game_state\": \"NOT_FINISHED\", \"level_delta\": 0, \"memory\": {}}\n\ndef goal_value(history):\n    return 0.5",
+      "source_length": 1135,
+      "source_sha256": "19441ebbdfccad9a9f1715593bea72d8e6998a421fc935c3d832956b6f7bcc0b",
+      "unsafe_coordinate_use": false,
+      "validation_error": null
+    }
+  ],
+  "prompt_contract_sha256": "2850bc72cf42c42e2c813962aa7fb413d74f3ff65789719ac76dd32e26157b96",
+  "prompt_contract_version": "grounded-actions-palette-diverse-v2",
+  "runtime": {
+    "cuda_device_capability": "sm_89",
+    "kernel_release": "5.15.167.4-microsoft-standard-WSL2",
+    "nvidia_driver_version": "581.15",
+    "package_versions": {
+      "arc-agi": "0.9.9",
+      "arcengine": "0.9.3",
+      "bitsandbytes": "0.49.2",
+      "numpy": "2.5.1",
+      "transformers": "5.13.1"
+    },
+    "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "python_version": "3.12.3",
+    "torch_cuda_version": "13.0",
+    "torch_version": "2.11.0+cu130"
+  },
+  "schema_version": 2,
+  "seed": 11,
+  "source_input": "fixtures/grounding/bp35_seed11_initial_history.json",
+  "source_input_kind": "history_fixture",
+  "source_input_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+  "source_trace_canonical_sha256": "c6fd2d38f937d9c5f5a1e7f8e0d5b366db005ebd8a8ae155c21f7e1c34a3e5e8",
+  "summary": {
+    "action_sensitive_programs": 3,
+    "distinct_behavior_classes": 3,
+    "gate_reasons": [],
+    "grounded_safe_programs": 3,
+    "hard_memory_limit_enforced_programs": 3,
+    "hard_memory_limit_required": true,
+    "palette_conflict_programs": 0,
+    "passes": true,
+    "sandbox_valid_programs": 4,
+    "unsafe_coordinate_programs": 0
+  },
+  "system_prompt_sha256": "d70743071154406a43bec797dae1761c69cea01f1b12cd8e45265f6212698d5c",
+  "user_prompt_sha256": [
+    "4438b0af7b9d38b0799b5e66de0e3199ed5ea61f183500132627273d3f9709be",
+    "0ed073003210e2066bddff04b78a5824e5241f3a31b697a8d9b51eec041def0e",
+    "83355169c438409426393ceebafaf0f08a91f234f1c22c9d0a443a77c912861f",
+    "b911fb8beeabea0d0714b7980d915ed70ba8e5798c2580391840bd78f70591f7"
+  ]
+}

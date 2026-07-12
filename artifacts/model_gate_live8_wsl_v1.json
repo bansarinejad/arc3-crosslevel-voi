@@ -1,6 +1,6 @@
 {
   "contract_status": "superseded-v1-capacity-diagnostic",
-  "replacement_pending": "artifacts/model_gate_live8_wsl.json",
+  "superseded_by": "artifacts/model_gate_live8_wsl.json",
   "config_sha256": "11b42cf6d1adc3c6e4f0771705723c4f376d174e77d9c8f1d620e8f1bc04b514",
   "elapsed_seconds": 27.63156238700003,
   "expected_model_revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",

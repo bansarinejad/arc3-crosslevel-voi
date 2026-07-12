@@ -30,16 +30,22 @@ and 5.32 tokens/s. These numbers are diagnostic only; see `artifacts/model_gate.
 
 The WSL stack check passes with Python 3.12.3, Torch 2.11.0+cu130, CUDA runtime 13.0,
 bitsandbytes 0.49.2, Transformers 5.13.1, driver 581.15, and compute capability `sm_89`.
-Dependency consistency and a BF16 CUDA matrix multiplication both pass. The model and
-grounding gate artifacts are regenerated separately before gameplay. The machine-readable
-stack evidence is `artifacts/wsl_stack_check.json`. Close GPU-heavy desktop applications
+Dependency consistency and a BF16 CUDA matrix multiplication both pass. Model and grounding
+gate evidence is recorded separately. The machine-readable stack evidence is
+`artifacts/wsl_stack_check.json`. Close GPU-heavy desktop applications
 because the 4090 Laptop GPU has only 16 GiB physical VRAM.
 
 The v1 WSL eight-frame capacity preflight passed with 4/4 statically valid programs, no
 truncation, 9.35 GiB peak VRAM, and 26.64 generated tokens/s, but its grounding gate failed
-on behavioral diversity. It is retained as `artifacts/model_gate_live8_wsl_v1.json`; the v2
-contract must be remeasured. Loading the model directly
+on behavioral diversity and is retained as `artifacts/model_gate_live8_wsl_v1.json`.
+Loading the model directly
 from `/mnt/d` was aborted after three minutes at 6% because safetensors tensor mappings were
 dominated by the `p9` bridge. Copying the manifest-verified snapshot to
 `/home/bansarinejad/models/Qwen3.5-4B` reduced weight loading to about one second. See
 `artifacts/model_gate_live8_wsl_v1.json`.
+
+The fair-v2 WSL remeasurement passes: 3/4 programs are statically valid with no truncation,
+28.85 generated tokens/s, and 9.38 GiB peak VRAM. Its frozen-history grounding gate also
+passes with three safe, distinct, action-sensitive programs and enforced POSIX data-segment
+limits. See `artifacts/model_gate_live8_wsl.json` and
+`artifacts/prompt_grounding_bp35_seed11_wsl.json`.

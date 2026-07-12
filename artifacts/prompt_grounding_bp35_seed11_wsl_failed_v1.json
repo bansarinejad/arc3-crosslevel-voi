@@ -1,6 +1,6 @@
 {
   "contract_status": "failed-v1-noop-collapse-diagnostic",
-  "replacement_pending": "artifacts/prompt_grounding_bp35_seed11_wsl.json",
+  "superseded_by": "artifacts/prompt_grounding_bp35_seed11_wsl.json",
   "base_config_sha256": "11b42cf6d1adc3c6e4f0771705723c4f376d174e77d9c8f1d620e8f1bc04b514",
   "effective_offline_config_sha256": "5fe7254b96441e1a6eec3bbd34bccb2822782a2d177245f3ea39abe9a6c3f5ad",
   "evaluation_actions": [
