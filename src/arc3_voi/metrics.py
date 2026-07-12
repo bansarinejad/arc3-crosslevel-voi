@@ -1,0 +1,412 @@
+"""Official-score-compatible metrics, trace records, and preregistered gates."""
+
+from __future__ import annotations
+
+import json
+from collections import defaultdict
+from collections.abc import Iterable, Mapping
+from dataclasses import asdict, dataclass, field
+from pathlib import Path
+from statistics import mean
+from typing import Any
+
+from .experiment import GateResult, ScoreGateInput, evaluate_score_gate
+from .statistics import (
+    PairedSummary,
+    ScoreObservation,
+    paired_seed_deltas,
+    summarize_paired_observations,
+)
+
+
+@dataclass(frozen=True, slots=True)
+class StepRecord:
+    """One action and its fully replayable pre-action and resulting observations."""
+
+    step: int
+    level: int
+    history: tuple[dict[str, Any], ...]
+    action: dict[str, Any]
+    available_actions: tuple[str, ...]
+    decision_mode: str
+    decision_score: float
+    decision_diagnostics: dict[str, Any]
+    probe_utility: float | None
+    agreement: float | None
+    generated_tokens: int
+    weighted_transition_loss: float | None
+    best_hypothesis_transition_loss: float | None
+    valid_hypotheses: int
+    hypothesis_ids: tuple[str, ...]
+    hypothesis_weights: tuple[float, ...]
+    hypothesis_validity: tuple[bool, ...]
+    invalidated_hypotheses: tuple[str, ...]
+    timeout_hypotheses: tuple[str, ...]
+    persistence_estimate: float | None
+    persistence_successes: int | None
+    persistence_trials: int | None
+    boundary_survival: bool | None
+    fallback: bool
+    elapsed_seconds: float
+    observed_grid: list[list[int]]
+    observed_available_actions: tuple[str, ...]
+    observed_state: str
+    observed_level: int
+    observed_win_levels: int
+    observed_level_delta: int
+
+
+@dataclass(slots=True)
+class RunMetrics:
+    run_id: str
+    game_id: str
+    seed: int
+    variant: str
+    model_profile: str
+    config_hash: str
+    levels_completed: int = 0
+    win_levels: int = 0
+    total_actions: int = 0
+    generated_tokens: int = 0
+    wall_seconds: float = 0.0
+    peak_vram_gb: float | None = None
+    invalid_programs: int = 0
+    program_timeouts: int = 0
+    # The current controller exposes invalid pool entries but not every nested
+    # beam-search worker invocation.  Keep this flag false unless an execution
+    # backend supplies exact call counters; gates then fail closed rather than
+    # interpreting an unobserved timeout count as zero.
+    timeout_instrumentation_complete: bool = False
+    program_prediction_calls: int | None = None
+    program_goal_calls: int | None = None
+    program_execution_errors: int = 0
+    direct_fallbacks: int = 0
+    boundary_survival_successes: int = 0
+    boundary_survival_trials: int = 0
+    decision_points: int = 0
+    two_valid_decision_points: int = 0
+    mean_weighted_transition_loss: float | None = None
+    mean_best_hypothesis_transition_loss: float | None = None
+    per_level_actions: list[int] = field(default_factory=list)
+    steps: list[StepRecord] = field(default_factory=list)
+    rhae: float | None = None
+    termination_reason: str | None = None
+    error: str | None = None
+
+    def finalize(self, baseline_actions: list[int] | tuple[int, ...] | None = None) -> None:
+        self.decision_points = len(self.steps)
+        self.two_valid_decision_points = sum(
+            step.valid_hypotheses >= 2 for step in self.steps
+        )
+        weighted_losses = [
+            step.weighted_transition_loss
+            for step in self.steps
+            if step.weighted_transition_loss is not None
+        ]
+        best_losses = [
+            step.best_hypothesis_transition_loss
+            for step in self.steps
+            if step.best_hypothesis_transition_loss is not None
+        ]
+        self.mean_weighted_transition_loss = (
+            mean(weighted_losses) if weighted_losses else None
+        )
+        self.mean_best_hypothesis_transition_loss = (
+            mean(best_losses) if best_losses else None
+        )
+        if baseline_actions and self.win_levels:
+            self.rhae = game_rhae(
+                baseline_actions,
+                self.per_level_actions,
+                total_levels=self.win_levels,
+            )
+
+    def summary(self) -> dict[str, Any]:
+        value = asdict(self)
+        value.pop("steps")
+        return value
+
+
+def level_rhae(human_actions: int, agent_actions: int) -> float:
+    if human_actions <= 0:
+        raise ValueError("human action baseline must be positive")
+    if agent_actions <= 0:
+        raise ValueError("agent actions must be positive for a completed level")
+    return min(1.15, (human_actions / agent_actions) ** 2)
+
+
+def game_rhae(
+    human_baselines: list[int] | tuple[int, ...],
+    completed_level_actions: list[int] | tuple[int, ...],
+    *,
+    total_levels: int | None = None,
+) -> float:
+    """Return official weighted RHAE, including the completion-fraction ceiling."""
+
+    total = total_levels or len(human_baselines)
+    if total <= 0:
+        raise ValueError("total_levels must be positive")
+    if len(human_baselines) < min(total, len(completed_level_actions)):
+        raise ValueError("missing human baseline for a completed level")
+    denominator = total * (total + 1) / 2
+    weighted = 0.0
+    completed = completed_level_actions[:total]
+    for index, actions in enumerate(completed, start=1):
+        weighted += index * level_rhae(int(human_baselines[index - 1]), int(actions))
+    # The official methodology caps a game by its weighted completed-level
+    # fraction.  Thus even a per-level 1.15 shortcut bonus cannot raise a
+    # partially or fully completed game above its completion ceiling.
+    completion_ceiling = sum(range(1, len(completed) + 1)) / denominator
+    return min(weighted / denominator, completion_ceiling)
+
+
+def write_run(metrics: RunMetrics, directory: str | Path) -> tuple[Path, Path]:
+    destination = Path(directory)
+    destination.mkdir(parents=True, exist_ok=True)
+    summary_path = destination / f"{metrics.run_id}.json"
+    trace_path = destination / f"{metrics.run_id}.jsonl"
+    summary_path.write_text(
+        json.dumps(metrics.summary(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    with trace_path.open("w", encoding="utf-8") as stream:
+        for record in metrics.steps:
+            stream.write(json.dumps(asdict(record), separators=(",", ":"), sort_keys=True))
+            stream.write("\n")
+    return summary_path, trace_path
+
+
+def load_run(summary_path: str | Path, trace_path: str | Path | None = None) -> RunMetrics:
+    """Load a summary and its detailed trace back into the gate-analysis model."""
+
+    summary_source = Path(summary_path)
+    payload = json.loads(summary_source.read_text(encoding="utf-8"))
+    metrics = RunMetrics(**payload)
+    source = Path(trace_path) if trace_path is not None else summary_source.with_suffix(".jsonl")
+    if source.exists():
+        steps = []
+        with source.open(encoding="utf-8") as stream:
+            for line in stream:
+                if not line.strip():
+                    continue
+                value = json.loads(line)
+                for key in (
+                    "history",
+                    "available_actions",
+                    "hypothesis_ids",
+                    "hypothesis_weights",
+                    "hypothesis_validity",
+                    "invalidated_hypotheses",
+                    "timeout_hypotheses",
+                    "observed_available_actions",
+                ):
+                    value[key] = tuple(value[key])
+                steps.append(StepRecord(**value))
+        metrics.steps = steps
+    return metrics
+
+
+@dataclass(frozen=True, slots=True)
+class MechanismGateAnalysis:
+    passed: bool
+    reasons: tuple[str, ...]
+    decision_points: int
+    two_valid_fraction: float
+    timeout_rate: float | None
+    committee_best_loss: float | None
+    single_program_loss: float | None
+    relative_loss_improvement: float | None
+
+
+def evaluate_mechanism_gate(
+    committee_runs: Iterable[RunMetrics],
+    single_runs: Iterable[RunMetrics],
+) -> MechanismGateAnalysis:
+    """Evaluate the mechanism gate from recorded decision-level evidence.
+
+    Timeout evidence deliberately fails closed when the controller/backend did
+    not expose exact prediction-call counters.
+    """
+
+    committee = tuple(committee_runs)
+    single = tuple(single_runs)
+    committee_steps = tuple(step for run in committee for step in run.steps)
+    single_steps = tuple(step for run in single for step in run.steps)
+    decisions = len(committee_steps)
+    two_valid_fraction = (
+        sum(step.valid_hypotheses >= 2 for step in committee_steps) / decisions
+        if decisions
+        else 0.0
+    )
+
+    complete_timeout_data = bool(committee) and all(
+        run.timeout_instrumentation_complete
+        and run.program_prediction_calls is not None
+        and run.program_goal_calls is not None
+        for run in committee
+    )
+    program_calls = (
+        sum(
+            int(run.program_prediction_calls or 0) + int(run.program_goal_calls or 0)
+            for run in committee
+        )
+        if complete_timeout_data
+        else 0
+    )
+    timeout_rate = (
+        sum(run.program_timeouts for run in committee) / program_calls
+        if complete_timeout_data and program_calls > 0
+        else None
+    )
+    committee_losses = [
+        step.best_hypothesis_transition_loss
+        for step in committee_steps
+        if step.best_hypothesis_transition_loss is not None
+    ]
+    single_losses = [
+        step.weighted_transition_loss
+        for step in single_steps
+        if step.weighted_transition_loss is not None
+    ]
+    committee_loss = mean(committee_losses) if committee_losses else None
+    single_loss = mean(single_losses) if single_losses else None
+    relative_improvement = (
+        (single_loss - committee_loss) / single_loss
+        if single_loss is not None and single_loss > 0 and committee_loss is not None
+        else None
+    )
+
+    reasons: list[str] = []
+    if decisions == 0:
+        reasons.append("no committee decision points were recorded")
+    elif two_valid_fraction < 0.80:
+        reasons.append("fewer than two valid distinct programs at 80% of decisions")
+    if timeout_rate is None:
+        reasons.append("exact program timeout instrumentation is unavailable")
+    elif timeout_rate >= 0.01:
+        reasons.append("program timeout rate is not below 1%")
+    if relative_improvement is None:
+        reasons.append("committee and single-program prequential losses are incomplete")
+    elif relative_improvement < 0.15:
+        reasons.append("best-committee prequential loss is not 15% below S")
+    return MechanismGateAnalysis(
+        passed=not reasons,
+        reasons=tuple(reasons),
+        decision_points=decisions,
+        two_valid_fraction=two_valid_fraction,
+        timeout_rate=timeout_rate,
+        committee_best_loss=committee_loss,
+        single_program_loss=single_loss,
+        relative_loss_improvement=relative_improvement,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class DevelopmentGateAnalysis:
+    gate: GateResult
+    game_deltas: Mapping[str, float]
+    x_mean_rhae: float
+    m_mean_rhae: float
+
+
+def evaluate_development_score_gate(runs: Iterable[RunMetrics]) -> DevelopmentGateAnalysis:
+    """Average seeds within games and evaluate the preregistered X-versus-M gate."""
+
+    rows = tuple(runs)
+    paired_seed_deltas(
+        (
+            ScoreObservation(run.game_id, run.seed, run.variant, float(run.rhae))
+            for run in rows
+            if run.variant in {"X", "M"} and run.rhae is not None
+        ),
+        "X",
+        "M",
+    )
+    grouped = _complete_game_variant_runs(rows, variants=("X", "M"))
+    games = sorted({game for game, variant in grouped if variant == "X"})
+    if not games:
+        raise ValueError("no complete paired X/M games with RHAE were recorded")
+    game_rhae_means = {
+        (game, variant): mean(run.rhae for run in grouped[(game, variant)] if run.rhae is not None)
+        for game in games
+        for variant in ("X", "M")
+    }
+    deltas = {game: game_rhae_means[(game, "X")] - game_rhae_means[(game, "M")] for game in games}
+
+    def average_field(variant: str, field_name: str) -> float:
+        per_game = [
+            mean(float(getattr(run, field_name)) for run in grouped[(game, variant)])
+            for game in games
+        ]
+        return mean(per_game)
+
+    x_rhae = mean(game_rhae_means[(game, "X")] for game in games)
+    m_rhae = mean(game_rhae_means[(game, "M")] for game in games)
+    gate = evaluate_score_gate(
+        ScoreGateInput(
+            x_rhae=x_rhae,
+            m_rhae=m_rhae,
+            x_levels=average_field("X", "levels_completed"),  # type: ignore[arg-type]
+            m_levels=average_field("M", "levels_completed"),  # type: ignore[arg-type]
+            x_actions=average_field("X", "total_actions"),  # type: ignore[arg-type]
+            m_actions=average_field("M", "total_actions"),  # type: ignore[arg-type]
+            positive_game_fraction=sum(value > 0 for value in deltas.values()) / len(deltas),
+            x_wall_seconds=average_field("X", "wall_seconds"),
+            m_wall_seconds=average_field("M", "wall_seconds"),
+        )
+    )
+    return DevelopmentGateAnalysis(gate, deltas, x_rhae, m_rhae)
+
+
+@dataclass(frozen=True, slots=True)
+class ConfirmationGateAnalysis:
+    passed: bool
+    reasons: tuple[str, ...]
+    comparator: str
+    summary: PairedSummary
+
+
+def evaluate_confirmation_gate(
+    runs: Iterable[RunMetrics],
+    *,
+    comparator: str,
+    bootstrap_samples: int = 20_000,
+) -> ConfirmationGateAnalysis:
+    """Evaluate the locked 10-game claim gate after averaging seeds per game."""
+
+    if comparator == "X":
+        raise ValueError("confirmation comparator must differ from X")
+    observations = [
+        ScoreObservation(run.game_id, run.seed, run.variant, float(run.rhae))
+        for run in runs
+        if run.variant in {"X", comparator} and run.rhae is not None
+    ]
+    summary = summarize_paired_observations(
+        observations,
+        "X",
+        comparator,
+        bootstrap_samples=bootstrap_samples,
+    )
+    reasons: list[str] = []
+    if summary.games != 10:
+        reasons.append("confirmation requires exactly 10 complete paired games")
+    if summary.wins < 6:
+        reasons.append("X wins fewer than 6 of 10 games")
+    if summary.probability_positive < 0.90:
+        reasons.append("bootstrap probability of a positive mean is below 0.90")
+    return ConfirmationGateAnalysis(not reasons, tuple(reasons), comparator, summary)
+
+
+def _complete_game_variant_runs(
+    runs: Iterable[RunMetrics], *, variants: tuple[str, str]
+) -> dict[tuple[str, str], list[RunMetrics]]:
+    grouped: dict[tuple[str, str], list[RunMetrics]] = defaultdict(list)
+    for run in runs:
+        if run.variant in variants and run.rhae is not None:
+            grouped[(run.game_id, run.variant)].append(run)
+    complete = {
+        game
+        for game, variant in grouped
+        if variant == variants[0] and (game, variants[1]) in grouped
+    }
+    return {key: value for key, value in grouped.items() if key[0] in complete}

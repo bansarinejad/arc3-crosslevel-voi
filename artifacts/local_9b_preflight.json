@@ -1,0 +1,19 @@
+{
+  "elapsed_seconds": 104.67847489999986,
+  "fits_vram_gate": false,
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "total_vram_gb": 15.99169921875
+  },
+  "model_id": "Qwen/Qwen3.5-9B",
+  "output_tokens": 557,
+  "passes_runtime_gate": null,
+  "passes_throughput_gate": false,
+  "peak_vram_gb": 23.281042098999023,
+  "projected_p95_seconds": null,
+  "requested_sequences": 4,
+  "runtime_fraction": null,
+  "syntactically_valid_programs": 4,
+  "tokens_per_second": 5.321055742664443
+}

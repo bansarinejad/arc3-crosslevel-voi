@@ -1,0 +1,35 @@
+experiment:
+  seed: 20260712
+  variant: X
+  max_environment_actions: 256
+  max_generated_tokens: 12288
+  max_generation_batches: 3
+  max_wall_seconds: 1200.0
+  history_length: 8
+
+hypotheses:
+  max_hypotheses: 4
+  eta: 5.0
+  complexity_lambda: 0.002
+  loss_refresh_threshold: 0.25
+  consecutive_loss_refreshes: 2
+  effective_pool_refresh_threshold: 1.5
+  max_refreshes_per_level: 1
+
+planning:
+  max_candidates: 12
+  depth: 4
+  beam_width: 8
+  agreement_threshold: 0.8
+  max_probes_per_level: 3
+  risk_coefficient: 3.0
+  robust_std_coefficient: 0.5
+
+generation:
+  temperature: 0.6
+  top_p: 0.95
+  max_new_tokens_per_hypothesis: 1536
+
+sandbox:
+  timeout_ms: 100
+  memory_mb: 256

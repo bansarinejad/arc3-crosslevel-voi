@@ -1,0 +1,10 @@
+extends: base.yaml
+model:
+  id: Qwen/Qwen3.5-9B
+  profile: kaggle-9b-bf16-fallback
+  context_length: 16384
+  quantization: none
+  compute_dtype: bfloat16
+  max_runtime_fraction: 0.8
+  offline: true
+  max_batch_sequences: 1

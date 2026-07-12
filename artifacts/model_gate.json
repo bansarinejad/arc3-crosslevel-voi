@@ -1,0 +1,37 @@
+{
+  "date": "2026-07-12",
+  "hardware": {
+    "device": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "driver": "581.15",
+    "reported_memory_mib": 16376
+  },
+  "runtime": {
+    "accelerate": "1.14.0",
+    "arc_agi": "0.9.9",
+    "arcengine": "0.9.3",
+    "bitsandbytes": "0.49.2",
+    "cuda": "13.0",
+    "numpy": "2.5.1",
+    "torch": "2.11.0+cu130",
+    "torchvision": "0.26.0+cu130",
+    "transformers": "5.13.1"
+  },
+  "rejected_primary": {
+    "artifact": "local_9b_preflight.json",
+    "model": "Qwen/Qwen3.5-9B",
+    "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
+    "profile": "NF4 double quantization, BF16 compute, four simultaneous sequences",
+    "reason": "23.281 GiB peak and 5.321 tokens/s fail the fixed 14.5 GiB and 12 tokens/s gates"
+  },
+  "selected_local": {
+    "artifact": "local_4b_preflight.json",
+    "model": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "profile": "BF16, four logical candidates, deterministic physical microbatch size one",
+    "peak_vram_gb": 12.519318580627441,
+    "tokens_per_second": 15.796212494580786,
+    "statically_valid_programs": 3,
+    "requested_programs": 4,
+    "passes": true
+  }
+}

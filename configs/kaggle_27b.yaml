@@ -1,0 +1,10 @@
+extends: base.yaml
+model:
+  id: Qwen/Qwen3.6-27B-FP8
+  profile: kaggle-fp8
+  context_length: 16384
+  quantization: fp8
+  compute_dtype: bfloat16
+  max_runtime_fraction: 0.8
+  offline: true
+  max_batch_sequences: 1

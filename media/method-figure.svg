@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="720" viewBox="0 0 1600 720" role="img" aria-labelledby="title desc">
+  <title id="title">Cross-level value-of-information controller</title>
+  <desc id="desc">Four executable programs predict action outcomes. Disagreement can trigger an early probe whose information benefits increasingly weighted later levels.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#07111f"/><stop offset="1" stop-color="#0c1d38"/></linearGradient>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#7dd3fc"/></marker>
+    <style>
+      .h{font:700 30px system-ui,sans-serif;fill:#f8fafc}.t{font:500 21px system-ui,sans-serif;fill:#cbd5e1}.s{font:600 18px system-ui,sans-serif;fill:#e2e8f0}.box{fill:#102441;stroke:#38bdf8;stroke-width:3;rx:22}.arrow{stroke:#7dd3fc;stroke-width:5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1600" height="720" fill="url(#bg)" rx="30"/>
+  <text x="60" y="70" class="h">Learn early</text><text x="1250" y="70" class="h">Exploit late</text>
+  <rect x="55" y="115" width="320" height="490" class="box"/>
+  <text x="90" y="160" class="t">Executable version space</text>
+  <g class="s">
+    <rect x="95" y="205" width="235" height="62" fill="#123454" stroke="#22d3ee" rx="12"/><text x="118" y="245">Program h₁</text>
+    <rect x="95" y="292" width="235" height="62" fill="#21305c" stroke="#60a5fa" rx="12"/><text x="118" y="332">Program h₂</text>
+    <rect x="95" y="379" width="235" height="62" fill="#42265e" stroke="#e879f9" rx="12"/><text x="118" y="419">Program h₃</text>
+    <rect x="95" y="466" width="235" height="62" fill="#493a21" stroke="#facc15" rx="12"/><text x="118" y="506">Program h₄</text>
+  </g>
+  <path d="M375 360 H505" class="arrow"/>
+  <rect x="505" y="175" width="330" height="370" class="box"/>
+  <text x="545" y="220" class="t">Counterfactual partition</text>
+  <circle cx="670" cy="330" r="72" fill="#083c5b" stroke="#22d3ee" stroke-width="4"/>
+  <text x="635" y="322" class="s">probe</text><text x="614" y="352" class="s">action a</text>
+  <path d="M670 258 V235 M600 330 H555 M740 330 H785 M620 385 L585 430 M720 385 L755 430" stroke="#f8fafc" stroke-width="4"/>
+  <text x="540" y="490" class="t">Exact predicted outcomes → EVSI(a)</text>
+  <path d="M835 360 H960" class="arrow"/>
+  <rect x="960" y="175" width="300" height="370" class="box"/>
+  <text x="995" y="220" class="t">Cross-level decision</text>
+  <text x="995" y="285" class="s">mₗ · EVSI(a)</text><text x="995" y="325" class="s">− action cost</text><text x="995" y="365" class="s">− catastrophe risk</text>
+  <line x1="995" y1="405" x2="1225" y2="405" stroke="#64748b" stroke-width="2"/>
+  <text x="995" y="455" class="s">J(a) &gt; 0 → probe</text><text x="995" y="495" class="s">otherwise → robust plan</text>
+  <path d="M1260 360 H1350" class="arrow"/>
+  <g transform="translate(1360 155)">
+    <rect x="0" y="330" width="45" height="70" fill="#38bdf8"/><rect x="65" y="270" width="45" height="130" fill="#38bdf8"/><rect x="130" y="190" width="45" height="210" fill="#38bdf8"/><rect x="195" y="80" width="45" height="320" fill="#38bdf8"/>
+    <text x="4" y="440" class="s">l</text><text x="65" y="440" class="s">l+1</text><text x="130" y="440" class="s">l+2</text><text x="195" y="440" class="s">L</text>
+  </g>
+  <text x="60" y="665" class="t">Information bought on a low-weight early level can reduce actions across more valuable later levels.</text>
+</svg>
+

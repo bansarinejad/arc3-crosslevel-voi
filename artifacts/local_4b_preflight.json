@@ -1,0 +1,32 @@
+{
+  "elapsed_seconds": 31.336625800002366,
+  "fits_vram_gate": true,
+  "hardware": {
+    "cuda_available": true,
+    "device_name": "NVIDIA GeForce RTX 4090 Laptop GPU",
+    "total_vram_gb": 15.99169921875
+  },
+  "model_id": "Qwen/Qwen3.5-4B",
+  "output_tokens": 495,
+  "passes_runtime_gate": null,
+  "passes_throughput_gate": true,
+  "peak_vram_gb": 12.519318580627441,
+  "program_source_lengths": [715, 304, 218, 348],
+  "program_source_sha256": [
+    "6700e20626ff0ec6808d2eeff47e1ae5d887a89b1f16b023670029da4ebd4e21",
+    "d4545390ad27db375f7764c2bae7cee985b40b807dd2a67311f0027f789b954e",
+    "8ba2358a5804ca63a2eeaf9303ae796293bed825f88042bee6dde33edaa28f94",
+    "02fb95e33eef7b994b4328c4f3f1d449e304e3c72b97a1e64b8e6ef76d0aac26"
+  ],
+  "projected_p95_seconds": null,
+  "requested_sequences": 4,
+  "runtime_fraction": null,
+  "statically_valid_programs": 3,
+  "syntactically_valid_programs": 3,
+  "tokens_per_second": 15.796212494580786,
+  "truncated_sequences": 0,
+  "validation_failures": {
+    "disallowed_attribute": 1,
+    "disallowed_call": 1
+  }
+}

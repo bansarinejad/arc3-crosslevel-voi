@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+title: "Learn Early, Exploit Late: Cross-Level Value of Information for ARC-AGI-3"
+message: "If you use this software, cite the Paper Track writeup and this repository."
+type: software
+version: 0.1.0
+date-released: 2026-07-12
+license: MIT-0 OR CC-BY-4.0
+authors:
+  - name: "ARC-AGI-3 Paper Track Entrant"
+abstract: >-
+  Pre-results research software for finite executable version spaces and cross-level
+  value of information in ARC-AGI-3. Replace the anonymized author and add the final
+  repository identifier before public release.

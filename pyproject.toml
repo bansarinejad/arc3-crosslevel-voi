@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "arc3-crosslevel-voi"
+version = "0.1.0"
+description = "Cross-level value-of-information controllers for ARC-AGI-3"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT-0 OR CC-BY-4.0" }
+authors = [{ name = "ARC-AGI-3 Paper Track Entrant" }]
+dependencies = [
+  "numpy>=2.0,<3",
+  "PyYAML>=6.0,<7",
+]
+
+[project.optional-dependencies]
+arc = ["arc-agi>=0.9.8", "truststore>=0.10"]
+model = [
+  "accelerate>=1.6",
+  "bitsandbytes>=0.46",
+  "pillow>=11",
+  "torch>=2.7",
+  "torchvision>=0.22",
+  "transformers>=4.53",
+]
+stats = ["scipy>=1.14,<2"]
+dev = [
+  "mypy>=1.15",
+  "pytest>=8,<9",
+  "pytest-cov>=6",
+  "ruff>=0.11",
+]
+
+[project.scripts]
+arc3-voi = "arc3_voi.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/arc3_voi"]
+
+[tool.pytest.ini_options]
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["arc3_voi"]
+
+[[tool.mypy.overrides]]
+module = [
+  "arc_agi",
+  "arcengine",
+  "PIL",
+  "PIL.*",
+  "torch",
+  "torch.*",
+  "transformers",
+  "transformers.*",
+  "yaml",
+]
+follow_imports = "skip"
+ignore_missing_imports = true

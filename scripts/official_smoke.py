@@ -1,0 +1,46 @@
+"""One-action anonymous smoke test against the official ARC endpoint."""
+
+from __future__ import annotations
+
+import json
+
+from arc3_voi.agent import build_agent
+from arc3_voi.arc_adapter import ArcCompetitionClient
+from arc3_voi.config import ExperimentConfig, SystemConfig
+from arc3_voi.model import ScriptedBackend
+from arc3_voi.runner import run_game
+
+
+def main() -> int:
+    backend = ScriptedBackend(
+        action_policy=lambda _history, valid: {"kind": valid[0].split("(", 1)[0]}
+    )
+    config = SystemConfig(
+        experiment=ExperimentConfig(
+            variant="D",
+            max_environment_actions=1,
+            max_generated_tokens=16,
+            max_wall_seconds=20,
+        )
+    )
+    session = ArcCompetitionClient().make("ls20", seed=0)
+    with build_agent(backend, config) as agent:
+        metrics = run_game(
+            session,
+            agent.controller,
+            run_id="official-anonymous-smoke",
+            seed=0,
+            variant="D",
+            model_profile="scripted-smoke",
+            config_hash="smoke",
+            max_environment_actions=1,
+            max_generated_tokens=16,
+            max_wall_seconds=20,
+        )
+    print(json.dumps(metrics.summary(), indent=2, sort_keys=True))
+    return 0 if metrics.total_actions == 1 else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
+

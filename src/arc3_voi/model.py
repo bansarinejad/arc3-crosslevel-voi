@@ -1,0 +1,407 @@
+"""Optional local Qwen backend and deterministic test backends."""
+
+from __future__ import annotations
+
+import json
+import random
+import time
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Protocol
+
+import numpy as np
+
+from .prompts import (
+    DIRECT_SYSTEM_PROMPT,
+    PROGRAM_SYSTEM_PROMPT,
+    direct_prompt,
+    extract_python,
+    parse_action_json,
+    program_prompt,
+)
+from .rendering import render_grid_pil
+
+
+@dataclass(frozen=True, slots=True)
+class GenerationSettings:
+    temperature: float = 0.6
+    top_p: float = 0.95
+    max_new_tokens: int = 1536
+    context_length: int = 16_384
+
+
+@dataclass(frozen=True, slots=True)
+class ModelProfile:
+    model_id: str
+    quantization: str = "none"
+    compute_dtype: str = "bfloat16"
+    offline: bool = False
+    device_map: str = "auto"
+    seed: int = 20_260_712
+    max_batch_sequences: int = 4
+    settings: GenerationSettings = field(default_factory=GenerationSettings)
+
+
+@dataclass(frozen=True, slots=True)
+class GenerationResult:
+    texts: tuple[str, ...]
+    output_tokens: int
+    elapsed_seconds: float
+    peak_vram_gb: float | None = None
+    sequence_token_counts: tuple[int, ...] = ()
+    hit_token_limit: tuple[bool, ...] = ()
+
+    @property
+    def tokens_per_second(self) -> float:
+        return self.output_tokens / self.elapsed_seconds if self.elapsed_seconds > 0 else 0.0
+
+
+class ModelBackend(Protocol):
+    """One backbone exposes both program-induction and direct-policy modes."""
+
+    def generate_programs(
+        self,
+        history: Any,
+        count: int,
+        *,
+        feedback: str | None = None,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> GenerationResult: ...
+
+    def direct_action(
+        self,
+        history: Any,
+        valid_actions: Sequence[str],
+        *,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> tuple[dict[str, Any], GenerationResult]: ...
+
+
+class ScriptedBackend:
+    """Dependency-free backend for replay tests and deterministic experiments."""
+
+    def __init__(
+        self,
+        programs: Sequence[str] = (),
+        action_policy: Callable[[Sequence[Any], Sequence[str]], dict[str, Any]] | None = None,
+    ) -> None:
+        self._programs = tuple(programs)
+        self._action_policy = action_policy or (lambda _history, actions: {"kind": actions[0]})
+
+    def generate_programs(
+        self,
+        history: Any,
+        count: int,
+        *,
+        feedback: str | None = None,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> GenerationResult:
+        del history, feedback, max_new_tokens, max_wall_seconds
+        texts = (
+            tuple(self._programs[index % len(self._programs)] for index in range(count))
+            if self._programs
+            else ()
+        )
+        return GenerationResult(
+            texts=texts,
+            output_tokens=sum(len(x.split()) for x in texts),
+            elapsed_seconds=0.001,
+        )
+
+    def direct_action(
+        self,
+        history: Any,
+        valid_actions: Sequence[str],
+        *,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> tuple[dict[str, Any], GenerationResult]:
+        del max_new_tokens, max_wall_seconds
+        action = self._action_policy(history, valid_actions)
+        return action, GenerationResult((json.dumps(action),), 1, 0.001)
+
+
+class TransformersQwenBackend:
+    """Lazy multimodal backend; importing the core package never imports Torch."""
+
+    def __init__(self, profile: ModelProfile, *, model_path: str | Path | None = None) -> None:
+        self.profile = profile
+        self.model_path = str(model_path or profile.model_id)
+        self._processor: Any = None
+        self._model: Any = None
+        self._torch: Any = None
+
+    def load(self) -> None:
+        if self._model is not None:
+            return
+        try:
+            import torch
+            from transformers import AutoModelForMultimodalLM, AutoProcessor, BitsAndBytesConfig
+        except ImportError as exc:  # pragma: no cover - optional heavy dependencies
+            raise RuntimeError("install the 'model' optional dependencies to load Qwen") from exc
+
+        dtype = getattr(torch, self.profile.compute_dtype)
+        random.seed(self.profile.seed)
+        np.random.seed(self.profile.seed % (2**32))
+        torch.manual_seed(self.profile.seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(self.profile.seed)
+        kwargs: dict[str, Any] = {
+            "device_map": self.profile.device_map,
+            "dtype": dtype,
+            "local_files_only": self.profile.offline,
+        }
+        if self.profile.quantization.lower() == "nf4":
+            kwargs["quantization_config"] = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True,
+                bnb_4bit_compute_dtype=dtype,
+            )
+        self._processor = AutoProcessor.from_pretrained(
+            self.model_path, local_files_only=self.profile.offline
+        )
+        self._model = AutoModelForMultimodalLM.from_pretrained(self.model_path, **kwargs)
+        self._model.eval()
+        self._torch = torch
+
+    def generate_programs(
+        self,
+        history: Any,
+        count: int,
+        *,
+        feedback: str | None = None,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> GenerationResult:
+        prompt = program_prompt(history, feedback=feedback)
+        started = time.perf_counter()
+        chunks: list[GenerationResult] = []
+        remaining_count = count
+        while remaining_count > 0:
+            chunk_count = min(remaining_count, self.profile.max_batch_sequences)
+            wall_remaining = (
+                None
+                if max_wall_seconds is None
+                else max_wall_seconds - (time.perf_counter() - started)
+            )
+            if wall_remaining is not None and wall_remaining <= 0:
+                raise TimeoutError("program generation exhausted the shared wall-time budget")
+            chunks.append(
+                self._generate(
+                    PROGRAM_SYSTEM_PROMPT,
+                    prompt,
+                    history,
+                    count=chunk_count,
+                    max_new_tokens=max_new_tokens,
+                    max_wall_seconds=wall_remaining,
+                )
+            )
+            remaining_count -= chunk_count
+        result = GenerationResult(
+            texts=tuple(text for chunk in chunks for text in chunk.texts),
+            output_tokens=sum(chunk.output_tokens for chunk in chunks),
+            elapsed_seconds=sum(chunk.elapsed_seconds for chunk in chunks),
+            peak_vram_gb=max(
+                (chunk.peak_vram_gb for chunk in chunks if chunk.peak_vram_gb is not None),
+                default=None,
+            ),
+            sequence_token_counts=tuple(
+                value for chunk in chunks for value in chunk.sequence_token_counts
+            ),
+            hit_token_limit=tuple(
+                value for chunk in chunks for value in chunk.hit_token_limit
+            ),
+        )
+        return GenerationResult(
+            texts=tuple(extract_python(text) for text in result.texts),
+            output_tokens=result.output_tokens,
+            elapsed_seconds=result.elapsed_seconds,
+            peak_vram_gb=result.peak_vram_gb,
+        )
+
+    def direct_action(
+        self,
+        history: Any,
+        valid_actions: Sequence[str],
+        *,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> tuple[dict[str, Any], GenerationResult]:
+        result = self._generate(
+            DIRECT_SYSTEM_PROMPT,
+            direct_prompt(history, valid_actions),
+            history,
+            count=1,
+            max_new_tokens=min(256, max_new_tokens) if max_new_tokens is not None else 256,
+            max_wall_seconds=max_wall_seconds,
+        )
+        try:
+            action = parse_action_json(result.texts[0])
+        except ValueError:
+            action = {}
+        return action, result
+
+    def _generate(
+        self,
+        system_prompt: str,
+        text_prompt: str,
+        history: Sequence[Any],
+        *,
+        count: int,
+        max_new_tokens: int | None = None,
+        max_wall_seconds: float | None = None,
+    ) -> GenerationResult:
+        total_started = time.perf_counter()
+        self.load()
+        assert self._torch is not None
+        assert self._processor is not None
+        assert self._model is not None
+        if hasattr(history, "frames"):
+            latest_grid = history.frames[-1] if history.frames else None
+        else:
+            latest_grid = getattr(history[-1], "grid", None) if history else None
+        content: list[dict[str, Any]] = []
+        if latest_grid is not None:
+            content.append({"type": "image", "image": render_grid_pil(latest_grid)})
+        content.append({"type": "text", "text": text_prompt})
+        messages = [
+            {"role": "system", "content": [{"type": "text", "text": system_prompt}]},
+            {"role": "user", "content": content},
+        ]
+        inputs = self._processor.apply_chat_template(
+            messages,
+            add_generation_prompt=True,
+            enable_thinking=False,
+            tokenize=True,
+            return_dict=True,
+            return_tensors="pt",
+        )
+        device = next(self._model.parameters()).device
+        inputs = {key: value.to(device) for key, value in inputs.items()}
+        input_length = int(inputs["input_ids"].shape[-1])
+        generation_limit = (
+            self.profile.settings.max_new_tokens
+            if max_new_tokens is None
+            else max_new_tokens
+        )
+        if generation_limit < 1:
+            raise ValueError("max_new_tokens must be positive")
+        if input_length + generation_limit > self.profile.settings.context_length:
+            raise RuntimeError(
+                f"prompt ({input_length}) plus output budget ({generation_limit}) exceeds "
+                f"context budget {self.profile.settings.context_length}"
+            )
+
+        if self._torch.cuda.is_available():
+            self._torch.cuda.reset_peak_memory_stats()
+        stopping_criteria = None
+        if max_wall_seconds is not None:
+            remaining = max_wall_seconds - (time.perf_counter() - total_started)
+            if remaining <= 0:
+                raise TimeoutError("model wall-time budget expired before generation")
+            from transformers import MaxTimeCriteria, StoppingCriteriaList
+
+            stopping_criteria = StoppingCriteriaList([MaxTimeCriteria(remaining)])
+        started = time.perf_counter()
+        with self._torch.inference_mode():
+            outputs = self._model.generate(
+                **inputs,
+                do_sample=True,
+                temperature=self.profile.settings.temperature,
+                top_p=self.profile.settings.top_p,
+                max_new_tokens=generation_limit,
+                num_return_sequences=count,
+                stopping_criteria=stopping_criteria,
+            )
+        elapsed = max(time.perf_counter() - started, 1e-9)
+        generated = outputs[:, input_length:]
+        texts = tuple(self._processor.batch_decode(generated, skip_special_tokens=True))
+        token_counts, hit_token_limit = _sequence_token_counts(
+            generated,
+            eos_token_id=getattr(self._model.generation_config, "eos_token_id", None),
+            pad_token_id=getattr(self._model.generation_config, "pad_token_id", None),
+            max_new_tokens=generation_limit,
+        )
+        peak = None
+        if self._torch.cuda.is_available():
+            peak = self._torch.cuda.max_memory_allocated() / 1024**3
+        return GenerationResult(
+            texts,
+            sum(token_counts),
+            elapsed,
+            peak,
+            token_counts,
+            hit_token_limit,
+        )
+
+
+def backend_from_config(
+    config: Any, *, model_path: str | Path | None = None
+) -> TransformersQwenBackend:
+    """Create the lazy backend from a validated SystemConfig-like object."""
+
+    if config.model is None:
+        raise ValueError("selected configuration has no model section")
+    profile = ModelProfile(
+        model_id=config.model.id,
+        quantization=config.model.quantization,
+        compute_dtype=config.model.compute_dtype,
+        offline=config.model.offline,
+        seed=config.experiment.seed,
+        max_batch_sequences=config.model.max_batch_sequences,
+        settings=GenerationSettings(
+            temperature=config.generation.temperature,
+            top_p=config.generation.top_p,
+            max_new_tokens=config.generation.max_new_tokens_per_hypothesis,
+            context_length=config.model.context_length,
+        ),
+    )
+    return TransformersQwenBackend(profile, model_path=model_path)
+
+
+def _count_generated_tokens(
+    generated: Any, *, eos_token_id: int | list[int] | None, pad_token_id: int | None
+) -> int:
+    """Count real generated tokens without charging batch padding as model output."""
+
+    counts, _ = _sequence_token_counts(
+        generated,
+        eos_token_id=eos_token_id,
+        pad_token_id=pad_token_id,
+        max_new_tokens=None,
+    )
+    return sum(counts)
+
+
+def _sequence_token_counts(
+    generated: Any,
+    *,
+    eos_token_id: int | list[int] | None,
+    pad_token_id: int | None,
+    max_new_tokens: int | None,
+) -> tuple[tuple[int, ...], tuple[bool, ...]]:
+    eos_ids = {eos_token_id} if isinstance(eos_token_id, int) else set(eos_token_id or ())
+    counts: list[int] = []
+    limit_flags: list[bool] = []
+    for row in generated.tolist():
+        count = 0
+        terminated = False
+        for token_id in row:
+            if token_id in eos_ids:
+                count += 1
+                terminated = True
+                break
+            if pad_token_id is not None and token_id == pad_token_id:
+                terminated = True
+                break
+            count += 1
+        counts.append(count)
+        limit_flags.append(
+            max_new_tokens is not None and count >= max_new_tokens and not terminated
+        )
+    return tuple(counts), tuple(limit_flags)

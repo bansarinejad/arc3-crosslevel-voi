@@ -1,0 +1,27 @@
+Learn Early, Exploit Late — third-party notices
+
+Submitter-authored code is licensed separately. Third-party components and model weights
+are not relicensed by this repository.
+
+Checked local components as of 12 July 2026:
+
+- ARC-AGI Toolkit (`arc-agi==0.9.9`): installed metadata and the official repository
+  declare the MIT License. The upstream text and copyright notice are preserved at
+  `LICENSES/ARC-AGI-Toolkit-MIT.txt`.
+- `arcengine==0.9.3`: installed distribution metadata declares the MIT License. Preserve
+  the exact wheel's license material when redistributing the Kaggle wheelhouse.
+- `Qwen/Qwen3.5-9B` and selected `Qwen/Qwen3.5-4B`: both downloaded snapshots' model
+  cards declare `apache-2.0`, and their included `LICENSE` is Apache License 2.0,
+  Copyright 2026 Alibaba Cloud. Preserve each model-local license and model card with
+  redistributed weights. A convenience copy of Apache-2.0 is in
+  `LICENSES/Apache-2.0.txt`.
+
+The selected Qwen3.5-4B snapshot is also Apache-2.0; its exact revision and license/weight
+hashes are recorded in `docs/provenance.md`. Qwen3.6-27B-FP8 remains conditional. Verify
+and preserve that exact snapshot's own model card and license before packaging.
+
+All other Python packages retain their upstream licenses. The offline bundle manifest
+hashes exact wheels; the final release must archive license/NOTICE files from those
+wheels. See `docs/provenance.md`.
+
+No source code from Tufa Labs' Duck harness is included.
