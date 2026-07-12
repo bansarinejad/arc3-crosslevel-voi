@@ -356,7 +356,7 @@ class BeamSearchPlanner:
         *,
         depth: int = 4,
         beam_width: int = 8,
-        parallel_hypotheses: bool = True,
+        parallel_hypotheses: bool = False,
     ) -> None:
         if depth < 1 or beam_width < 1:
             raise ValueError("depth and beam_width must be positive")

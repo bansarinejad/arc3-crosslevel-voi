@@ -1,0 +1,271 @@
+{
+  "decision": {
+    "parallel_default_enabled": false,
+    "reason": "Parallel median wall time exceeded serial median wall time on the target local WSL stack"
+  },
+  "execution_order_alternated": true,
+  "phases": [
+    {
+      "mode": "serial",
+      "order_index": 0,
+      "per_hypothesis_counter_deltas": [
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        }
+      ],
+      "seconds": 5.177337303000002,
+      "snapshot_sha256": "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710",
+      "trial": 1
+    },
+    {
+      "mode": "parallel",
+      "order_index": 1,
+      "per_hypothesis_counter_deltas": [
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        }
+      ],
+      "seconds": 6.565430341999999,
+      "snapshot_sha256": "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710",
+      "trial": 1
+    },
+    {
+      "mode": "parallel",
+      "order_index": 0,
+      "per_hypothesis_counter_deltas": [
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        }
+      ],
+      "seconds": 6.516413275000005,
+      "snapshot_sha256": "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710",
+      "trial": 2
+    },
+    {
+      "mode": "serial",
+      "order_index": 1,
+      "per_hypothesis_counter_deltas": [
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        }
+      ],
+      "seconds": 4.876778274000003,
+      "snapshot_sha256": "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710",
+      "trial": 2
+    },
+    {
+      "mode": "serial",
+      "order_index": 0,
+      "per_hypothesis_counter_deltas": [
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        }
+      ],
+      "seconds": 5.010953483999998,
+      "snapshot_sha256": "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710",
+      "trial": 3
+    },
+    {
+      "mode": "parallel",
+      "order_index": 1,
+      "per_hypothesis_counter_deltas": [
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        },
+        {
+          "execution_errors": 0,
+          "goal_calls": 2460,
+          "prediction_calls": 2460,
+          "timeouts": 0
+        }
+      ],
+      "seconds": 6.530002100999994,
+      "snapshot_sha256": "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710",
+      "trial": 3
+    }
+  ],
+  "platform": "Linux-5.15.167.4-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "provenance": {
+    "launch_git_commit": "cfe55fc1c9150670a2b4fd83fcfce225faf3cab1",
+    "launch_worktree_clean": true
+  },
+  "python": "3.12.3 (main, Nov  6 2024, 18:32:19) [GCC 13.2.0]",
+  "schema_version": 1,
+  "shape": {
+    "actions": 12,
+    "beam_width": 8,
+    "depth": 4,
+    "grid": [
+      64,
+      64
+    ],
+    "history_frames": 8,
+    "hypotheses": 4
+  },
+  "summary": {
+    "all_snapshot_sha256": [
+      "bb4785fa6a9f5525d3dece572e5d2594a629b3b313e78edf94e7d3784e4f3710"
+    ],
+    "child_peak_rss_bytes": null,
+    "child_peak_rss_note": "Not observable without adding a benchmark-only process dependency",
+    "median_paired_speedup": 0.7673739466688118,
+    "paired_speedups": [
+      0.7885754677617753,
+      0.7483838222338652,
+      0.7673739466688118
+    ],
+    "parallel_median_seconds": 6.530002100999994,
+    "parallel_p95_seconds": 6.561887517899999,
+    "parent_peak_rss_bytes": 232538112,
+    "per_hypothesis_counter_deltas": [
+      {
+        "execution_errors": 0,
+        "goal_calls": 14760,
+        "prediction_calls": 14760,
+        "timeouts": 0
+      },
+      {
+        "execution_errors": 0,
+        "goal_calls": 14760,
+        "prediction_calls": 14760,
+        "timeouts": 0
+      },
+      {
+        "execution_errors": 0,
+        "goal_calls": 14760,
+        "prediction_calls": 14760,
+        "timeouts": 0
+      },
+      {
+        "execution_errors": 0,
+        "goal_calls": 14760,
+        "prediction_calls": 14760,
+        "timeouts": 0
+      }
+    ],
+    "serial_median_seconds": 5.010953483999998,
+    "serial_p95_seconds": 5.160698921100002,
+    "snapshots_equal": true
+  },
+  "trials": 3
+}

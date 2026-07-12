@@ -164,6 +164,10 @@ def _twelve_actions() -> tuple[Action, ...]:
     )
 
 
+def test_parallel_hypothesis_evaluation_is_opt_in() -> None:
+    assert BeamSearchPlanner().parallel_hypotheses is False
+
+
 def test_beam_planner_assigns_one_to_immediate_completion() -> None:
     observation = Observation(
         np.zeros((2, 2), dtype=np.int16),

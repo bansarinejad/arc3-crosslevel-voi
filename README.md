@@ -53,6 +53,14 @@ does not contain code from Duck or other competition entries.
   corrected. Exact run hashes and audits are in
   `artifacts/pilot_bp35_seed11_fair_v2.json`; the preceding worker-memory incident remains in
   `artifacts/pilot_seed11_worker_memory_incident.json`.
+- Profiled the planner at its maximum registered shape on WSL: four programs, eight
+  64×64 frames, 12 actions, depth four, and beam width eight. Concurrent hypothesis
+  workers produced identical snapshots with zero errors or timeouts, but were slower
+  than serial evaluation (6.53 s versus 5.01 s median across three order-alternated
+  trials). Concurrency therefore remains opt-in and is disabled by default. The
+  semantics-preserving history-sharing, signature-memoization, root-preflight, and
+  transport-copy reductions remain enabled. See
+  `artifacts/planner_benchmark_cfe55fc_wsl.json`.
 - The first D/S/M/X pilot is retained only as a pre-grounding diagnostic. Its renderer
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded

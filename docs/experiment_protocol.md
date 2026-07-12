@@ -65,6 +65,13 @@ X/M runtime condition passed at 0.992×; the 2.54× M/S ratio is an efficiency d
 not a preregistered gate. The remaining 176 rows are locked pending the corrections recorded
 in `artifacts/pilot_bp35_seed11_fair_v2.json`.
 
+The maximum-shape WSL planner benchmark did not authorize concurrent committee
+evaluation: its three order-alternated trials produced identical snapshots and no
+timeouts, but parallel median wall time was 6.53 seconds versus 5.01 seconds serial.
+Parallel evaluation remains an explicit opt-in experiment and is off by default. This
+decision changes scheduling only; depth, beam width, action frontier, and budgets remain
+frozen.
+
 `evaluate_mechanism_gate`, `evaluate_development_score_gate`, and
 `evaluate_confirmation_gate` consume the immutable run records and implement these
 thresholds directly. The mechanism check fails closed if exact worker-call timeout
