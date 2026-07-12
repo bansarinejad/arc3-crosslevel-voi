@@ -5,6 +5,7 @@ from __future__ import annotations
 import time
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from math import fsum, isclose, sqrt
 from typing import TypeAlias
@@ -340,14 +341,28 @@ class _BeamNode:
     goal_value: float
 
 
+@dataclass(frozen=True, slots=True)
+class _HypothesisPlanningResult:
+    predictions: tuple[Prediction | None, ...]
+    costs: tuple[float, ...]
+    invalid: bool
+
+
 class BeamSearchPlanner:
     """Depth-limited, program-specific search with a shared action frontier."""
 
-    def __init__(self, *, depth: int = 4, beam_width: int = 8) -> None:
+    def __init__(
+        self,
+        *,
+        depth: int = 4,
+        beam_width: int = 8,
+        parallel_hypotheses: bool = True,
+    ) -> None:
         if depth < 1 or beam_width < 1:
             raise ValueError("depth and beam_width must be positive")
         self.depth = depth
         self.beam_width = beam_width
+        self.parallel_hypotheses = parallel_hypotheses
 
     def evaluate(
         self,
@@ -367,38 +382,46 @@ class BeamSearchPlanner:
 
         hypotheses = tuple(item[0] for item in weighted_hypotheses)
         weights = _normalise_weights(tuple(float(item[1]) for item in weighted_hypotheses))
-        cache: dict[tuple[str, Hashable, Action], Prediction | None] = {}
         prediction_rows: dict[Action, list[Prediction | None]] = {action: [] for action in actions}
         cost_rows: dict[Action, list[float]] = {action: [] for action in actions}
 
-        invalid_indices: set[int] = set()
-        for hypothesis_index, hypothesis in enumerate(hypotheses):
-            local_predictions: dict[Action, Prediction | None] = {}
-            local_costs: dict[Action, float] = {}
-            for action in actions:
-                self._check_deadline(deadline)
-                prediction = self._predict(hypothesis, history, action, cache)
-                local_predictions[action] = prediction
-                if prediction is None:
-                    invalid_indices.add(hypothesis_index)
-                    break
-                try:
-                    local_costs[action] = self._completion_cost(
+        action_tuple = tuple(actions)
+        if self.parallel_hypotheses and len(hypotheses) > 1:
+            with ThreadPoolExecutor(
+                max_workers=len(hypotheses),
+                thread_name_prefix="arc3-plan",
+            ) as executor:
+                futures = tuple(
+                    executor.submit(
+                        self._evaluate_hypothesis,
                         hypothesis,
                         history,
-                        action,
-                        prediction,
-                        tuple(actions),
+                        action_tuple,
                         win_levels,
-                        cache,
                         deadline,
                     )
-                except _InvalidHypothesis:
-                    invalid_indices.add(hypothesis_index)
-                    break
-            for action in actions:
-                prediction_rows[action].append(local_predictions.get(action))
-                cost_rows[action].append(local_costs.get(action, 8.0))
+                    for hypothesis in hypotheses
+                )
+                results = tuple(future.result() for future in futures)
+        else:
+            results = tuple(
+                self._evaluate_hypothesis(
+                    hypothesis,
+                    history,
+                    action_tuple,
+                    win_levels,
+                    deadline,
+                )
+                for hypothesis in hypotheses
+            )
+
+        invalid_indices = {
+            index for index, result in enumerate(results) if result.invalid
+        }
+        for result in results:
+            for action_index, action in enumerate(action_tuple):
+                prediction_rows[action].append(result.predictions[action_index])
+                cost_rows[action].append(result.costs[action_index])
 
         # A generated program that cannot predict every root action is invalid,
         # rather than an extra observable outcome the real environment might
@@ -437,6 +460,60 @@ class BeamSearchPlanner:
             ),
         )
 
+    def _evaluate_hypothesis(
+        self,
+        hypothesis: Hypothesis,
+        history: History,
+        actions: tuple[Action, ...],
+        win_levels: int,
+        deadline: float | None,
+    ) -> _HypothesisPlanningResult:
+        cache: dict[tuple[str, Hashable, Action], Prediction | None] = {}
+        signature_cache: dict[History, Hashable] = {}
+        predictions: list[Prediction | None] = []
+        for action in actions:
+            self._check_deadline(deadline)
+            predictions.append(
+                self._predict(
+                    hypothesis,
+                    history,
+                    action,
+                    cache,
+                    signature_cache,
+                )
+            )
+        if any(prediction is None for prediction in predictions):
+            return _HypothesisPlanningResult(
+                tuple(predictions),
+                (8.0,) * len(actions),
+                True,
+            )
+
+        costs: list[float] = []
+        invalid = False
+        for action, prediction in zip(actions, predictions, strict=True):
+            self._check_deadline(deadline)
+            assert prediction is not None
+            try:
+                costs.append(
+                    self._completion_cost(
+                        hypothesis,
+                        history,
+                        action,
+                        prediction,
+                        actions,
+                        win_levels,
+                        cache,
+                        signature_cache,
+                        deadline,
+                    )
+                )
+            except _InvalidHypothesis:
+                invalid = True
+                break
+        costs.extend([8.0] * (len(actions) - len(costs)))
+        return _HypothesisPlanningResult(tuple(predictions), tuple(costs), invalid)
+
     def _completion_cost(
         self,
         hypothesis: Hypothesis,
@@ -446,6 +523,7 @@ class BeamSearchPlanner:
         actions: tuple[Action, ...],
         win_levels: int,
         cache: dict[tuple[str, Hashable, Action], Prediction | None],
+        signature_cache: dict[History, Hashable],
         deadline: float | None,
     ) -> float:
         if first_prediction is None:
@@ -468,7 +546,13 @@ class BeamSearchPlanner:
             for node in beam:
                 for action in actions:
                     self._check_deadline(deadline)
-                    prediction = self._predict(hypothesis, node.history, action, cache)
+                    prediction = self._predict(
+                        hypothesis,
+                        node.history,
+                        action,
+                        cache,
+                        signature_cache,
+                    )
                     if prediction is None or self._catastrophe(prediction):
                         continue
                     if self._completed(prediction):
@@ -525,8 +609,13 @@ class BeamSearchPlanner:
         history: History,
         action: Action,
         cache: dict[tuple[str, Hashable, Action], Prediction | None],
+        signature_cache: dict[History, Hashable],
     ) -> Prediction | None:
-        key = (hypothesis.hypothesis_id, self._history_signature(history), action)
+        key = (
+            hypothesis.hypothesis_id,
+            self._history_signature(history, signature_cache),
+            action,
+        )
         if key not in cache:
             try:
                 cache[key] = hypothesis.predict(history, action)
@@ -535,7 +624,12 @@ class BeamSearchPlanner:
         return cache[key]
 
     @staticmethod
-    def _history_signature(history: History) -> Hashable:
+    def _history_signature(
+        history: History,
+        cache: dict[History, Hashable] | None = None,
+    ) -> Hashable:
+        if cache is not None and history in cache:
+            return cache[history]
         frames = tuple(
             (frame.shape, frame.dtype.str, memoryview(np.ascontiguousarray(frame)).tobytes())
             for frame in history.frames
@@ -544,8 +638,22 @@ class BeamSearchPlanner:
             None if action is None else (int(action.kind), action.row, action.col)
             for action in history.actions
         )
+        action_sets = tuple(
+            tuple(sorted(int(kind) for kind in action_set))
+            for action_set in history.available_action_sets
+        )
         states = tuple(_state_name(state) for state in history.game_states)
-        return frames, actions, states, history.level_deltas, history.levels
+        signature = (
+            frames,
+            actions,
+            action_sets,
+            states,
+            history.level_deltas,
+            history.levels,
+        )
+        if cache is not None:
+            cache[history] = signature
+        return signature
 
     @staticmethod
     def _advance(
@@ -563,7 +671,11 @@ class BeamSearchPlanner:
             level=level,
             win_levels=max(win_levels, level),
         )
-        return history.append(observation, action, prediction.level_delta)
+        return history._append_trusted_observation(
+            observation,
+            action,
+            prediction.level_delta,
+        )
 
 
 __all__ = [

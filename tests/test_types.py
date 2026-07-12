@@ -96,6 +96,26 @@ def test_history_keeps_aligned_last_eight_stable_frames() -> None:
     assert history.current_level == 1
 
 
+def test_trusted_history_append_structurally_shares_frozen_frames() -> None:
+    history = History.from_observation(observation(0))
+    next_observation = observation(1)
+
+    advanced = history._append_trusted_observation(
+        next_observation,
+        Action(ActionKind.ACTION1),
+        0,
+    )
+
+    assert advanced.frames[0] is history.frames[0]
+    assert advanced.frames[-1] is next_observation.grid
+    assert advanced.frames[0].flags.owndata
+    assert advanced.frames[-1].flags.owndata
+    assert not advanced.frames[0].flags.writeable
+    assert not advanced.frames[-1].flags.writeable
+    with pytest.raises(ValueError):
+        advanced.frames[-1][0, 0] = 7
+
+
 def test_history_rejects_unaligned_fields() -> None:
     with pytest.raises(ValueError, match="same length"):
         History(frames=(np.zeros((2, 2), dtype=np.int8),))

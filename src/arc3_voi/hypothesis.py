@@ -18,7 +18,12 @@ MAX_PREQUENTIAL_LOSS = 2.0
 
 @runtime_checkable
 class Hypothesis(Protocol):
-    """The stable interface implemented by executable transition-and-goal programs."""
+    """The stable interface implemented by executable transition-and-goal programs.
+
+    Implementations must be referentially transparent in their explicit inputs.
+    Planner caching, root preflight, and independent committee scheduling all rely
+    on calls having no hidden mutable state.
+    """
 
     hypothesis_id: str
     ast_nodes: int

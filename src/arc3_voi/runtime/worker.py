@@ -183,6 +183,23 @@ def _safe_builtins() -> dict[str, Any]:
     return allowed
 
 
+def _freeze_program_literal(value: Any) -> Any:
+    """Make validated top-level literal data recursively immutable."""
+
+    if isinstance(value, list | tuple):
+        return tuple(_freeze_program_literal(item) for item in value)
+    if isinstance(value, set | frozenset):
+        return frozenset(_freeze_program_literal(item) for item in value)
+    if isinstance(value, dict):
+        return MappingProxyType(
+            {
+                _freeze_program_literal(key): _freeze_program_literal(item)
+                for key, item in value.items()
+            }
+        )
+    return value
+
+
 def _transport_value(
     value: Any,
     *,
@@ -190,7 +207,7 @@ def _transport_value(
     depth: int = 0,
     counter: list[int] | None = None,
 ) -> Any:
-    """Copy trusted application data into a narrow, pickle-safe value language."""
+    """Normalize trusted application data into a narrow, pickle-safe value language."""
 
     if counter is None:
         counter = [0]
@@ -209,6 +226,15 @@ def _transport_value(
     if isinstance(value, np.ndarray):
         if value.dtype.hasobject:
             raise _TransportError(f"{path} contains an object-dtype array")
+        # Connection.send serializes synchronously into a distinct child-process
+        # object. Reusing an owned, immutable contiguous array here avoids an
+        # otherwise redundant parent-side copy of every retained history frame.
+        if (
+            value.flags.owndata
+            and not value.flags.writeable
+            and value.flags.c_contiguous
+        ):
+            return value
         return np.array(value, copy=True)
     if dataclasses.is_dataclass(value) and not isinstance(value, type):
         return {
@@ -377,6 +403,7 @@ def _worker_main(
         "np": _NumpyFacade(),
         "__name__": "generated_hypothesis",
     }
+    trusted_namespace_names = frozenset(namespace)
     try:
         tree = compile(
             canonical_source,
@@ -388,6 +415,9 @@ def _worker_main(
         # This is trusted runtime machinery executing statically validated source;
         # generated programs themselves cannot reference exec or compile.
         exec(tree, namespace, namespace)
+        for name in namespace.keys() - trusted_namespace_names:
+            if not callable(namespace[name]):
+                namespace[name] = _freeze_program_literal(namespace[name])
         predict = namespace.get("predict")
         goal_value = namespace.get("goal_value")
         if not callable(predict) or not callable(goal_value):

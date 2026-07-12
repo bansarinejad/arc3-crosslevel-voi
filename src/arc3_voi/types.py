@@ -238,6 +238,43 @@ class History:
             levels=(*self.levels[start:], observation.level),
         )
 
+    def _append_trusted_observation(
+        self,
+        observation: Observation,
+        action: Action | None,
+        level_delta: int,
+    ) -> History:
+        """Append planner-owned immutable data without recopying retained grids.
+
+        This private fast path is valid only when the observation has not escaped
+        trusted controller code. Public callers must use :meth:`append`, which
+        retains the defensive-copy boundary.
+        """
+
+        if isinstance(level_delta, bool) or not isinstance(level_delta, int):
+            raise TypeError("level_delta must be an integer")
+        start = max(0, len(self.frames) + 1 - self.MAX_LENGTH)
+        result = object.__new__(History)
+        object.__setattr__(result, "frames", (*self.frames[start:], observation.grid))
+        object.__setattr__(result, "actions", (*self.actions[start:], action))
+        object.__setattr__(
+            result,
+            "available_action_sets",
+            (*self.available_action_sets[start:], observation.available_actions),
+        )
+        object.__setattr__(
+            result,
+            "game_states",
+            (*self.game_states[start:], observation.game_state),
+        )
+        object.__setattr__(
+            result,
+            "level_deltas",
+            (*self.level_deltas[start:], level_delta),
+        )
+        object.__setattr__(result, "levels", (*self.levels[start:], observation.level))
+        return result
+
     @property
     def latest_grid(self) -> Grid:
         if not self.frames:

@@ -393,6 +393,16 @@ def _is_literal(node: ast.AST) -> bool:
     return False
 
 
+def _is_immutable_literal(node: ast.AST) -> bool:
+    if isinstance(node, ast.Constant):
+        return True
+    if isinstance(node, ast.Tuple):
+        return all(_is_immutable_literal(item) for item in node.elts)
+    if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.UAdd | ast.USub):
+        return _is_immutable_literal(node.operand)
+    return False
+
+
 class _ProgramValidator(ast.NodeVisitor):
     def __init__(self, helper_names: frozenset[str]):
         self.helper_names = helper_names
@@ -462,11 +472,11 @@ class _ProgramValidator(ast.NodeVisitor):
                     )
                 )
         for default in [*node.args.defaults, *node.args.kw_defaults]:
-            if default is not None and not _is_literal(default):
+            if default is not None and not _is_immutable_literal(default):
                 self.issues.append(
                     _issue(
                         ValidationCode.DISALLOWED_NODE,
-                        "function defaults must be literals",
+                        "function defaults must be immutable literals",
                         default,
                     )
                 )

@@ -54,6 +54,29 @@ class ExampleAction:
     col: int | None = None
 
 
+def test_transport_reuses_only_immutable_contiguous_arrays() -> None:
+    immutable = np.zeros((4, 4), dtype=np.int16)
+    immutable.flags.writeable = False
+    writable = np.arange(16, dtype=np.int16).reshape(4, 4)
+    aliased = np.arange(16, dtype=np.int16).reshape(4, 4)
+    aliased.flags.writeable = False
+
+    assert (
+        worker_runtime._transport_value(immutable, path="history.frames[0]")
+        is immutable
+    )
+    writable_copy = worker_runtime._transport_value(
+        writable,
+        path="history.frames[0]",
+    )
+    assert writable_copy is not writable
+    assert np.array_equal(writable_copy, writable)
+    assert (
+        worker_runtime._transport_value(aliased, path="history.frames[0]")
+        is not aliased
+    )
+
+
 def test_validation_canonicalizes_source_and_counts_ast_nodes() -> None:
     compact = validate_program(VALID_PROGRAM)
     reformatted = validate_program("\n\n" + textwrap.dedent(VALID_PROGRAM).replace("    ", "  "))
@@ -131,6 +154,48 @@ def goal_value(history):
     codes = {issue.code for issue in captured.value.issues}
     assert ValidationCode.INVALID_TOP_LEVEL in codes
     assert ValidationCode.DISALLOWED_NAME in codes
+
+
+def test_validator_rejects_mutable_helper_defaults() -> None:
+    source = """
+def helper(state=[0]):
+    state[0] += 1
+    return state[0]
+
+def predict(history, action):
+    helper()
+    return {"next_grid": history.frames[-1], "game_state": "NOT_FINISHED", "level_delta": 0}
+
+def goal_value(history):
+    return 0.0
+"""
+    with pytest.raises(SandboxValidationError) as captured:
+        validate_program(source)
+
+    assert any(
+        "function defaults must be immutable literals" in issue.message
+        for issue in captured.value.issues
+    )
+
+
+def test_worker_freezes_top_level_literal_state() -> None:
+    source = """
+STATE = [0]
+
+def predict(history, action):
+    STATE[0] += 1
+    return {"next_grid": history.frames[-1], "game_state": "NOT_FINISHED", "level_delta": 0}
+
+def goal_value(history):
+    return 0.0
+"""
+    history = ExampleHistory(frames=(np.zeros((2, 2), dtype=np.int16),))
+    with ProgramWorker(source, timeout_seconds=0.5) as worker:
+        result = worker.predict(history, ExampleAction(kind="ACTION1"))
+
+    assert not result.ok
+    assert result.error is not None
+    assert result.error.kind is WorkerErrorKind.EXECUTION
 
 
 def test_persistent_worker_executes_numpy_program_with_sanitized_dataclasses() -> None:
