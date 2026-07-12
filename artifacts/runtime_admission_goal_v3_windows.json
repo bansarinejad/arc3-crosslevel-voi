@@ -1,0 +1,449 @@
+{
+  "contract": {
+    "admission_rule": "at least two eligible distinct selected programs, no selected grounding failures or planner invalids, and either agreement below threshold with material EVSI and positive cross-level utility, or differing optimal action sets with material EVSI",
+    "agreement_threshold": 0.8,
+    "beam_width": 8,
+    "initial_cross_level_persistence": 0.5,
+    "material_evsi_threshold_actions": 0.05,
+    "planning_depth": 4,
+    "role_policy": "candidate 0 is conservative; every later candidate must be action-sensitive and goal-conditioned"
+  },
+  "contract_version": "runtime-admission-v1",
+  "gate": {
+    "passes": false,
+    "reasons": [
+      "no material decision diversity: require low agreement with positive cross-level utility, or differing optimal sets with material EVSI"
+    ]
+  },
+  "git": {
+    "commit": "44c7ea7a04fa242545f585a2dcfe9c56da2f10dd",
+    "dirty": false,
+    "repository_root": "D:/kaggle competitions/arc3-crosslevel-voi",
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "history": {
+    "actions": [
+      "ACTION3",
+      "ACTION4",
+      "ACTION7",
+      "ACTION6(42,33)",
+      "ACTION6(5,42)",
+      "ACTION6(63,31)",
+      "ACTION6(3,15)",
+      "ACTION6(3,21)",
+      "ACTION6(3,27)",
+      "ACTION6(15,33)",
+      "ACTION6(15,39)",
+      "ACTION6(15,45)"
+    ],
+    "frames": 1,
+    "level": 1,
+    "win_levels": 9
+  },
+  "inputs": {
+    "current_config_sha256": "5e8515c81db38475798a15d76f4379dd8a524d87a753d8bc972f6df364158c4a",
+    "fixture": "fixtures/grounding/bp35_seed11_initial_history.json",
+    "fixture_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+    "grounding_artifact": "artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json",
+    "grounding_artifact_schema": 4,
+    "grounding_artifact_sha256": "3a64ac2598dcaa3326fc9b7dc71631e4b418bca9c74c29b777111643fbda90b4",
+    "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+    "source_base_config_sha256": "21a2fb16fc2865527f50efa1cf7d729c46b9689bb4eda6d8daf1c1e18434cb3c",
+    "source_prompt_contract_version": "grounded-actions-palette-graded-goals-v3"
+  },
+  "offline": true,
+  "planner_error": null,
+  "planning": {
+    "actions": [
+      {
+        "action": "ACTION3",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.001953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION4",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.001953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION7",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.001953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION6(42,33)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0029296875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "70d1228e02b5dc4554ba0011710c3896f39e2e4fd123e804c8987409e3d356e2",
+          "faab11f325a6d575cb02d7b46dc0ba14274680109f96e1a62534b9485b57ddb2"
+        ]
+      },
+      {
+        "action": "ACTION6(5,42)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.021484375
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "3defa12533eeee25d9a62da66acbaa045d4da326f687106f4fdc0ebb12b22499",
+          "65001ad19b12dd2f790766ce3e20a89a122ae1ff1bf89042a2b0dbfec6de3b9b"
+        ]
+      },
+      {
+        "action": "ACTION6(63,31)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0029296875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "5d04110c31fd20152e5cba14a6ae5ea72e1dada4096991a56ee2acda1e8b7eab",
+          "faab11f325a6d575cb02d7b46dc0ba14274680109f96e1a62534b9485b57ddb2"
+        ]
+      },
+      {
+        "action": "ACTION6(3,15)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0029296875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "faab11f325a6d575cb02d7b46dc0ba14274680109f96e1a62534b9485b57ddb2"
+        ]
+      },
+      {
+        "action": "ACTION6(3,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0029296875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "faab11f325a6d575cb02d7b46dc0ba14274680109f96e1a62534b9485b57ddb2"
+        ]
+      },
+      {
+        "action": "ACTION6(3,27)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0068359375
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "ad6b0248e702c99e7bae2d5c31469555133fbdb64240a929544ff62519b87f89"
+        ]
+      },
+      {
+        "action": "ACTION6(15,33)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0126953125
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "94566942067c2fc58d30ca1df4de99a711fe5e581493bce032878756a72e881a"
+        ]
+      },
+      {
+        "action": "ACTION6(15,39)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0185546875
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "0c2f6d7cc59a1194c4821f87d67b3de92c67343b14b0cc84cc999df4afc1fb08"
+        ]
+      },
+      {
+        "action": "ACTION6(15,45)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          6.091796875,
+          7.8466796875,
+          4.0244140625
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "df1afa4a675d28c67a0172911a9ae26f069350ad242d143fbfe21bc22d91c5cd"
+        ]
+      }
+    ],
+    "agreement": 1.0,
+    "cross_level_multiplier": 23.0,
+    "differing_optimal_sets": true,
+    "hypothesis_ids": [
+      "1a53db59b71728e8f83a7084fbc32516e2e503079d68c861e7a4350f06bfcb66",
+      "24f7801db5da2148355fd7670f313199460b68ab612d771476312d8d8edd0b0d",
+      "a57468c016afeadc68f0172e1c60016f12c7d981b31dad094cdba8a78bfbbb63"
+    ],
+    "indifference": 0.8289047514082454,
+    "invalid_hypothesis_ids": [],
+    "maximum_cross_level_utility": -1.0,
+    "maximum_evsi": 0.0,
+    "maximum_myopic_utility": -1.0,
+    "myopic_multiplier": 1.0,
+    "optimal_action_sets": {
+      "1a53db59b71728e8f83a7084fbc32516e2e503079d68c861e7a4350f06bfcb66": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(42,33)",
+        "ACTION6(5,42)",
+        "ACTION6(63,31)",
+        "ACTION6(3,15)",
+        "ACTION6(3,21)",
+        "ACTION6(3,27)",
+        "ACTION6(15,33)",
+        "ACTION6(15,39)",
+        "ACTION6(15,45)"
+      ],
+      "24f7801db5da2148355fd7670f313199460b68ab612d771476312d8d8edd0b0d": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(42,33)",
+        "ACTION6(5,42)",
+        "ACTION6(63,31)",
+        "ACTION6(3,15)",
+        "ACTION6(3,21)",
+        "ACTION6(3,27)",
+        "ACTION6(15,33)",
+        "ACTION6(15,39)",
+        "ACTION6(15,45)"
+      ],
+      "a57468c016afeadc68f0172e1c60016f12c7d981b31dad094cdba8a78bfbbb63": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7"
+      ]
+    },
+    "per_hypothesis_cost_variation": {
+      "1a53db59b71728e8f83a7084fbc32516e2e503079d68c861e7a4350f06bfcb66": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 6.091796875,
+        "minimum": 6.091796875,
+        "range": 0.0
+      },
+      "24f7801db5da2148355fd7670f313199460b68ab612d771476312d8d8edd0b0d": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 7.8466796875,
+        "minimum": 7.8466796875,
+        "range": 0.0
+      },
+      "a57468c016afeadc68f0172e1c60016f12c7d981b31dad094cdba8a78bfbbb63": {
+        "action_varying": true,
+        "distinct_costs": 7,
+        "maximum": 4.0244140625,
+        "minimum": 4.001953125,
+        "range": 0.0224609375
+      }
+    },
+    "weights": [
+      0.3895106104713339,
+      0.4013729745831882,
+      0.20911641494547786
+    ]
+  },
+  "programs": [
+    {
+      "assigned_role": "Conservative evidence-first baseline; no effect is allowed only when best supported.",
+      "ast_nodes": 269,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "candidate_index": 0,
+      "eligibility": {
+        "action_sensitive": false,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": false,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "1a53db59b71728e8f83a7084fbc32516e2e503079d68c861e7a4350f06bfcb66",
+      "raw_source_sha256": "7fba09cb127008eec16cd1f2b89a1a1c303443cad51c01684bb2dd591c7e2b47",
+      "requirements": {
+        "action_sensitivity": false,
+        "goal_conditioning": false
+      }
+    },
+    {
+      "assigned_role": "Local ACTION6 interaction with graded progress from normalized changed-cell evidence.",
+      "ast_nodes": 254,
+      "behavior_signature": "9a8bcdbb5fa8e07617e0aaf3d55a7bf3ec3b130f4b3562ff957eab7b7ef7dea8",
+      "candidate_index": 1,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "24f7801db5da2148355fd7670f313199460b68ab612d771476312d8d8edd0b0d",
+      "raw_source_sha256": "dc31a25b54fb8d4621b71eb1a51b94028d6b28f14a7e0e4e583e0f5ede3863c9",
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      }
+    },
+    {
+      "assigned_role": "Object or agent motion with graded progress from normalized distance or alignment.",
+      "ast_nodes": 580,
+      "behavior_signature": "9e5825770a6badb6acf0950243ae81f657bb33d385124645b707f0a761923f91",
+      "candidate_index": 2,
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "a57468c016afeadc68f0172e1c60016f12c7d981b31dad094cdba8a78bfbbb63",
+      "raw_source_sha256": "ebd3827509677704e6f1963ac3e52e7e108c0cd5c8b16955b6b6260eea1e1642",
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      }
+    },
+    {
+      "assigned_role": "Component-wide, toggle, selection, or global effects with graded component progress.",
+      "ast_nodes": 291,
+      "behavior_signature": null,
+      "candidate_index": 3,
+      "eligibility": {
+        "action_sensitive": false,
+        "all_actions_ok": false,
+        "eligible": false,
+        "goal_action_conditioned": false,
+        "goal_value_ok": false,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "hypothesis_id": "5f14702adb7f92b56dc6030c17fb3ad84e4b562009eb07feea9237d4d4aa5a40",
+      "raw_source_sha256": "0d489ba90d3cd681a9e4d9428358b1bb3c1c009436f169c59dc20a9ace83415b",
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      }
+    }
+  ],
+  "schema_version": 1,
+  "selection": {
+    "behavioral_deduplicated_ids": [],
+    "distinct_selected_behavior_classes": 3,
+    "eligible_ids": [
+      "1a53db59b71728e8f83a7084fbc32516e2e503079d68c861e7a4350f06bfcb66",
+      "24f7801db5da2148355fd7670f313199460b68ab612d771476312d8d8edd0b0d",
+      "a57468c016afeadc68f0172e1c60016f12c7d981b31dad094cdba8a78bfbbb63"
+    ],
+    "filter_precedes_persistent_worker_construction": true,
+    "ineligible_ids": [
+      "5f14702adb7f92b56dc6030c17fb3ad84e4b562009eb07feea9237d4d4aa5a40"
+    ],
+    "ineligible_selected_ids": [],
+    "selected_ids": [
+      "1a53db59b71728e8f83a7084fbc32516e2e503079d68c861e7a4350f06bfcb66",
+      "24f7801db5da2148355fd7670f313199460b68ab612d771476312d8d8edd0b0d",
+      "a57468c016afeadc68f0172e1c60016f12c7d981b31dad094cdba8a78bfbbb63"
+    ]
+  },
+  "status": "pilot_blocked"
+}
