@@ -23,8 +23,8 @@ run reaches it, 180 runs consume 60 GPU-hours, below the preregistered 80-hour f
 trigger. Kaggle additionally applies its global evaluator deadline and the 20% headroom
 gate.
 
-The hashed experiment configuration also freezes prompt contract
-`grounded-actions-palette-v1` and perception contract
+The active hashed experiment configuration freezes prompt contract
+`grounded-actions-palette-graded-goals-v3` and perception contract
 `arc-agi-0.9.9-color-map-scale8-grid-v1`. The original four-row pilot used a renderer
 whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
 retained only as pre-grounding diagnostics and cannot enter any aggregate or claim gate.
@@ -54,16 +54,26 @@ fail rather than compare variants with missing or asymmetric seed cells.
 Failed gates must remain in the results and force claim downgrades documented in the
 paper outline.
 
-### Current scale-up state — 13 July 2026
+### Current scale-up state — 12 July 2026
 
-The corrected fair-v2 seed-11 D/S/M/X cell is complete and retained as valid negative
+The historical corrected fair-v2 seed-11 D/S/M/X cell is complete and retained as valid negative
 engineering evidence. All variants completed zero levels. M/X kept at least two programs
 at every decision and had no timeout, but improved best-committee prequential loss only
 7.87% over S rather than the required 15%. Their 241 non-reset planning rows had identical
 cost vectors across actions, making EVSI zero and X behaviorally identical to M. The formal
 X/M runtime condition passed at 0.992×; the 2.54× M/S ratio is an efficiency diagnostic,
-not a preregistered gate. The remaining 176 rows are locked pending the corrections recorded
-in `artifacts/pilot_bp35_seed11_fair_v2.json`.
+not a preregistered gate. The other 176 fair-v2 rows were superseded and abandoned after
+the goal contract changed; they are not pending. This negative result and its claim limits
+remain recorded in `artifacts/pilot_bp35_seed11_fair_v2.json`.
+
+The replacement schema-v4 goal-v3 grounding gate passes on WSL and native Windows. WSL
+has 2 safe programs in 2 distinct behavior classes, 1 with an action-conditioned graded
+goal, and enforced hard memory ceilings for both eligible workers. Windows has 3 safe
+programs in 3 distinct classes and 2 conditioned graded programs; its POSIX hard-memory
+limit is unavailable and not required. The two artifacts establish functional contract
+parity, not bit-identical generation. The active `development_matrix.json` now contains
+180 pending rows over 15 games, seeds `11`, `23`, and `47`, and D/S/M/X. No goal-v3
+gameplay has run.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no

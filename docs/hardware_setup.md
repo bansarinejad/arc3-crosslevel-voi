@@ -72,3 +72,15 @@ instead of claiming enforcement. Prompt and perception contract hashes, the comp
 model revision, and weight manifest match the WSL evidence; platform generation itself is not
 bit-identical. See `artifacts/model_gate_live8_windows.json` and
 `artifacts/prompt_grounding_bp35_seed11_windows.json`.
+
+Those schema-v3 fair-v2 artifacts remain historical evidence for the runtime and memory
+fixes. The current schema-v4 goal-v3 gate also passes on both platforms. WSL produced 2
+eligible programs in 2 distinct behavior classes, including 1 action-conditioned graded
+goal program, and verified the hard +256 MiB allocation ceiling for both eligible workers.
+Native Windows produced 3 eligible programs in 3 distinct classes, including 2 conditioned
+graded programs; POSIX `RLIMIT_DATA` is unavailable and therefore not required there. The
+shared contracts and fixed inputs establish functional parity only: stochastic platform
+generation is not claimed to be bit-identical. See
+`artifacts/prompt_grounding_bp35_seed11_goal_v3_wsl.json` and
+`artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json`. These passes authorize the
+active matrix as an engineering input, but no goal-v3 gameplay has run.

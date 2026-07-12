@@ -14,9 +14,11 @@ does not contain code from Duck or other competition entries.
   weighting and refresh, behavioral deduplication, candidate generation, depth-four
   beam planning, D/S/M/X controllers, direct fallback, trace replay, RHAE/statistics,
   competition lifecycle, and lazy Qwen backends.
-- Frozen: the dated 25-game metadata snapshot, deterministic 15/10 split, and revised
-  180-run development matrix under `artifacts/`, with versioned prompt/perception
-  contracts and identical 256-action, 12,288-token, and 1,200-second caps.
+- Frozen: the dated 25-game metadata snapshot, deterministic 15/10 split, and active
+  180-run goal-v3 development matrix under `artifacts/`, with versioned
+  prompt/perception contracts and identical 256-action, 12,288-token, and
+  1,200-second caps. All 180 active rows (15 games x seeds 11/23/47 x D/S/M/X)
+  remain pending; no goal-v3 gameplay has run.
 - Verified pre-grounding engineering smoke: the official anonymous endpoint accepted one
   action through the 4B committee on frozen `ls20-9607627b`, with two-or-more valid
   programs and no fallback/timeouts/errors. It validates lifecycle wiring only; see
@@ -26,7 +28,7 @@ does not contain code from Duck or other competition entries.
   Dependency consistency and a BF16 CUDA operation pass. See `artifacts/wsl_stack_check.json`.
 - Retained the v1 WSL capacity pass and failed grounding gate as diagnostics: its safe
   programs collapsed to one behavioral no-op class, so it did not authorize gameplay.
-- Passed the fair-v2 WSL model gate: 3/4 valid programs, no truncation, 28.85 tokens/s,
+- Passed the historical fair-v2 WSL model gate: 3/4 valid programs, no truncation, 28.85 tokens/s,
   and 9.38 GiB peak. The original one-frame grounding pass is now explicitly superseded:
   the seed-11 pilot exposed that its absolute 256 MiB `RLIMIT_DATA` ceiling was below the
   trusted NumPy runtime's existing data segment. The runtime now hard-limits allocation
@@ -43,14 +45,24 @@ does not contain code from Duck or other competition entries.
   fixture, model revision, and weight manifest match WSL; generated source is not claimed to
   be bit-identical across platforms. See `artifacts/model_gate_live8_windows.json` and
   `artifacts/prompt_grounding_bp35_seed11_windows.json`.
+- Passed the current schema-v4 goal-v3 grounding gate on both platforms. WSL produced
+  2 safe programs in 2 distinct behavior classes, including 1 action-conditioned graded
+  goal program; both eligible workers verified the hard +256 MiB allocation ceiling.
+  Native Windows produced 3 safe programs in 3 distinct classes, including 2 conditioned
+  graded programs; POSIX hard memory enforcement is not available or required there.
+  The same contract passes on identical inputs across platforms; generated programs are
+  not bitwise identical and their quality is not equated. See
+  `artifacts/prompt_grounding_bp35_seed11_goal_v3_wsl.json`
+  and `artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json`.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
   best prequential loss improved only 7.87% over S, below the 15% mechanism gate. All 241
   M/X planning rows had action-invariant cost vectors, so EVSI was zero and X was exactly
-  equivalent to M after timing and variant labels were removed. The remaining 176 runs stay
-  locked while goal-function invalidation, probe telemetry, and planning cost collapse are
-  corrected. Exact run hashes and audits are in
+  equivalent to M after timing and variant labels were removed. The other 176 fair-v2 rows
+  were superseded and abandoned after goal-function invalidation, probe telemetry, and planning
+  cost-collapse corrections changed the prompt/config contract. They are not pending rows
+  in the active matrix. Exact run hashes and audits are in
   `artifacts/pilot_bp35_seed11_fair_v2.json`; the preceding worker-memory incident remains in
   `artifacts/pilot_seed11_worker_memory_incident.json`.
 - Profiled the planner at its maximum registered shape on WSL: four programs, eight
@@ -65,7 +77,7 @@ does not contain code from Duck or other competition entries.
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
   matrix and gate are preserved with `_pre_grounding` suffixes.
-- Not yet completed: the remaining 176 revised development runs, locked confirmation,
+- Not yet completed: all 180 active goal-v3 development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
