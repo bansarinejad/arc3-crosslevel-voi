@@ -90,6 +90,30 @@ def test_validation_canonicalizes_source_and_counts_ast_nodes() -> None:
     assert compact.node_count > 0
 
 
+def test_pure_numeric_divmod_builtin_is_available() -> None:
+    source = """
+def predict(history, action):
+    quotient, remainder = divmod(int(action.row), 2)
+    grid = np.array(history.frames[-1], dtype=np.int8)
+    grid[0, 0] = quotient + remainder
+    return {"next_grid": grid, "game_state": "NOT_FINISHED", "level_delta": 0}
+
+def goal_value(history):
+    return 0.0
+"""
+    validate_program(source)
+    history = ExampleHistory(frames=(np.zeros((2, 2), dtype=np.int16),))
+    with ProgramWorker(source, timeout_seconds=0.5) as worker:
+        result = worker.predict(
+            history,
+            ExampleAction(kind="ACTION6", row=3, col=0),
+        )
+
+    assert result.ok
+    assert result.value is not None
+    assert result.value["next_grid"][0, 0] == 2
+
+
 @pytest.mark.parametrize(
     ("payload", "expected_code"),
     [

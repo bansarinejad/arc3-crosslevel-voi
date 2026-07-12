@@ -29,6 +29,7 @@ SAFE_BUILTIN_CALLS = frozenset(
         "any",
         "bool",
         "dict",
+        "divmod",
         "enumerate",
         "filter",
         "float",
