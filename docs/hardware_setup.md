@@ -4,9 +4,12 @@ The lock now pins the official PyTorch 2.11 CUDA 13.0 index for the `model` extr
 still avoid importing Torch, while a full model environment resolves the same CUDA wheels on
 Windows and Linux.
 
-The reference environment is Ubuntu 24.04.1 under WSL2 with normal user `bansarinejad`.
-Keep the repository and model snapshot under `/mnt/d`, but place the virtual environment on
-WSL's native filesystem at `/home/bansarinejad/.venvs/arc3-crosslevel-voi`; putting the venv
+The repository is at `D:\kaggle competitions\arc3-crosslevel-voi` on Windows and
+`/mnt/d/kaggle competitions/arc3-crosslevel-voi` under WSL; quote the WSL path because it
+contains a space. The reference environment is Ubuntu 24.04.1 under WSL2 with normal user
+`bansarinejad`. Keep the repository and model snapshot under `/mnt/d`, but place the
+virtual environment on WSL's native filesystem at
+`/home/bansarinejad/.venvs/arc3-crosslevel-voi`; putting the venv
 on `/mnt/d` made Python imports and spawned-worker startup spend minutes in the `p9` bridge.
 
 Native Windows fallback for the current 581.15/CUDA 13.0 driver:
@@ -74,7 +77,7 @@ bit-identical. See `artifacts/model_gate_live8_windows.json` and
 `artifacts/prompt_grounding_bp35_seed11_windows.json`.
 
 Those schema-v3 fair-v2 artifacts remain historical evidence for the runtime and memory
-fixes. The current schema-v4 goal-v3 gate also passes on both platforms. WSL produced 2
+fixes. The historical schema-v4 goal-v3 gate passed on both platforms. WSL produced 2
 eligible programs in 2 distinct behavior classes, including 1 action-conditioned graded
 goal program, and verified the hard +256 MiB allocation ceiling for both eligible workers.
 Native Windows produced 3 eligible programs in 3 distinct classes, including 2 conditioned
@@ -82,5 +85,11 @@ graded programs; POSIX `RLIMIT_DATA` is unavailable and therefore not required t
 shared contracts and fixed inputs establish functional parity only: stochastic platform
 generation is not claimed to be bit-identical. See
 `artifacts/prompt_grounding_bp35_seed11_goal_v3_wsl.json` and
-`artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json`. These passes authorize the
-active matrix as an engineering input, but no goal-v3 gameplay has run.
+`artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json`.
+
+The subsequent historical goal-v3 pilot exposed an admission-order defect: behavioral
+deduplication could replace a role-eligible program with a smaller behaviorally equivalent
+but role-ineligible program. The current runtime filters role grounding before starting
+persistent workers or deduplicating candidates. This source-level correction has not yet passed a
+fresh WSL/Windows runtime admission gate and does not authorize gameplay by itself. Scale-up
+remains locked pending that offline gate and then a fresh four-run pilot.

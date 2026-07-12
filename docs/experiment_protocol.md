@@ -24,8 +24,9 @@ trigger. Kaggle additionally applies its global evaluator deadline and the 20% h
 gate.
 
 The active hashed experiment configuration freezes prompt contract
-`grounded-actions-palette-graded-goals-v3` and perception contract
-`arc-agi-0.9.9-color-map-scale8-grid-v1`. The original four-row pilot used a renderer
+`grounded-actions-palette-graded-goals-v3`, perception contract
+`arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
+`crosslevel-voi-runtime-v1`. The original four-row pilot used a renderer
 whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
 retained only as pre-grounding diagnostics and cannot enter any aggregate or claim gate.
 
@@ -54,7 +55,7 @@ fail rather than compare variants with missing or asymmetric seed cells.
 Failed gates must remain in the results and force claim downgrades documented in the
 paper outline.
 
-### Current scale-up state — 12 July 2026
+### Current scale-up state — 13 July 2026
 
 The historical corrected fair-v2 seed-11 D/S/M/X cell is complete and retained as valid negative
 engineering evidence. All variants completed zero levels. M/X kept at least two programs
@@ -66,14 +67,31 @@ not a preregistered gate. The other 176 fair-v2 rows were superseded and abandon
 the goal contract changed; they are not pending. This negative result and its claim limits
 remain recorded in `artifacts/pilot_bp35_seed11_fair_v2.json`.
 
-The replacement schema-v4 goal-v3 grounding gate passes on WSL and native Windows. WSL
-has 2 safe programs in 2 distinct behavior classes, 1 with an action-conditioned graded
-goal, and enforced hard memory ceilings for both eligible workers. Windows has 3 safe
+The historical schema-v4 goal-v3 grounding gate passed on WSL and native Windows. WSL
+had 2 safe programs in 2 distinct behavior classes, 1 with an action-conditioned graded
+goal, and enforced hard memory ceilings for both eligible workers. Windows had 3 safe
 programs in 3 distinct classes and 2 conditioned graded programs; its POSIX hard-memory
-limit is unavailable and not required. The two artifacts establish functional contract
-parity, not bit-identical generation. The active `development_matrix.json` now contains
-180 pending rows over 15 games, seeds `11`, `23`, and `47`, and D/S/M/X. No goal-v3
-gameplay has run.
+limit was unavailable and not required. The two artifacts establish functional contract
+parity, not bit-identical generation.
+
+The resulting historical goal-v3 seed-11 D/S/M/X pilot is complete and audited at
+`artifacts/pilot_bp35_seed11_goal_v3.json`. Every variant completed zero levels and scored
+zero RHAE. M's best prequential loss was 13.2913% below S, short of the 15% mechanism
+gate, while X/M runtime was 1.00133x and passed the 1.5x condition. M and X were
+semantically identical and selected no probes. The audit found that post-gate behavioral
+deduplication selected a smaller ineligible candidate over its eligible conservative
+equivalent, so only one live committee member satisfied the role-specific grounding
+requirements. This invalidates the historical gate as admission evidence for that live
+committee. Its four completed rows and the other 176 abandoned rows are preserved in
+`artifacts/development_matrix_goal_v3_pilot.json`.
+
+The current runtime filters role grounding before worker admission and deduplication,
+clamps EVSI magnitudes at or below `1e-12` to zero, labels mandatory RESET decisions as
+lifecycle, and separates controller-decision latency from environment latency. Its active
+`development_matrix.json` has 180 pending rows with new content-addressed IDs under
+implementation contract `crosslevel-voi-runtime-v1`. No row in that active matrix has
+run. Scale-up remains locked pending an offline runtime admission gate and, only if it
+passes, a fresh four-run pilot. No current-runtime gate or pilot pass is claimed.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no
@@ -94,7 +112,9 @@ available-action sets, revealed grid/state/level delta, decision diagnostics, Gi
 weights, persistence estimate, prequential losses, and boundary-survival event when one
 is resolved. The final `WIN` observation is ingested before the runner exits, so its
 prediction loss is not silently dropped. Worker call/error/timeout counters are
-monotone agent totals, refresh invalid-program counts are per-decision deltas, and peak
+monotone agent totals, refresh invalid-program counts are per-decision deltas, mandatory
+RESET decisions are recorded as lifecycle actions, controller-decision and environment
+latencies are separate fields, and peak
 VRAM is the maximum of model-reported and runtime-measured peaks. Raw working traces remain
 outside Git while experiments are in progress. Small content-addressed fixtures required by
 tests are tracked directly; completed controlled traces are copied into the hashed release

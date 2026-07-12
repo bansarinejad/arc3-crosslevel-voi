@@ -14,11 +14,12 @@ does not contain code from Duck or other competition entries.
   weighting and refresh, behavioral deduplication, candidate generation, depth-four
   beam planning, D/S/M/X controllers, direct fallback, trace replay, RHAE/statistics,
   competition lifecycle, and lazy Qwen backends.
-- Frozen: the dated 25-game metadata snapshot, deterministic 15/10 split, and active
-  180-run goal-v3 development matrix under `artifacts/`, with versioned
-  prompt/perception contracts and identical 256-action, 12,288-token, and
-  1,200-second caps. All 180 active rows (15 games x seeds 11/23/47 x D/S/M/X)
-  remain pending; no goal-v3 gameplay has run.
+- Frozen: the dated 25-game metadata snapshot and deterministic 15/10 split. The
+  active 180-run development matrix under `artifacts/` uses prompt contract goal-v3,
+  implementation contract `crosslevel-voi-runtime-v1`, and identical 256-action,
+  12,288-token, and 1,200-second caps. All 180 active rows (15 games x seeds
+  11/23/47 x D/S/M/X) are pending; they have new content-addressed run IDs and no
+  active-matrix gameplay has run.
 - Verified pre-grounding engineering smoke: the official anonymous endpoint accepted one
   action through the 4B committee on frozen `ls20-9607627b`, with two-or-more valid
   programs and no fallback/timeouts/errors. It validates lifecycle wiring only; see
@@ -45,7 +46,7 @@ does not contain code from Duck or other competition entries.
   fixture, model revision, and weight manifest match WSL; generated source is not claimed to
   be bit-identical across platforms. See `artifacts/model_gate_live8_windows.json` and
   `artifacts/prompt_grounding_bp35_seed11_windows.json`.
-- Passed the current schema-v4 goal-v3 grounding gate on both platforms. WSL produced
+- Passed the historical schema-v4 goal-v3 grounding gate on both platforms. WSL produced
   2 safe programs in 2 distinct behavior classes, including 1 action-conditioned graded
   goal program; both eligible workers verified the hard +256 MiB allocation ceiling.
   Native Windows produced 3 safe programs in 3 distinct classes, including 2 conditioned
@@ -54,6 +55,22 @@ does not contain code from Duck or other competition entries.
   not bitwise identical and their quality is not equated. See
   `artifacts/prompt_grounding_bp35_seed11_goal_v3_wsl.json`
   and `artifacts/prompt_grounding_bp35_seed11_goal_v3_windows.json`.
+- Completed and independently audited the historical goal-v3 seed-11 D/S/M/X pilot.
+  All four variants exhausted 256 actions with zero completed levels and zero RHAE.
+  M improved best prequential loss over S by 13.2913%, below the 15% mechanism gate;
+  X/M runtime was 1.00133x, within the 1.5x limit. M and X were semantically identical,
+  selected no probes, and differed only in declared multiplier/utility, timing, and
+  variant fields. The audit also found that post-gate behavioral deduplication replaced
+  an eligible conservative candidate with a smaller ineligible equivalent, leaving only
+  one role-eligible program in the live committee. The other 176 historical goal-v3 rows
+  are abandoned and superseded. See `artifacts/pilot_bp35_seed11_goal_v3.json` and the
+  immutable `artifacts/development_matrix_goal_v3_pilot.json` snapshot.
+- Corrected the runtime exposed by that audit: generated roles are now checked for
+  action sensitivity and goal conditioning before worker admission and behavioral
+  deduplication; EVSI magnitudes at or below `1e-12` are clamped to zero; mandatory
+  `RESET` is labeled as lifecycle rather than exploit; and controller-decision latency
+  is recorded separately from environment latency. These changes have not yet passed a
+  fresh runtime admission gate or gameplay pilot.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
@@ -77,14 +94,16 @@ does not contain code from Duck or other competition entries.
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
   matrix and gate are preserved with `_pre_grounding` suffixes.
-- Not yet completed: all 180 active goal-v3 development runs, locked confirmation,
+- Not yet completed: the current runtime admission gate, a fresh four-run pilot, all
+  180 active development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official
 4B BF16 fallback is the selected local model. There are deliberately no
-development aggregate or positive cross-level performance claim until a corrected pilot
-passes the preregistered scale-up gates and the controlled matrices are executed.
+development aggregate or positive cross-level performance claim. Scale-up remains locked
+until the current runtime passes its offline admission gate and then a fresh four-run pilot
+passes the preregistered scale-up gates.
 
 ## Quick start
 
