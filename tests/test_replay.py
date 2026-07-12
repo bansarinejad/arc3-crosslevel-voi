@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 
 import numpy as np
+import pytest
 
 from arc3_voi.metrics import load_run, write_run
 from arc3_voi.replay import (
@@ -10,6 +11,7 @@ from arc3_voi.replay import (
     load_transitions,
     replay_prequential_losses,
 )
+from arc3_voi.run_store import TRACE_ARTIFACT_KEY
 from arc3_voi.runner import run_game
 from arc3_voi.types import Action, GameState, History, Prediction
 
@@ -55,3 +57,23 @@ def test_runner_trace_round_trips_into_deterministic_replay(tmp_path) -> None:
     assert transitions[-1].domain_observation().game_state is GameState.WIN
     assert replay_prequential_losses(PerfectReplayHypothesis(), transitions) == (0.0, 0.0)
     assert canonical_trace_hash(trace) == canonical_trace_hash(trace)
+
+
+def test_load_run_rejects_mismatched_legacy_trace_pair(tmp_path) -> None:
+    metrics = run_game(
+        FakeSession(),
+        FakeController(),
+        run_id="legacy-mismatch",
+        seed=7,
+        variant="D",
+        model_profile="test",
+        config_hash="abc",
+    )
+    summary, trace = write_run(metrics, tmp_path)
+    payload = json.loads(summary.read_text())
+    payload.pop(TRACE_ARTIFACT_KEY)
+    summary.write_text(json.dumps(payload), encoding="utf-8")
+    trace.write_text(trace.read_text().splitlines()[0] + "\n", encoding="utf-8")
+
+    with pytest.raises(ValueError, match="incomplete or inconsistent"):
+        load_run(summary)

@@ -75,9 +75,15 @@ def test_resume_requires_exact_clean_summary(tmp_path) -> None:
                 "config_hash": row.config_hash,
                 "error": None,
                 "termination_reason": "win",
+                "decision_points": 0,
+                "total_actions": 0,
+                "generated_tokens": 0,
+                "direct_fallbacks": 0,
+                "two_valid_decision_points": 0,
             }
         )
     )
+    (tmp_path / f"{row.run_id}.jsonl").write_text("")
     assert completed_run_ids(matrix, tmp_path) == {row.run_id}
 
 

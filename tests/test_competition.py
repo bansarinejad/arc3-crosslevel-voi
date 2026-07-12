@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from arc3_voi.competition import run_scorecard
 from arc3_voi.config import ExperimentConfig, SystemConfig
@@ -54,3 +55,53 @@ def test_scorecard_reuses_backend_and_makes_each_game_once(tmp_path) -> None:
     assert len(result.runs) == 2
     assert not result.stopped_early
 
+
+def test_scorecard_resume_only_makes_the_missing_game(tmp_path) -> None:
+    backend = ScriptedBackend(action_policy=lambda _history, _valid: {"kind": "ACTION1"})
+    config = SystemConfig(experiment=ExperimentConfig(variant="D", max_wall_seconds=5))
+    first_client = Client()
+    run_scorecard(
+        ("a",),
+        backend,
+        config,
+        output_directory=tmp_path,
+        client=first_client,  # type: ignore[arg-type]
+    )
+
+    resumed_client = Client()
+    result = run_scorecard(
+        ("a", "b"),
+        backend,
+        config,
+        output_directory=tmp_path,
+        client=resumed_client,  # type: ignore[arg-type]
+    )
+
+    assert first_client.made == ["a"]
+    assert resumed_client.made == ["b"]
+    assert [run.game_id for run in result.runs] == ["a", "b"]
+
+
+def test_scorecard_rejects_corrupt_clean_pair_before_making_game(tmp_path) -> None:
+    backend = ScriptedBackend(action_policy=lambda _history, _valid: {"kind": "ACTION1"})
+    config = SystemConfig(experiment=ExperimentConfig(variant="D", max_wall_seconds=5))
+    run_scorecard(
+        ("a",),
+        backend,
+        config,
+        output_directory=tmp_path,
+        client=Client(),  # type: ignore[arg-type]
+    )
+    trace = next(tmp_path.glob("*.jsonl"))
+    trace.write_bytes(trace.read_bytes()[:-10])
+
+    resumed_client = Client()
+    with pytest.raises(FileExistsError, match="clean completion claim"):
+        run_scorecard(
+            ("a",),
+            backend,
+            config,
+            output_directory=tmp_path,
+            client=resumed_client,  # type: ignore[arg-type]
+        )
+    assert resumed_client.made == []

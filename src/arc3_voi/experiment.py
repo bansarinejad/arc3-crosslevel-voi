@@ -11,6 +11,8 @@ from pathlib import Path
 from statistics import mean
 from typing import Any, Literal
 
+from .run_store import read_complete_run
+
 Variant = Literal["D", "S", "M", "X"]
 
 DEVELOPMENT_SEEDS = (11, 23, 47)
@@ -300,18 +302,16 @@ def validate_matrix(
 
 
 def completed_run_ids(matrix: Sequence[RunSpec], output: str | Path) -> frozenset[str]:
-    """Return only summaries that exactly match their manifest row and completed cleanly."""
+    """Return only complete run pairs matching their manifest row and clean exit."""
 
     destination = Path(output)
     completed: set[str] = set()
     for row in matrix:
         path = destination / f"{row.run_id}.json"
-        if not path.exists():
+        artifacts = read_complete_run(path)
+        if artifacts is None:
             continue
-        try:
-            value = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
+        value, _trace = artifacts
         expected = {
             "run_id": row.run_id,
             "game_id": row.full_game_id,

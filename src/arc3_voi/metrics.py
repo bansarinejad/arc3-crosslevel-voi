@@ -11,6 +11,7 @@ from statistics import mean
 from typing import Any
 
 from .experiment import GateResult, ScoreGateInput, evaluate_score_gate
+from .run_store import TRACE_ARTIFACT_KEY, publish_run_artifacts, read_complete_run
 from .statistics import (
     PairedSummary,
     ScoreObservation,
@@ -163,49 +164,45 @@ def game_rhae(
 
 
 def write_run(metrics: RunMetrics, directory: str | Path) -> tuple[Path, Path]:
-    destination = Path(directory)
-    destination.mkdir(parents=True, exist_ok=True)
-    summary_path = destination / f"{metrics.run_id}.json"
-    trace_path = destination / f"{metrics.run_id}.jsonl"
-    summary_path.write_text(
-        json.dumps(metrics.summary(), indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-        newline="\n",
+    return publish_run_artifacts(
+        metrics.summary(),
+        tuple(asdict(record) for record in metrics.steps),
+        directory,
     )
-    with trace_path.open("w", encoding="utf-8", newline="\n") as stream:
-        for record in metrics.steps:
-            stream.write(json.dumps(asdict(record), separators=(",", ":"), sort_keys=True))
-            stream.write("\n")
-    return summary_path, trace_path
 
 
 def load_run(summary_path: str | Path, trace_path: str | Path | None = None) -> RunMetrics:
     """Load a summary and its detailed trace back into the gate-analysis model."""
 
     summary_source = Path(summary_path)
-    payload = json.loads(summary_source.read_text(encoding="utf-8"))
-    metrics = RunMetrics(**payload)
     source = Path(trace_path) if trace_path is not None else summary_source.with_suffix(".jsonl")
+    records: tuple[dict[str, Any], ...] = ()
     if source.exists():
-        steps = []
-        with source.open(encoding="utf-8") as stream:
-            for line in stream:
-                if not line.strip():
-                    continue
-                value = json.loads(line)
-                for key in (
-                    "history",
-                    "available_actions",
-                    "hypothesis_ids",
-                    "hypothesis_weights",
-                    "hypothesis_validity",
-                    "invalidated_hypotheses",
-                    "timeout_hypotheses",
-                    "observed_available_actions",
-                ):
-                    value[key] = tuple(value[key])
-                steps.append(StepRecord(**value))
-        metrics.steps = steps
+        artifacts = read_complete_run(summary_source, source)
+        if artifacts is None:
+            raise ValueError("run summary and trace are incomplete or inconsistent")
+        payload, records = artifacts
+        payload = dict(payload)
+    else:
+        payload = json.loads(summary_source.read_text(encoding="utf-8"))
+        if TRACE_ARTIFACT_KEY in payload:
+            raise ValueError("run summary and trace are incomplete or inconsistent")
+    payload.pop(TRACE_ARTIFACT_KEY, None)
+    metrics = RunMetrics(**payload)
+    for record in records:
+        value = dict(record)
+        for key in (
+            "history",
+            "available_actions",
+            "hypothesis_ids",
+            "hypothesis_weights",
+            "hypothesis_validity",
+            "invalidated_hypotheses",
+            "timeout_hypotheses",
+            "observed_available_actions",
+        ):
+            value[key] = tuple(value[key])
+        metrics.steps.append(StepRecord(**value))
     return metrics
 
 

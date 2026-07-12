@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from dataclasses import asdict, replace
 from pathlib import Path
@@ -29,6 +30,7 @@ from .model import TransformersQwenBackend, backend_from_config
 from .preflight import run_model_preflight
 from .provenance import inspect_model_artifact
 from .rendering import PERCEPTION_REFERENCE_RENDER_SHA256
+from .run_store import ensure_retryable_run_artifacts, validate_run_id
 from .runner import run_game
 from .splitting import (
     SplitManifest,
@@ -301,6 +303,7 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
         if args.limit < 0:
             raise ValueError("limit must be non-negative")
         pending = pending[: args.limit]
+    _validate_pending_artifacts(pending, args.output)
     if args.dry_run:
         _emit(
             {
@@ -315,7 +318,6 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
     for row in pending:
         try:
             _execute_manifest_row(row, config, args.model_path, baselines, args.output)
-            completed += 1
         except Exception as exc:
             failure = {"run_id": row.run_id, "type": type(exc).__name__, "error": str(exc)}
             failures.append(failure)
@@ -325,6 +327,18 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
                 json.dumps(failure, indent=2, sort_keys=True) + "\n",
                 encoding="utf-8",
                 newline="\n",
+            )
+            continue
+        completed += 1
+        try:
+            _archive_resolved_failure(args.output, row.run_id)
+        except Exception as exc:
+            failures.append(
+                {
+                    "run_id": row.run_id,
+                    "type": f"FailureArchive{type(exc).__name__}",
+                    "error": str(exc),
+                }
             )
     _emit(
         {
@@ -336,6 +350,44 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
         }
     )
     return 2 if failures else 0
+
+
+def _validate_pending_artifacts(rows: tuple[RunSpec, ...], output: Path) -> None:
+    """Reject conflicting or damaged historical evidence before environment actions."""
+
+    for row in rows:
+        ensure_retryable_run_artifacts(
+            output / f"{row.run_id}.json",
+            expected_summary={
+                "run_id": row.run_id,
+                "game_id": row.full_game_id,
+                "seed": row.seed,
+                "variant": row.variant,
+                "model_profile": row.model_profile,
+                "config_hash": row.config_hash,
+            },
+        )
+
+
+def _archive_resolved_failure(output: Path, run_id: str) -> Path | None:
+    """Move a stale active failure record aside after its retry succeeds."""
+
+    validate_run_id(run_id)
+    source = output / "failures" / f"{run_id}.json"
+    if not source.exists():
+        return None
+    content = source.read_bytes()
+    digest = hashlib.sha256(content).hexdigest()
+    resolved = source.parent / "resolved"
+    resolved.mkdir(parents=True, exist_ok=True)
+    destination = resolved / f"{run_id}.{digest}.json"
+    if destination.exists():
+        if destination.read_bytes() != content:
+            raise FileExistsError(f"resolved failure hash collision: {destination}")
+        source.unlink()
+    else:
+        source.replace(destination)
+    return destination
 
 
 def _execute_manifest_row(

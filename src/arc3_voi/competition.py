@@ -10,8 +10,13 @@ from .agent import build_agent
 from .arc_adapter import ArcCompetitionClient
 from .config import SystemConfig
 from .experiment import stable_config_hash
-from .metrics import RunMetrics, write_run
+from .metrics import RunMetrics, load_run, write_run
 from .model import ModelBackend
+from .run_store import (
+    ensure_retryable_run_artifacts,
+    read_complete_run,
+    validate_run_id,
+)
 from .runner import run_game
 
 
@@ -44,6 +49,30 @@ def run_scorecard(
     results: list[RunMetrics] = []
     stopped = False
     for index, game_id in enumerate(game_ids):
+        run_id = f"scorecard-{index:03d}-{game_id}-{config.experiment.variant}"
+        validate_run_id(run_id)
+        summary_path = destination / f"{run_id}.json"
+        expected_identity = {
+            "run_id": run_id,
+            "game_id": game_id,
+            "seed": seed,
+            "variant": config.experiment.variant,
+            "model_profile": model_profile,
+            "config_hash": digest,
+        }
+        existing = read_complete_run(summary_path)
+        if existing is not None:
+            prior = load_run(summary_path)
+            _validate_scorecard_identity(prior, expected_identity)
+            if prior.error is None and prior.termination_reason is not None:
+                results.append(prior)
+                continue
+        else:
+            ensure_retryable_run_artifacts(
+                summary_path,
+                expected_summary=expected_identity,
+            )
+
         elapsed = time.perf_counter() - started
         if global_wall_seconds is not None and elapsed >= global_wall_seconds:
             stopped = True
@@ -59,7 +88,7 @@ def run_scorecard(
             metrics = run_game(
                 session,
                 agent.controller,
-                run_id=f"scorecard-{index:03d}-{game_id}-{config.experiment.variant}",
+                run_id=run_id,
                 seed=seed,
                 variant=config.experiment.variant,
                 model_profile=model_profile,
@@ -75,3 +104,21 @@ def run_scorecard(
         write_run(metrics, destination)
         results.append(metrics)
     return CompetitionResult(tuple(results), time.perf_counter() - started, stopped)
+
+
+def _validate_scorecard_identity(
+    metrics: RunMetrics, expected: dict[str, object]
+) -> None:
+    actual = {
+        "run_id": metrics.run_id,
+        "game_id": metrics.game_id,
+        "seed": metrics.seed,
+        "variant": metrics.variant,
+        "model_profile": metrics.model_profile,
+        "config_hash": metrics.config_hash,
+    }
+    conflicts = [key for key, value in expected.items() if actual[key] != value]
+    if conflicts:
+        raise ValueError(
+            f"scorecard artifact identity conflict: {', '.join(conflicts)}"
+        )
