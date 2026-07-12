@@ -5,7 +5,17 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
-from arc3_voi.prompts import extract_python, history_payload, parse_action_json
+from arc3_voi.prompts import (
+    DIRECT_SYSTEM_PROMPT,
+    PROGRAM_SYSTEM_PROMPT,
+    PROMPT_CONTRACT_SHA256,
+    PROMPT_REFERENCE_DIRECT_SHA256,
+    PROMPT_REFERENCE_PROGRAM_SHA256,
+    extract_python,
+    history_payload,
+    parse_action_json,
+)
+from arc3_voi.rendering import ARC_PALETTE_LEGEND
 
 
 def test_extract_python_fence() -> None:
@@ -59,6 +69,26 @@ def test_history_payload_is_compact_and_stable() -> None:
     assert len(payload[0]["grid"].splitlines()) == 64
 
 
+def test_history_payload_sorts_available_actions_by_contract_id() -> None:
+    entry = SimpleNamespace(
+        grid=np.zeros((2, 2), dtype=np.int8),
+        action=None,
+        available_actions=("ACTION7", "ACTION3", "RESET", "ACTION6"),
+        game_state="NOT_FINISHED",
+        level_delta=0,
+        level=1,
+    )
+
+    payload = history_payload([entry])
+
+    assert payload[0]["available_actions"] == [
+        "RESET",
+        "ACTION3",
+        "ACTION6",
+        "ACTION7",
+    ]
+
+
 def test_image_backed_history_payload_preserves_eight_aligned_frames() -> None:
     entries = [
         SimpleNamespace(
@@ -80,3 +110,17 @@ def test_image_backed_history_payload_preserves_eight_aligned_frames() -> None:
     assert payload[0]["level_delta"] == 0  # Original entry 2.
     assert payload[-1]["level"] == 2
     assert payload[-1]["action"] == {"kind": "ACTION1"}
+    assert payload[-1]["grid_values"] == [9]
+
+
+def test_prompts_share_exact_palette_and_action_contracts() -> None:
+    assert ARC_PALETTE_LEGEND in PROGRAM_SYSTEM_PROMPT
+    assert ARC_PALETTE_LEGEND in DIRECT_SYSTEM_PROMPT
+    assert "Only ACTION6 carries coordinates" in PROGRAM_SYSTEM_PROMPT
+    assert "For every other kind, row and col are None" in PROGRAM_SYSTEM_PROMPT
+    assert "copy one exact" in DIRECT_SYSTEM_PROMPT.lower()
+    assert "Return one listed" in DIRECT_SYSTEM_PROMPT
+    assert len(PROMPT_CONTRACT_SHA256) == 64
+    int(PROMPT_CONTRACT_SHA256, 16)
+    assert len(PROMPT_REFERENCE_PROGRAM_SHA256) == 64
+    assert len(PROMPT_REFERENCE_DIRECT_SHA256) == 64

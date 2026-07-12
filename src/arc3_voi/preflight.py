@@ -4,14 +4,23 @@ from __future__ import annotations
 
 import hashlib
 import math
+import platform
+import subprocess
 from collections import Counter
 from dataclasses import asdict, dataclass
+from importlib import metadata
 from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
 
 from .model import GenerationResult, ModelBackend
+from .provenance import (
+    GitProvenance,
+    ModelArtifactInfo,
+    inspect_git_provenance,
+    inspect_model_artifact,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -22,9 +31,32 @@ class HardwareInfo:
 
 
 @dataclass(frozen=True, slots=True)
+class RuntimeInfo:
+    platform: str
+    kernel_release: str
+    python_version: str
+    torch_version: str | None
+    torch_cuda_version: str | None
+    cuda_device_capability: str | None
+    nvidia_driver_version: str | None
+    package_versions: dict[str, str | None]
+
+
+@dataclass(frozen=True, slots=True)
 class PreflightReport:
+    git: GitProvenance
     hardware: HardwareInfo
+    runtime: RuntimeInfo
     model_id: str
+    model_artifact: ModelArtifactInfo
+    expected_model_revision: str | None
+    expected_weight_manifest_sha256: str | None
+    config_sha256: str | None
+    prompt_contract_version: str | None
+    perception_contract_version: str | None
+    prompt_contract_sha256: str | None
+    perception_contract_sha256: str | None
+    perception_reference_render_sha256: str | None
     output_tokens: int
     elapsed_seconds: float
     tokens_per_second: float
@@ -35,6 +67,7 @@ class PreflightReport:
     syntactically_valid_programs: int
     statically_valid_programs: int
     validation_failures: dict[str, int]
+    program_sources: tuple[str, ...]
     program_source_sha256: tuple[str, ...]
     program_source_lengths: tuple[int, ...]
     truncated_sequences: int
@@ -61,6 +94,54 @@ def detect_hardware() -> HardwareInfo:
     )
 
 
+def detect_runtime() -> RuntimeInfo:
+    """Capture the software/driver surface needed to interpret GPU measurements."""
+
+    torch_version = cuda_version = capability = None
+    try:
+        import torch
+    except ImportError:
+        pass
+    else:
+        torch_version = str(torch.__version__)
+        cuda_version = None if torch.version.cuda is None else str(torch.version.cuda)
+        if torch.cuda.is_available():
+            major, minor = torch.cuda.get_device_capability(0)
+            capability = f"sm_{major}{minor}"
+    packages: dict[str, str | None] = {}
+    for name in ("arc-agi", "arcengine", "bitsandbytes", "numpy", "transformers"):
+        try:
+            packages[name] = metadata.version(name)
+        except metadata.PackageNotFoundError:
+            packages[name] = None
+    driver = None
+    try:
+        result = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-gpu=driver_version",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+        driver = result.stdout.splitlines()[0].strip() or None
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired, IndexError):
+        pass
+    return RuntimeInfo(
+        platform=platform.platform(),
+        kernel_release=platform.release(),
+        python_version=platform.python_version(),
+        torch_version=torch_version,
+        torch_cuda_version=cuda_version,
+        cuda_device_capability=capability,
+        nvidia_driver_version=driver,
+        package_versions=packages,
+    )
+
+
 def run_model_preflight(
     backend: ModelBackend,
     *,
@@ -71,6 +152,16 @@ def run_model_preflight(
     hidden_game_count: int | None = None,
     runtime_limit_seconds: float | None = None,
     program_count: int = 1,
+    config_sha256: str | None = None,
+    prompt_contract_version: str | None = None,
+    perception_contract_version: str | None = None,
+    prompt_contract_sha256: str | None = None,
+    perception_contract_sha256: str | None = None,
+    perception_reference_render_sha256: str | None = None,
+    model_artifact: ModelArtifactInfo | None = None,
+    expected_model_revision: str | None = None,
+    expected_weight_manifest_sha256: str | None = None,
+    git_provenance: GitProvenance | None = None,
 ) -> PreflightReport:
     history = []
     for index in range(8):
@@ -109,8 +200,19 @@ def run_model_preflight(
         runtime_pass = fraction <= 0.8
     peak = result.peak_vram_gb
     return PreflightReport(
+        git=git_provenance or inspect_git_provenance(),
         hardware=detect_hardware(),
+        runtime=detect_runtime(),
         model_id=model_id,
+        model_artifact=model_artifact or inspect_model_artifact(None),
+        expected_model_revision=expected_model_revision,
+        expected_weight_manifest_sha256=expected_weight_manifest_sha256,
+        config_sha256=config_sha256,
+        prompt_contract_version=prompt_contract_version,
+        perception_contract_version=perception_contract_version,
+        prompt_contract_sha256=prompt_contract_sha256,
+        perception_contract_sha256=perception_contract_sha256,
+        perception_reference_render_sha256=perception_reference_render_sha256,
         output_tokens=result.output_tokens,
         elapsed_seconds=result.elapsed_seconds,
         tokens_per_second=result.tokens_per_second,
@@ -121,6 +223,7 @@ def run_model_preflight(
         syntactically_valid_programs=valid_programs,
         statically_valid_programs=valid_programs,
         validation_failures=dict(sorted(validation_failures.items())),
+        program_sources=result.texts,
         program_source_sha256=tuple(
             hashlib.sha256(source.encode("utf-8")).hexdigest() for source in result.texts
         ),

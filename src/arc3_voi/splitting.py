@@ -121,7 +121,11 @@ def save_snapshot(games: list[GameMetadata], path: str | Path) -> None:
         "metadata_hash": metadata_hash(games),
         "games": [asdict(game) for game in sorted(games, key=lambda item: item.game_id)],
     }
-    destination.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    destination.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def _quartile_bins(values: list[float]) -> list[int]:

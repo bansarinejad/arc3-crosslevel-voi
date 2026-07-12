@@ -1,4 +1,6 @@
 {
+  "contract_status": "superseded-pre-grounding-diagnostic",
+  "replacement_pending": "artifacts/model_gate_live8_windows.json",
   "date": "2026-07-12",
   "hardware": {
     "device": "NVIDIA GeForce RTX 4090 Laptop GPU",
@@ -17,14 +19,14 @@
     "transformers": "5.13.1"
   },
   "rejected_primary": {
-    "artifact": "local_9b_preflight.json",
+    "artifact": "artifacts/local_9b_preflight.json",
     "model": "Qwen/Qwen3.5-9B",
     "revision": "c202236235762e1c871ad0ccb60c8ee5ba337b9a",
     "profile": "NF4 double quantization, BF16 compute, four simultaneous sequences",
     "reason": "23.281 GiB peak and 5.321 tokens/s fail the fixed 14.5 GiB and 12 tokens/s gates"
   },
   "selected_local": {
-    "artifact": "local_4b_preflight.json",
+    "artifact": "artifacts/local_4b_preflight.json",
     "model": "Qwen/Qwen3.5-4B",
     "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
     "profile": "BF16, four logical candidates, deterministic physical microbatch size one",

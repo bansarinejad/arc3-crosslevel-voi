@@ -64,6 +64,10 @@ def run_scorecard(
                 variant=config.experiment.variant,
                 model_profile=model_profile,
                 config_hash=digest,
+                model_revision=(config.model.expected_revision if config.model else None),
+                weight_manifest_sha256=(
+                    config.model.expected_weight_manifest_sha256 if config.model else None
+                ),
                 max_environment_actions=config.experiment.max_environment_actions,
                 max_generated_tokens=config.experiment.max_generated_tokens,
                 max_wall_seconds=per_game_wall,
@@ -71,4 +75,3 @@ def run_scorecard(
         write_run(metrics, destination)
         results.append(metrics)
     return CompetitionResult(tuple(results), time.perf_counter() - started, stopped)
-

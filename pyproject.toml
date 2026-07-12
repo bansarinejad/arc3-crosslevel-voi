@@ -7,7 +7,7 @@ name = "arc3-crosslevel-voi"
 version = "0.1.0"
 description = "Cross-level value-of-information controllers for ARC-AGI-3"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 license = { text = "MIT-0 OR CC-BY-4.0" }
 authors = [{ name = "ARC-AGI-3 Paper Track Entrant" }]
 dependencies = [
@@ -16,13 +16,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-arc = ["arc-agi>=0.9.8", "truststore>=0.10"]
+arc = ["arc-agi==0.9.9", "arcengine==0.9.3", "truststore>=0.10"]
 model = [
   "accelerate>=1.6",
   "bitsandbytes>=0.46",
   "pillow>=11",
-  "torch>=2.7",
-  "torchvision>=0.22",
+  "torch==2.11.0",
+  "torchvision==0.26.0",
   "transformers>=4.53",
 ]
 stats = ["scipy>=1.14,<2"]
@@ -35,6 +35,15 @@ dev = [
 
 [project.scripts]
 arc3-voi = "arc3_voi.cli:main"
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu130" }
+torchvision = { index = "pytorch-cu130" }
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/arc3_voi"]

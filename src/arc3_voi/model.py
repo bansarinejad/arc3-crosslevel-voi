@@ -17,12 +17,19 @@ import numpy as np
 from .prompts import (
     DIRECT_SYSTEM_PROMPT,
     PROGRAM_SYSTEM_PROMPT,
+    PROMPT_CONTRACT_SHA256,
+    PROMPT_CONTRACT_VERSION,
     direct_prompt,
     extract_python,
     parse_action_json,
     program_prompt,
 )
-from .rendering import render_grid_pil
+from .provenance import inspect_model_artifact
+from .rendering import (
+    PERCEPTION_CONTRACT_SHA256,
+    PERCEPTION_CONTRACT_VERSION,
+    render_grid_pil,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -385,6 +392,34 @@ def backend_from_config(
 
     if config.model is None:
         raise ValueError("selected configuration has no model section")
+    if config.experiment.prompt_contract_version != PROMPT_CONTRACT_VERSION:
+        raise ValueError(
+            "configuration prompt contract does not match the implemented prompt"
+        )
+    if config.experiment.prompt_contract_sha256 != PROMPT_CONTRACT_SHA256:
+        raise ValueError(
+            "configuration prompt contract fingerprint does not match the implemented prompt"
+        )
+    if config.experiment.perception_contract_version != PERCEPTION_CONTRACT_VERSION:
+        raise ValueError(
+            "configuration perception contract does not match the implemented renderer"
+        )
+    if config.experiment.perception_contract_sha256 != PERCEPTION_CONTRACT_SHA256:
+        raise ValueError(
+            "configuration perception contract fingerprint does not match the implemented renderer"
+        )
+    if (
+        config.model.expected_revision is None
+        or config.model.expected_weight_manifest_sha256 is None
+    ):
+        raise ValueError("model configuration must freeze revision and weight manifest")
+    if model_path is None:
+        raise ValueError("model_path is required to verify the frozen model artifact")
+    artifact = inspect_model_artifact(model_path)
+    if artifact.revision != config.model.expected_revision:
+        raise ValueError("local model revision does not match the frozen configuration")
+    if artifact.weight_manifest_sha256 != config.model.expected_weight_manifest_sha256:
+        raise ValueError("local model weight manifest does not match the frozen configuration")
     profile = ModelProfile(
         model_id=config.model.id,
         quantization=config.model.quantization,

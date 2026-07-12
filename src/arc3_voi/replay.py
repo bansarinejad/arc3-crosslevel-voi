@@ -122,7 +122,7 @@ def load_transitions(path: str | Path) -> tuple[ReplayTransition, ...]:
 def dump_transitions(transitions: tuple[ReplayTransition, ...], path: str | Path) -> None:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    with destination.open("w", encoding="utf-8") as stream:
+    with destination.open("w", encoding="utf-8", newline="\n") as stream:
         for item in transitions:
             payload = {
                 "history": item.history,

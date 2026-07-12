@@ -30,12 +30,23 @@ def run_game(
     variant: str,
     model_profile: str,
     config_hash: str,
+    model_revision: str | None = None,
+    weight_manifest_sha256: str | None = None,
     max_environment_actions: int = 256,
     max_generated_tokens: int = 12_288,
     max_wall_seconds: float = 1_200.0,
     baseline_actions: tuple[int, ...] | None = None,
 ) -> RunMetrics:
-    metrics = RunMetrics(run_id, session.game_id, seed, variant, model_profile, config_hash)
+    metrics = RunMetrics(
+        run_id,
+        session.game_id,
+        seed,
+        variant,
+        model_profile,
+        config_hash,
+        model_revision=model_revision,
+        weight_manifest_sha256=weight_manifest_sha256,
+    )
     budget = Budget(
         max_environment_actions=max_environment_actions,
         max_generated_tokens=max_generated_tokens,

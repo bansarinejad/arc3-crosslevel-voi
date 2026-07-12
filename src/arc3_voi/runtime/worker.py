@@ -273,7 +273,7 @@ def _serialize_output(value: Any, *, operation: str) -> Any:
 
 
 def _apply_memory_limit(memory_limit_mb: int) -> tuple[bool, str | None]:
-    """Apply the POSIX address-space ceiling; return enforcement and diagnostic."""
+    """Apply the POSIX data-segment ceiling; return enforcement and diagnostic."""
 
     if os.name != "posix":
         return False, "hard per-process memory limits are unavailable on this platform"
@@ -281,8 +281,8 @@ def _apply_memory_limit(memory_limit_mb: int) -> tuple[bool, str | None]:
         import resource
 
         limit_bytes = memory_limit_mb * 1024 * 1024
-        setrlimit = resource.setrlimit  # type: ignore[attr-defined]
-        rlimit_data = resource.RLIMIT_DATA  # type: ignore[attr-defined]
+        setrlimit = vars(resource)["setrlimit"]
+        rlimit_data = vars(resource)["RLIMIT_DATA"]
         setrlimit(rlimit_data, (limit_bytes, limit_bytes))
         return True, None
     except (ImportError, OSError, ValueError) as exc:

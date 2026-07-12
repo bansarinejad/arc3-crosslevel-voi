@@ -10,7 +10,7 @@ from typing import Any
 import numpy as np
 
 from .runtime.sandbox import ValidatedProgram, validate_program
-from .runtime.worker import ProgramWorker
+from .runtime.worker import ProgramWorker, WorkerMetadata
 from .types import Action, GameState, History, Prediction
 
 
@@ -101,6 +101,12 @@ class ExecutableHypothesis:
     @property
     def alive(self) -> bool:
         return self._worker.alive
+
+    @property
+    def worker_metadata(self) -> WorkerMetadata | None:
+        """Expose immutable sandbox startup evidence for diagnostics and gates."""
+
+        return self._worker.metadata
 
     def close(self) -> None:
         self._worker.close()

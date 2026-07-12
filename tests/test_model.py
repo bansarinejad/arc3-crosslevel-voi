@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+from dataclasses import replace
 from types import SimpleNamespace
 
 import numpy as np
 import pytest
 
+from arc3_voi.config import load_config
 from arc3_voi.model import (
     ScriptedBackend,
     _count_generated_tokens,
@@ -13,7 +15,9 @@ from arc3_voi.model import (
     _multimodal_content,
     _sequence_token_counts,
     _validate_context_budget,
+    backend_from_config,
 )
+from arc3_voi.provenance import inspect_model_artifact
 
 
 def test_scripted_backend_is_deterministic() -> None:
@@ -78,3 +82,71 @@ def test_cuda_memory_fraction_enforces_explicit_gib_cap() -> None:
     total = 16 * 1024**3
     assert _cuda_memory_fraction(14.5, total) == pytest.approx(14.5 / 16)
     assert _cuda_memory_fraction(None, total) is None
+
+
+def test_backend_rejects_unversioned_prompt_or_perception_contract() -> None:
+    config = load_config("configs/local_4b.yaml")
+    bad_prompt = replace(
+        config,
+        experiment=replace(config.experiment, prompt_contract_version="stale"),
+    )
+    with pytest.raises(ValueError, match="prompt contract"):
+        backend_from_config(bad_prompt)
+    bad_perception = replace(
+        config,
+        experiment=replace(config.experiment, perception_contract_version="stale"),
+    )
+    with pytest.raises(ValueError, match="perception contract"):
+        backend_from_config(bad_perception)
+    bad_prompt_hash = replace(
+        config,
+        experiment=replace(config.experiment, prompt_contract_sha256="0" * 64),
+    )
+    with pytest.raises(ValueError, match="prompt contract fingerprint"):
+        backend_from_config(bad_prompt_hash)
+    bad_perception_hash = replace(
+        config,
+        experiment=replace(config.experiment, perception_contract_sha256="0" * 64),
+    )
+    with pytest.raises(ValueError, match="perception contract fingerprint"):
+        backend_from_config(bad_perception_hash)
+
+
+def test_backend_enforces_frozen_local_model_identity(tmp_path) -> None:
+    weight = tmp_path / "model.safetensors"
+    weight.write_bytes(b"test-weights")
+    metadata = tmp_path / ".cache" / "huggingface" / "download"
+    metadata.mkdir(parents=True)
+    (metadata / "model.safetensors.metadata").write_text(
+        f"{'a' * 40}\n{'b' * 64}\n0\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    artifact = inspect_model_artifact(tmp_path)
+    config = load_config("configs/local_4b.yaml")
+    assert config.model is not None
+
+    missing = replace(
+        config,
+        model=replace(
+            config.model,
+            expected_revision=None,
+            expected_weight_manifest_sha256=None,
+        ),
+    )
+    with pytest.raises(ValueError, match="must freeze revision"):
+        backend_from_config(missing, model_path=tmp_path)
+    with pytest.raises(ValueError, match="revision"):
+        backend_from_config(config, model_path=tmp_path)
+
+    matching = replace(
+        config,
+        model=replace(
+            config.model,
+            expected_revision=artifact.revision,
+            expected_weight_manifest_sha256=artifact.weight_manifest_sha256,
+        ),
+    )
+    backend = backend_from_config(matching, model_path=tmp_path)
+    assert backend.profile.model_id == config.model.id
+    backend.close()

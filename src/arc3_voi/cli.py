@@ -27,6 +27,8 @@ from .experiment import (
 from .metrics import write_run
 from .model import TransformersQwenBackend, backend_from_config
 from .preflight import run_model_preflight
+from .provenance import inspect_model_artifact
+from .rendering import PERCEPTION_REFERENCE_RENDER_SHA256
 from .runner import run_game
 from .splitting import (
     SplitManifest,
@@ -120,7 +122,7 @@ def main(argv: list[str] | None = None) -> int:
             load_metadata(args.metadata), development_size=args.development_size
         )
         args.out.parent.mkdir(parents=True, exist_ok=True)
-        args.out.write_text(manifest.to_json(), encoding="utf-8")
+        args.out.write_text(manifest.to_json(), encoding="utf-8", newline="\n")
         _emit(asdict(manifest))
         return 0
     if args.command == "matrix":
@@ -217,6 +219,17 @@ def _preflight_command(args: argparse.Namespace) -> None:
             hidden_game_count=args.hidden_game_count,
             runtime_limit_seconds=args.runtime_limit_seconds,
             program_count=config.hypotheses.max_hypotheses,
+            config_sha256=stable_config_hash(config),
+            prompt_contract_version=config.experiment.prompt_contract_version,
+            perception_contract_version=config.experiment.perception_contract_version,
+            prompt_contract_sha256=config.experiment.prompt_contract_sha256,
+            perception_contract_sha256=config.experiment.perception_contract_sha256,
+            perception_reference_render_sha256=PERCEPTION_REFERENCE_RENDER_SHA256,
+            model_artifact=inspect_model_artifact(args.model_path),
+            expected_model_revision=config.model.expected_revision,
+            expected_weight_manifest_sha256=(
+                config.model.expected_weight_manifest_sha256
+            ),
         )
     finally:
         backend.close()
@@ -246,6 +259,10 @@ def _run_command(args: argparse.Namespace) -> int:
             variant=config.experiment.variant,
             model_profile=config.model.profile if config.model else "no-model",
             config_hash=stable_config_hash(config),
+            model_revision=config.model.expected_revision if config.model else None,
+            weight_manifest_sha256=(
+                config.model.expected_weight_manifest_sha256 if config.model else None
+            ),
             max_environment_actions=config.experiment.max_environment_actions,
             max_generated_tokens=config.experiment.max_generated_tokens,
             max_wall_seconds=config.experiment.max_wall_seconds,
@@ -305,7 +322,9 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
             failure_dir = args.output / "failures"
             failure_dir.mkdir(parents=True, exist_ok=True)
             (failure_dir / f"{row.run_id}.json").write_text(
-                json.dumps(failure, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+                json.dumps(failure, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+                newline="\n",
             )
     _emit(
         {
@@ -341,6 +360,10 @@ def _execute_manifest_row(
             variant=row.variant,
             model_profile=row.model_profile,
             config_hash=row.config_hash,
+            model_revision=config.model.expected_revision if config.model else None,
+            weight_manifest_sha256=(
+                config.model.expected_weight_manifest_sha256 if config.model else None
+            ),
             max_environment_actions=config.experiment.max_environment_actions,
             max_generated_tokens=config.experiment.max_generated_tokens,
             max_wall_seconds=config.experiment.max_wall_seconds,
@@ -419,7 +442,7 @@ def _emit(value: Any, path: Path | None = None) -> None:
     text = json.dumps(value, indent=2, sort_keys=True, default=str) + "\n"
     if path:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text, encoding="utf-8")
+        path.write_text(text, encoding="utf-8", newline="\n")
     print(text, end="")
 
 

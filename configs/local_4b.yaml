@@ -2,6 +2,8 @@ extends: base.yaml
 model:
   id: Qwen/Qwen3.5-4B
   profile: local-bf16-fallback
+  expected_revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  expected_weight_manifest_sha256: c47c8788748b8a8e459e1985198fd401703e69faa8f53d87e1c7cb060f1c07c9
   context_length: 16384
   quantization: none
   compute_dtype: bfloat16

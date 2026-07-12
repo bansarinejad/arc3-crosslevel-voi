@@ -64,6 +64,8 @@ class RunMetrics:
     variant: str
     model_profile: str
     config_hash: str
+    model_revision: str | None = None
+    weight_manifest_sha256: str | None = None
     levels_completed: int = 0
     win_levels: int = 0
     total_actions: int = 0
@@ -168,8 +170,9 @@ def write_run(metrics: RunMetrics, directory: str | Path) -> tuple[Path, Path]:
     summary_path.write_text(
         json.dumps(metrics.summary(), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
-    with trace_path.open("w", encoding="utf-8") as stream:
+    with trace_path.open("w", encoding="utf-8", newline="\n") as stream:
         for record in metrics.steps:
             stream.write(json.dumps(asdict(record), separators=(",", ":"), sort_keys=True))
             stream.write("\n")

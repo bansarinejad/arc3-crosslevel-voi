@@ -23,6 +23,12 @@ run reaches it, 180 runs consume 60 GPU-hours, below the preregistered 80-hour f
 trigger. Kaggle additionally applies its global evaluator deadline and the 20% headroom
 gate.
 
+The hashed experiment configuration also freezes prompt contract
+`grounded-actions-palette-v1` and perception contract
+`arc-agi-0.9.9-color-map-scale8-grid-v1`. The original four-row pilot used a renderer
+whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
+retained only as pre-grounding diagnostics and cannot enter any aggregate or claim gate.
+
 Development uses seeds `11, 23, 47`. Confirmation uses `101, 211, 307, 401, 503` and
 compares `X` only to the strongest development comparator. If projected local compute
 exceeds 80 GPU-hours, the frozen fallback uses the first two and first three seeds.
@@ -61,8 +67,10 @@ weights, persistence estimate, prequential losses, and boundary-survival event w
 is resolved. The final `WIN` observation is ingested before the runner exits, so its
 prediction loss is not silently dropped. Worker call/error/timeout counters are
 monotone agent totals, refresh invalid-program counts are per-decision deltas, and peak
-VRAM is the maximum of model-reported and runtime-measured peaks. JSONL traces are
-versioned research artifacts and are intentionally tracked by Git.
+VRAM is the maximum of model-reported and runtime-measured peaks. Raw working traces remain
+outside Git while experiments are in progress. Small content-addressed fixtures required by
+tests are tracked directly; completed controlled traces are copied into the hashed release
+bundle and public reproduction artifact rather than silently omitted.
 
 ## Conditional ARC-AGI-2 branch
 

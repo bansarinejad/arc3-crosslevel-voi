@@ -135,9 +135,15 @@ def write_manifest(root: Path, provenance: dict[str, Any]) -> Path:
         "files": payload_records(root),
     }
     path = root / MANIFEST_NAME
-    path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     (root / MANIFEST_DIGEST_NAME).write_text(
-        f"{sha256_file(path)}  {MANIFEST_NAME}\n", encoding="ascii"
+        f"{sha256_file(path)}  {MANIFEST_NAME}\n",
+        encoding="ascii",
+        newline="\n",
     )
     return path
 

@@ -2,10 +2,35 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from collections.abc import Iterable
 from typing import Any
+
+from .rendering import ARC_PALETTE_LEGEND, GRID_LINE_RGB
+
+PROMPT_CONTRACT_VERSION = "grounded-actions-palette-v1"
+PROGRAM_ACTION_CONTRACT = """Action kinds are opaque numeric labels: RESET=0,
+ACTION1=1, ACTION2=2, ACTION3=3, ACTION4=4, ACTION5=5, ACTION6=6, ACTION7=7.
+Only ACTION6 carries coordinates. For ACTION6, row and col are integers in [0,63].
+For every other kind, row and col are None. Branch on int(action.kind) == 6 before
+reading or doing arithmetic with action.row/action.col. Never assume that ACTION1-5
+or ACTION7 have universal arrow, key, or button meanings; infer each effect from history.
+"""
+
+DIRECT_ACTION_CONTRACT = """The valid_actions list is exhaustive. Return one listed
+action exactly. If selecting ACTION6, copy one exact listed row/col pair; never invent
+a coordinate or use enlarged-image pixels. Omit coordinates for ACTION1-5 and ACTION7.
+Action names are opaque, so infer effects from history rather than assuming key meanings.
+"""
+
+VISUAL_GROUNDING_CONTRACT = (
+    "Each rendered cell interior uses this exact symbolic palette: "
+    + ARC_PALETTE_LEGEND
+    + f". Grid separator lines are RGB{GRID_LINE_RGB} and are not cell values. "
+    "Each history entry also lists the exact grid_values present in its image.\n"
+)
 
 PROGRAM_SYSTEM_PROMPT = """You infer compact executable rules for a novel ARC-AGI-3 game.
 Return only one Python program. The runtime preloads numpy as np. Do not import anything.
@@ -22,6 +47,7 @@ available_action_sets, game_states, level_deltas, and levels. The newest frame i
 history.frames[-1]. action is a read-only record with integer kind and optional row/col.
 History images are ordered oldest to newest; grid_image_index is zero based and the
 final image is the latest frame.
+""" + PROGRAM_ACTION_CONTRACT + VISUAL_GROUNDING_CONTRACT + """
 Copy a frame before changing it. Return a grid with the same shape and values in [0,15].
 game_state must be exactly "NOT_FINISHED", "WIN", or "GAME_OVER". Available NumPy
 operations include array/asarray, copy, zeros_like/ones_like/full_like, where, nonzero,
@@ -38,6 +64,10 @@ latest frame. A minimal contract-valid shape is:
 
 def predict(history, action):
     grid = np.array(history.frames[-1], dtype=np.int8)
+    kind = int(action.kind)
+    if kind == 6:
+        row = int(action.row)
+        col = int(action.col)
     return {"next_grid": grid, "game_state": "NOT_FINISHED", "level_delta": 0, "memory": {}}
 
 def goal_value(history):
@@ -50,7 +80,7 @@ Choose exactly one currently valid action. Return only compact JSON:
 Rows and columns are zero based in [0, 63]. Do not include markdown.
 History images are ordered oldest to newest; grid_image_index is zero based and the
 final image is the latest frame.
-"""
+""" + DIRECT_ACTION_CONTRACT + VISUAL_GROUNDING_CONTRACT
 
 _FENCE_RE = re.compile(r"```(?:python)?\s*(.*?)```", re.DOTALL | re.IGNORECASE)
 _JSON_RE = re.compile(r"\{.*?\}", re.DOTALL)
@@ -100,11 +130,15 @@ def history_payload(
     for image_index, entry in enumerate(bounded_entries):
         grid = getattr(entry, "grid", None)
         action = getattr(entry, "action", None)
+        available_actions = sorted(
+            getattr(entry, "available_actions", ()),
+            key=_action_kind_sort_key,
+        )
         entry_payload = {
             "action": None if action is None else _action_payload(action),
             "available_actions": [
                 getattr(action_kind, "name", str(action_kind))
-                for action_kind in getattr(entry, "available_actions", ())
+                for action_kind in available_actions
             ],
             "game_state": getattr(
                 getattr(entry, "game_state", "NOT_FINISHED"),
@@ -113,6 +147,7 @@ def history_payload(
             ),
             "level_delta": int(getattr(entry, "level_delta", 0)),
             "level": int(getattr(entry, "level", 1)),
+            "grid_values": _grid_values(grid),
         }
         if include_grid_ascii:
             entry_payload["grid"] = grid_to_ascii(grid)
@@ -120,6 +155,22 @@ def history_payload(
             entry_payload["grid_image_index"] = image_index
         payload.append(entry_payload)
     return payload
+
+
+def _action_kind_sort_key(action_kind: Any) -> tuple[int, str]:
+    """Order the frozen ARC action vocabulary independently of set iteration."""
+
+    name = str(getattr(action_kind, "name", action_kind))
+    if name == "RESET":
+        return (0, name)
+    if name.startswith("ACTION") and name[6:].isdigit():
+        return (int(name[6:]), name)
+    return (2**31 - 1, name)
+
+
+def _grid_values(grid: Any) -> list[int]:
+    rows = getattr(grid, "tolist", lambda: grid)()
+    return sorted({int(value) for row in rows for value in row})
 
 
 def program_prompt(history: Any, *, feedback: str | None = None) -> str:
@@ -207,3 +258,50 @@ class _HistoryEntry:
         self.game_state = game_state
         self.level_delta = level_delta
         self.level = level
+
+
+class _ReferenceAction:
+    def __init__(self, kind: str, row: int | None = None, col: int | None = None) -> None:
+        self.kind = kind
+        self.row = row
+        self.col = col
+
+
+_REFERENCE_HISTORY = tuple(
+    _HistoryEntry(
+        grid=((index % 16, 5), (10, 14)),
+        action=(
+            None
+            if index == 0
+            else _ReferenceAction("ACTION6", 12, 34)
+            if index == 9
+            else _ReferenceAction("ACTION3")
+        ),
+        available_actions=("ACTION7", "ACTION3", "ACTION6"),
+        game_state="NOT_FINISHED",
+        level_delta=index % 2,
+        level=1 + index // 5,
+    )
+    for index in range(10)
+)
+PROMPT_REFERENCE_PROGRAM_SHA256 = hashlib.sha256(
+    program_prompt(_REFERENCE_HISTORY).encode("utf-8")
+).hexdigest()
+PROMPT_REFERENCE_DIRECT_SHA256 = hashlib.sha256(
+    direct_prompt(
+        _REFERENCE_HISTORY,
+        ("ACTION3", "ACTION7", "ACTION6(row=12,col=34)"),
+    ).encode("utf-8")
+).hexdigest()
+PROMPT_CONTRACT_SHA256 = hashlib.sha256(
+    json.dumps(
+        {
+            "direct_reference_sha256": PROMPT_REFERENCE_DIRECT_SHA256,
+            "direct_system_prompt": DIRECT_SYSTEM_PROMPT,
+            "program_reference_sha256": PROMPT_REFERENCE_PROGRAM_SHA256,
+            "program_system_prompt": PROGRAM_SYSTEM_PROMPT,
+        },
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+).hexdigest()

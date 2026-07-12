@@ -1,24 +1,28 @@
 {
   "date": "2026-07-12",
+  "contract_status": "superseded-pre-grounding-diagnostic",
   "game_id": "bp35-0a0ad940",
   "engineering_correction": {
-    "corrected_behavior": "All eight frames are ordered image blocks with aligned metadata-only text",
+    "corrected_behavior": "All eight frames were ordered image blocks, but used a non-official palette",
     "failed_prompt_tokens": 18558,
     "failed_row_peak_cuda_allocated_gib": 45.77019214630127,
     "failure": "Pre-fix ASCII serialization duplicated full grids and caused WDDM shared-memory spill",
     "post_fix_eight_frame_peak_cuda_allocated_gib": 10.11571216583252,
     "post_fix_eight_frame_tokens_per_second": 22.805814033269268,
+    "renderer_palette_valid": false,
     "tests_passed": 137
   },
   "interpretation": {
     "central_mechanism_exercised": false,
     "development_gate_evidence": false,
-    "reason": "M and X had agreement 1.0, issued zero probes, and selected identical actions",
-    "score_claim": "No variant completed a level; this is engineering evidence only"
+    "reason": "The renderer palette disagreed with arc-agi 0.9.9 at all 16 values; M and X also had agreement 1.0 and issued zero probes",
+    "score_claim": "No variant completed a level; exclude this pilot from controlled performance evidence"
   },
   "matrix": {
+    "artifact": "artifacts/development_matrix_pre_grounding.json",
     "completed": 4,
     "remaining": 176,
+    "status": "superseded",
     "total": 180
   },
   "mechanism_diagnostics": {
@@ -31,7 +35,7 @@
     "X_two_valid_fraction": 0.99609375,
     "X_wall_ratio_vs_M": 0.9084337804764994
   },
-  "preflight_artifact": "artifacts/model_gate_live8.json",
+  "preflight_artifact": "artifacts/model_gate_live8_pre_grounding.json",
   "seed": 11,
   "variants": {
     "D": {

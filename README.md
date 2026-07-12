@@ -14,30 +14,32 @@ does not contain code from Duck or other competition entries.
   weighting and refresh, behavioral deduplication, candidate generation, depth-four
   beam planning, D/S/M/X controllers, direct fallback, trace replay, RHAE/statistics,
   competition lifecycle, and lazy Qwen backends.
-- Frozen: the dated 25-game metadata snapshot, deterministic 15/10 split, and 180-run
-  development matrix under `artifacts/`, with identical 256-action, 12,288-token, and
-  1,200-second per-game caps across variants.
-- Verified engineering smoke: the official anonymous endpoint accepted one action through
-  the selected 4B committee on frozen `ls20-9607627b`, with two-or-more valid programs,
-  no fallback/timeouts/errors, and 12.43 GiB peak. This is neither a game result nor
-  leaderboard evidence; see `artifacts/official_model_smoke.json`.
-- Passed the corrected eight-frame local model gate: official Qwen3.5-4B revision
-  `851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a` in BF16 generated four logical candidates
-  as deterministic single-sequence microbatches (10.12 GiB peak, 22.81 tokens/s, and
-  2/4 statically valid programs). See `artifacts/model_gate_live8.json`.
-- Completed the first frozen paired pilot cell (`bp35-0a0ad940`, seed 11): all D/S/M/X
-  rows terminated cleanly under their shared budgets, but every variant completed zero
-  levels. M and X maintained at least two valid programs at 255/256 decision points and
-  improved best-program prequential loss by 24.6% versus S. M and X nevertheless chose
-  identical actions with zero probes because agreement stayed at 1.0, so this cell is not
-  evidence for cross-level VOI. See `artifacts/pilot_bp35_seed11.json`.
-- Not yet completed: the remaining 176 controlled development runs, locked confirmation,
+- Frozen: the dated 25-game metadata snapshot, deterministic 15/10 split, and revised
+  180-run development matrix under `artifacts/`, with versioned prompt/perception
+  contracts and identical 256-action, 12,288-token, and 1,200-second caps.
+- Verified pre-grounding engineering smoke: the official anonymous endpoint accepted one
+  action through the 4B committee on frozen `ls20-9607627b`, with two-or-more valid
+  programs and no fallback/timeouts/errors. It validates lifecycle wiring only; see
+  `artifacts/official_model_smoke.json`.
+- Verified the WSL reference stack: Ubuntu 24.04.1, Python 3.12.3, Torch 2.11.0+cu130,
+  CUDA 13.0, driver 581.15, `sm_89`, bitsandbytes 0.49.2, and Transformers 5.13.1.
+  Dependency consistency and a BF16 CUDA operation pass. Model and grounding gates are
+  being regenerated under this exact stack before gameplay.
+- Preserved earlier official-palette Windows model and grounding checks as diagnostics only;
+  their artifacts predate contract-content fingerprints and the checked-in history fixture,
+  so they are explicitly marked superseded.
+- The first D/S/M/X pilot is retained only as a pre-grounding diagnostic. Its renderer
+  disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
+  scores and mechanism telemetry are excluded from controlled evidence. The superseded
+  matrix and gate are preserved with `_pre_grounding` suffixes.
+- Not yet completed: all 180 revised development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The checked-in four-sequence 9B NF4 preflight artifact does **not** pass the declared model
 gate and must not be substituted by an earlier single-sequence measurement. The official
-4B BF16 fallback does pass. There are deliberately no gameplay scores or positive
-cross-level performance claims until the controlled matrices are executed.
+4B BF16 fallback is the selected candidate pending the WSL model gate. There are deliberately
+no corrected-contract controlled gameplay scores or positive cross-level performance claims
+until the controlled matrices are executed.
 
 ## Quick start
 

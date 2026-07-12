@@ -222,6 +222,7 @@ def save_matrix(matrix: tuple[RunSpec, ...], path: str | Path) -> None:
         json.dumps([asdict(item) | {"run_id": item.run_id} for item in matrix], indent=2)
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 

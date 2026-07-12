@@ -29,6 +29,14 @@ def _non_negative_float(name: str, value: float) -> None:
 class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
+    prompt_contract_version: str = "grounded-actions-palette-v1"
+    perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
+    prompt_contract_sha256: str = (
+        "b405470f41323c27d94f4f19d9860a0473e43b18c80100b6e66b83b1b129aad9"
+    )
+    perception_contract_sha256: str = (
+        "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0"
+    )
     max_environment_actions: int = 256
     max_generated_tokens: int = 12_288
     max_generation_batches: int = 3
@@ -40,6 +48,16 @@ class ExperimentConfig:
             raise ConfigError("seed must be an integer")
         if self.variant not in {"D", "S", "M", "X"}:
             raise ConfigError("variant must be one of D, S, M, or X")
+        if not self.prompt_contract_version.strip():
+            raise ConfigError("prompt_contract_version cannot be empty")
+        if not self.perception_contract_version.strip():
+            raise ConfigError("perception_contract_version cannot be empty")
+        for name in ("prompt_contract_sha256", "perception_contract_sha256"):
+            digest = getattr(self, name)
+            if len(digest) != 64 or any(
+                character not in "0123456789abcdef" for character in digest
+            ):
+                raise ConfigError(f"{name} must be a lowercase SHA-256 digest")
         for name in (
             "max_environment_actions",
             "max_generated_tokens",
@@ -128,6 +146,8 @@ class SandboxConfig:
 class ModelConfig:
     id: str
     profile: str
+    expected_revision: str | None = None
+    expected_weight_manifest_sha256: str | None = None
     context_length: int = 16_384
     quantization: str = "none"
     double_quantization: bool = False
@@ -141,6 +161,27 @@ class ModelConfig:
     def __post_init__(self) -> None:
         if not self.id.strip() or not self.profile.strip():
             raise ConfigError("model id and profile cannot be empty")
+        if (self.expected_revision is None) != (
+            self.expected_weight_manifest_sha256 is None
+        ):
+            raise ConfigError(
+                "expected_revision and expected_weight_manifest_sha256 must be set together"
+            )
+        if self.expected_revision is not None and (
+            len(self.expected_revision) != 40
+            or any(character not in "0123456789abcdef" for character in self.expected_revision)
+        ):
+            raise ConfigError("expected_revision must be a lowercase 40-character commit")
+        if self.expected_weight_manifest_sha256 is not None and (
+            len(self.expected_weight_manifest_sha256) != 64
+            or any(
+                character not in "0123456789abcdef"
+                for character in self.expected_weight_manifest_sha256
+            )
+        ):
+            raise ConfigError(
+                "expected_weight_manifest_sha256 must be a lowercase SHA-256 digest"
+            )
         _positive_int("context_length", self.context_length)
         if self.quantization not in {"none", "nf4", "fp8"}:
             raise ConfigError("quantization must be none, nf4, or fp8")
@@ -212,6 +253,8 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                 {
                     "id",
                     "profile",
+                    "expected_revision",
+                    "expected_weight_manifest_sha256",
                     "context_length",
                     "quantization",
                     "double_quantization",
@@ -234,6 +277,10 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                 {
                     "seed",
                     "variant",
+                    "prompt_contract_version",
+                    "perception_contract_version",
+                    "prompt_contract_sha256",
+                    "perception_contract_sha256",
                     "max_environment_actions",
                     "max_generated_tokens",
                     "max_generation_batches",

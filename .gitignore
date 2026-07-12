@@ -1,4 +1,5 @@
 .venv/
+.venv-wsl/
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -10,5 +11,6 @@ artifacts/cache/
 data/
 models/
 recordings/
+runs/
 *.egg-info/
 .env

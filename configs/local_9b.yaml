@@ -2,6 +2,8 @@ extends: base.yaml
 model:
   id: Qwen/Qwen3.5-9B
   profile: local-nf4
+  expected_revision: c202236235762e1c871ad0ccb60c8ee5ba337b9a
+  expected_weight_manifest_sha256: 7d241f65e84063d41e959e31cbaf0ea50b7a0b43faf49f5ef3ff62d005c0f655
   context_length: 16384
   quantization: nf4
   double_quantization: true
