@@ -50,6 +50,10 @@ class ProgramGroundingResult:
     behavior_signature: str | None
     action_sensitive: bool
     hard_memory_limit_enforced: bool | None
+    memory_limit_kind: str | None = None
+    memory_baseline_bytes: int | None = None
+    memory_ceiling_bytes: int | None = None
+    memory_limit_diagnostic: str | None = None
 
     @property
     def palette_conflicts(self) -> tuple[PaletteClaim, ...]:
@@ -202,6 +206,10 @@ def evaluate_program_grounding(
         )
 
     memory_enforced: bool | None = None
+    memory_limit_kind: str | None = None
+    memory_baseline_bytes: int | None = None
+    memory_ceiling_bytes: int | None = None
+    memory_limit_diagnostic: str | None = None
     try:
         try:
             hypothesis.goal_value(history)
@@ -235,6 +243,10 @@ def evaluate_program_grounding(
         metadata = hypothesis.worker_metadata
         if metadata is not None:
             memory_enforced = metadata.hard_memory_limit_enforced
+            memory_limit_kind = metadata.memory_limit_kind
+            memory_baseline_bytes = metadata.memory_baseline_bytes
+            memory_ceiling_bytes = metadata.memory_ceiling_bytes
+            memory_limit_diagnostic = metadata.memory_limit_diagnostic
     finally:
         hypothesis.close()
 
@@ -269,6 +281,10 @@ def evaluate_program_grounding(
         behavior_signature=behavior_signature,
         action_sensitive=len(set(prediction_hashes)) > 1,
         hard_memory_limit_enforced=memory_enforced,
+        memory_limit_kind=memory_limit_kind,
+        memory_baseline_bytes=memory_baseline_bytes,
+        memory_ceiling_bytes=memory_ceiling_bytes,
+        memory_limit_diagnostic=memory_limit_diagnostic,
     )
 
 

@@ -8,6 +8,7 @@ from dataclasses import dataclass
 import numpy as np
 import pytest
 
+import arc3_voi.runtime.worker as worker_runtime
 from arc3_voi.runtime.sandbox import (
     SandboxValidationError,
     ValidationCode,
@@ -16,6 +17,7 @@ from arc3_voi.runtime.sandbox import (
 from arc3_voi.runtime.worker import (
     DEFAULT_MEMORY_LIMIT_MB,
     DEFAULT_TIMEOUT_SECONDS,
+    RLIMIT_DATA_HEADROOM_KIND,
     ProgramWorker,
     WorkerErrorKind,
 )
@@ -145,6 +147,18 @@ def test_persistent_worker_executes_numpy_program_with_sanitized_dataclasses() -
         assert startup.value.memory_limit_mb == DEFAULT_MEMORY_LIMIT_MB
         if os.name == "nt":
             assert not startup.value.hard_memory_limit_enforced
+            assert startup.value.memory_limit_kind is None
+            assert startup.value.memory_baseline_bytes is None
+            assert startup.value.memory_ceiling_bytes is None
+        elif os.path.exists("/proc/self/status"):
+            assert startup.value.hard_memory_limit_enforced
+            assert startup.value.memory_limit_kind == RLIMIT_DATA_HEADROOM_KIND
+            assert startup.value.memory_baseline_bytes is not None
+            assert startup.value.memory_ceiling_bytes is not None
+            assert (
+                startup.value.memory_ceiling_bytes - startup.value.memory_baseline_bytes
+                == DEFAULT_MEMORY_LIMIT_MB * 1024 * 1024
+            )
         else:
             assert isinstance(startup.value.hard_memory_limit_enforced, bool)
         first_pid = worker.pid
@@ -163,6 +177,106 @@ def test_persistent_worker_executes_numpy_program_with_sanitized_dataclasses() -
         assert goal.value == pytest.approx(0.125)
         assert worker.pid == first_pid
         assert worker.alive
+
+
+def test_worker_accepts_full_bounded_history_with_audited_memory_headroom() -> None:
+    history = ExampleHistory(
+        frames=tuple(np.zeros((64, 64), dtype=np.int16) for _ in range(8)),
+        actions=("ACTION1",) * 8,
+        available_action_sets=(frozenset({1, 2, 6}),) * 8,
+    )
+    action = ExampleAction(kind="ACTION6", row=63, col=63)
+
+    with ProgramWorker(VALID_PROGRAM, timeout_seconds=1.0) as worker:
+        prediction = worker.predict(history, action)
+        assert prediction.ok, prediction.error
+        assert prediction.value["memory"]["observations"] == 8
+        assert prediction.value["next_grid"].shape == (64, 64)
+        assert prediction.value["next_grid"][63, 63] == 7
+
+        metadata = worker.metadata
+        assert metadata is not None
+        if os.path.exists("/proc/self/status"):
+            assert metadata.hard_memory_limit_enforced
+            assert metadata.memory_baseline_bytes is not None
+            assert metadata.memory_ceiling_bytes is not None
+            assert (
+                metadata.memory_ceiling_bytes - metadata.memory_baseline_bytes
+                == DEFAULT_MEMORY_LIMIT_MB * 1024 * 1024
+            )
+
+
+@pytest.mark.skipif(
+    not os.path.exists("/proc/self/status"),
+    reason="the hard RLIMIT_DATA headroom implementation is Linux-specific",
+)
+def test_worker_rejects_allocation_larger_than_memory_headroom() -> None:
+    source = """
+def predict(history, action):
+    return np.zeros((300 * 1024 * 1024,), dtype=np.uint8)
+def goal_value(history):
+    return 0.0
+"""
+    with ProgramWorker(source, timeout_seconds=3.0) as worker:
+        startup = worker.start()
+        assert startup.ok, startup.error
+        assert startup.value is not None
+        assert startup.value.hard_memory_limit_enforced
+        assert startup.value.memory_limit_kind == RLIMIT_DATA_HEADROOM_KIND
+        assert startup.value.memory_baseline_bytes is not None
+        assert startup.value.memory_ceiling_bytes is not None
+        assert (
+            startup.value.memory_ceiling_bytes - startup.value.memory_baseline_bytes
+            == DEFAULT_MEMORY_LIMIT_MB * 1024 * 1024
+        )
+
+        result = worker.predict({}, {})
+        assert not result.ok
+        assert result.error is not None
+        assert result.error.kind is WorkerErrorKind.MEMORY
+
+        recovered = worker.goal_value({})
+        assert recovered.ok, recovered.error
+        assert recovered.value == pytest.approx(0.0)
+
+
+@pytest.mark.skipif(os.name != "posix", reason="Linux competition workers require RLIMIT_DATA")
+def test_posix_worker_startup_fails_closed_without_memory_enforcement(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class RecordingConnection:
+        def __init__(self) -> None:
+            self.responses: list[dict[str, object]] = []
+            self.closed = False
+
+        def send(self, response: dict[str, object]) -> None:
+            self.responses.append(response)
+
+        def close(self) -> None:
+            self.closed = True
+
+    connection = RecordingConnection()
+    monkeypatch.setattr(
+        worker_runtime,
+        "_apply_memory_limit",
+        lambda _memory_limit_mb: worker_runtime._MemoryLimitStatus(
+            False,
+            diagnostic="injected enforcement failure",
+        ),
+    )
+
+    worker_runtime._worker_main(  # type: ignore[arg-type]
+        connection,
+        validate_program(VALID_PROGRAM).canonical_source,
+        DEFAULT_MEMORY_LIMIT_MB,
+    )
+
+    assert connection.closed
+    assert len(connection.responses) == 1
+    response = connection.responses[0]
+    assert response["ok"] is False
+    assert response["kind"] == WorkerErrorKind.STARTUP.value
+    assert response["detail"] == "injected enforcement failure"
 
 
 def test_default_deadline_is_one_hundred_milliseconds() -> None:

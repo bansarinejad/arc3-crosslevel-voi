@@ -1,4 +1,6 @@
 {
+  "contract_status": "superseded-one-frame-worker-memory-diagnostic",
+  "replacement_pending": "artifacts/prompt_grounding_bp35_seed11_wsl.json",
   "base_config_sha256": "dac5979877702ce1b2b78d783cc7811b9013a69b7602abfe0860d6045014b363",
   "effective_offline_config_sha256": "2a2c4c534b64c39047288b24e84ca1d85f0186c9eb448928d9501b0cce80c1aa",
   "evaluation_actions": [

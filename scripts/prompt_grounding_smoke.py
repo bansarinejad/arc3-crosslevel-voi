@@ -128,7 +128,7 @@ def main() -> int:
         program_payloads.append(value)
     eligible = [program for program in programs if program.eligible]
     report: dict[str, Any] = {
-        "schema_version": 2,
+        "schema_version": 3,
         "offline": True,
         "git": asdict(inspect_git_provenance()),
         "model_id": config.model.id,

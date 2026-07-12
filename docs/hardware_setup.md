@@ -44,11 +44,21 @@ dominated by the `p9` bridge. Copying the manifest-verified snapshot to
 `/home/bansarinejad/models/Qwen3.5-4B` reduced weight loading to about one second. See
 `artifacts/model_gate_live8_wsl_v1.json`.
 
-The fair-v2 WSL remeasurement passes: 3/4 programs are statically valid with no truncation,
-28.85 generated tokens/s, and 9.38 GiB peak VRAM. Its frozen-history grounding gate also
-passes with three safe, distinct, action-sensitive programs and enforced POSIX data-segment
-limits. See `artifacts/model_gate_live8_wsl.json` and
-`artifacts/prompt_grounding_bp35_seed11_wsl.json`.
+The fair-v2 WSL model remeasurement passes: 3/4 programs are statically valid with no
+truncation, 28.85 generated tokens/s, and 9.38 GiB peak VRAM. Its original one-frame
+grounding pass is retained only as a superseded diagnostic at
+`artifacts/prompt_grounding_bp35_seed11_wsl_pre_worker_memory_fix.json`. The first corrected
+pilot showed why: NumPy/OpenBLAS had already reserved about 1.3 GiB of `VmData`, so Linux
+accepted an absolute 256 MiB `RLIMIT_DATA` that made a later pipe-buffer allocation fail.
+
+The corrected worker compiles the validated program, measures the trusted Linux `VmData`
+baseline, and verifies a hard `RLIMIT_DATA` ceiling exactly 256 MiB above it. This is a
+kernel-enforced incremental worker-lifetime allocation budget, not a claim that the entire
+Python/NumPy process occupies 256 MiB. Metadata records the limit kind, measured baseline,
+effective ceiling, enforcement status, and diagnostic. The full eight-frame 64x64 `int16`
+transport and a generated allocation above the budget are regression-tested. Incident details
+are in `artifacts/pilot_seed11_worker_memory_incident.json`; schema-v3 grounding evidence must
+pass before gameplay resumes.
 
 The fair-v2 native-Windows remeasurement also passes. Its model gate has 2/4 statically valid
 programs, no truncation, 21.40 generated tokens/s, and 10.78 GiB peak VRAM. Its grounding gate

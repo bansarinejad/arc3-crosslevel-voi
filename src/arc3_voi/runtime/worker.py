@@ -6,13 +6,16 @@ accepted by :func:`arc3_voi.runtime.sandbox.validate_program`.  Calls have a
 100 ms wall-clock deadline by default; a timed-out process is terminated instead
 of being reused.
 
-On POSIX, the child attempts to enforce a 256 MiB ``RLIMIT_DATA`` hard limit.
-Unlike an address-space limit, this does not count NumPy/OpenBLAS shared-library
-mappings against generated allocations.  The standard library does not expose
-an equivalent safe per-process primitive on Windows, so the same value remains a
-documented target there and caller-visible metadata reports that hard enforcement
-is unavailable.  The timeout remains hard-enforced by process termination on
-both platforms.
+On Linux, the child measures the trusted runtime's existing data segment after
+program initialization, then sets an ``RLIMIT_DATA`` hard ceiling 256 MiB above
+that baseline.  An absolute 256 MiB ceiling is invalid for a NumPy worker because
+its trusted runtime mappings already exceed that value.  Recording both values
+makes the generated-allocation headroom auditable without counting the preloaded
+runtime against the program.  The standard library does not expose an equivalent
+safe per-process primitive on Windows, so the same value remains a documented
+target there and caller-visible metadata reports that hard enforcement is
+unavailable.  The timeout remains hard-enforced by process termination on both
+platforms.
 """
 
 from __future__ import annotations
@@ -47,6 +50,7 @@ from arc3_voi.runtime.sandbox import (
 DEFAULT_TIMEOUT_SECONDS = 0.100
 DEFAULT_STARTUP_TIMEOUT_SECONDS = 10.0
 DEFAULT_MEMORY_LIMIT_MB = 256
+RLIMIT_DATA_HEADROOM_KIND = "rlimit_data_baseline_plus_budget"
 _MAX_TRANSPORT_ITEMS = 131_072
 _MAX_TRANSPORT_DEPTH = 32
 
@@ -59,6 +63,7 @@ class WorkerErrorKind(StrEnum):
     COMPILE = "compile"
     EXECUTION = "execution"
     OUTPUT = "output"
+    MEMORY = "memory"
     TIMEOUT = "timeout"
     CRASHED = "crashed"
     PROTOCOL = "protocol"
@@ -104,6 +109,19 @@ class WorkerMetadata:
     timeout_seconds: float
     memory_limit_mb: int
     hard_memory_limit_enforced: bool
+    memory_limit_kind: str | None
+    memory_baseline_bytes: int | None
+    memory_ceiling_bytes: int | None
+    memory_limit_diagnostic: str | None
+
+
+@dataclass(frozen=True, slots=True)
+class _MemoryLimitStatus:
+    enforced: bool
+    kind: str | None = None
+    baseline_bytes: int | None = None
+    ceiling_bytes: int | None = None
+    diagnostic: str | None = None
 
 
 class _TransportError(ValueError):
@@ -272,28 +290,78 @@ def _serialize_output(value: Any, *, operation: str) -> Any:
     return transported
 
 
-def _apply_memory_limit(memory_limit_mb: int) -> tuple[bool, str | None]:
-    """Apply the POSIX data-segment ceiling; return enforcement and diagnostic."""
+def _linux_data_segment_bytes() -> int:
+    """Read the current Linux data-segment reservation from procfs."""
+
+    with open("/proc/self/status", encoding="utf-8") as stream:
+        for line in stream:
+            if not line.startswith("VmData:"):
+                continue
+            fields = line.split()
+            if len(fields) != 3 or fields[2] != "kB":
+                break
+            value_kib = int(fields[1])
+            if value_kib < 0:
+                break
+            return value_kib * 1024
+    raise OSError("/proc/self/status did not contain a valid VmData value")
+
+
+def _apply_memory_limit(memory_limit_mb: int) -> _MemoryLimitStatus:
+    """Hard-limit generated allocation headroom above the trusted Linux baseline."""
 
     if os.name != "posix":
-        return False, "hard per-process memory limits are unavailable on this platform"
+        return _MemoryLimitStatus(
+            False,
+            diagnostic="hard per-process memory limits are unavailable on this platform",
+        )
     try:
         import resource
 
-        limit_bytes = memory_limit_mb * 1024 * 1024
+        baseline_bytes = _linux_data_segment_bytes()
+        budget_bytes = memory_limit_mb * 1024 * 1024
+        ceiling_bytes = baseline_bytes + budget_bytes
+        getrlimit = vars(resource)["getrlimit"]
         setrlimit = vars(resource)["setrlimit"]
         rlimit_data = vars(resource)["RLIMIT_DATA"]
-        setrlimit(rlimit_data, (limit_bytes, limit_bytes))
-        return True, None
-    except (ImportError, OSError, ValueError) as exc:
-        return False, f"could not apply RLIMIT_DATA: {type(exc).__name__}: {exc}"
+        _soft_limit, hard_limit = getrlimit(rlimit_data)
+        infinity = vars(resource)["RLIM_INFINITY"]
+        if hard_limit != infinity and hard_limit < ceiling_bytes:
+            return _MemoryLimitStatus(
+                False,
+                kind=RLIMIT_DATA_HEADROOM_KIND,
+                baseline_bytes=baseline_bytes,
+                ceiling_bytes=ceiling_bytes,
+                diagnostic="existing RLIMIT_DATA hard ceiling cannot provide full headroom",
+            )
+        setrlimit(rlimit_data, (ceiling_bytes, ceiling_bytes))
+        effective_soft, effective_hard = getrlimit(rlimit_data)
+        if effective_soft != ceiling_bytes or effective_hard != ceiling_bytes:
+            return _MemoryLimitStatus(
+                False,
+                kind=RLIMIT_DATA_HEADROOM_KIND,
+                baseline_bytes=baseline_bytes,
+                ceiling_bytes=ceiling_bytes,
+                diagnostic="RLIMIT_DATA did not retain the requested hard ceiling",
+            )
+        return _MemoryLimitStatus(
+            True,
+            kind=RLIMIT_DATA_HEADROOM_KIND,
+            baseline_bytes=baseline_bytes,
+            ceiling_bytes=ceiling_bytes,
+        )
+    except (ImportError, OSError, ValueError, OverflowError) as exc:
+        return _MemoryLimitStatus(
+            False,
+            diagnostic=f"could not apply RLIMIT_DATA headroom: {type(exc).__name__}: {exc}",
+        )
 
 
 def _send_response(connection: Connection, response: dict[str, Any]) -> bool:
     try:
         connection.send(response)
         return True
-    except (BrokenPipeError, EOFError, OSError, ValueError, TypeError):
+    except (BrokenPipeError, EOFError, OSError, ValueError, TypeError, MemoryError):
         return False
 
 
@@ -304,7 +372,6 @@ def _worker_main(
 ) -> None:
     """Child entry point.  Must remain top-level so Windows spawn can import it."""
 
-    memory_enforced, memory_diagnostic = _apply_memory_limit(memory_limit_mb)
     namespace: dict[str, Any] = {
         "__builtins__": _safe_builtins(),
         "np": _NumpyFacade(),
@@ -339,14 +406,32 @@ def _worker_main(
         connection.close()
         return
 
+    memory_status = _apply_memory_limit(memory_limit_mb)
+    if os.name == "posix" and not memory_status.enforced:
+        _send_response(
+            connection,
+            {
+                "request_id": 0,
+                "ok": False,
+                "kind": WorkerErrorKind.STARTUP.value,
+                "message": "required Linux worker memory limit was not enforced",
+                "detail": memory_status.diagnostic,
+            },
+        )
+        connection.close()
+        return
+
     if not _send_response(
         connection,
         {
             "request_id": 0,
             "ok": True,
             "value": {
-                "hard_memory_limit_enforced": memory_enforced,
-                "memory_limit_diagnostic": memory_diagnostic,
+                "hard_memory_limit_enforced": memory_status.enforced,
+                "memory_limit_kind": memory_status.kind,
+                "memory_baseline_bytes": memory_status.baseline_bytes,
+                "memory_ceiling_bytes": memory_status.ceiling_bytes,
+                "memory_limit_diagnostic": memory_status.diagnostic,
             },
         },
     ):
@@ -356,6 +441,17 @@ def _worker_main(
     while True:
         try:
             request = connection.recv()
+        except MemoryError:
+            _send_response(
+                connection,
+                {
+                    "request_id": -1,
+                    "ok": False,
+                    "kind": WorkerErrorKind.MEMORY.value,
+                    "message": "worker memory limit prevented request transport",
+                },
+            )
+            break
         except (EOFError, OSError, BrokenPipeError):
             break
         if not isinstance(request, dict):
@@ -398,6 +494,14 @@ def _worker_main(
                 "ok": False,
                 "kind": WorkerErrorKind.OUTPUT.value,
                 "message": str(exc),
+                "elapsed_ms": (time.perf_counter() - started) * 1_000,
+            }
+        except MemoryError:
+            response = {
+                "request_id": request_id,
+                "ok": False,
+                "kind": WorkerErrorKind.MEMORY.value,
+                "message": "generated program exceeded worker memory headroom",
                 "elapsed_ms": (time.perf_counter() - started) * 1_000,
             }
         except BaseException as exc:  # isolate all generated-code failures
@@ -557,6 +661,26 @@ class ProgramWorker:
                 hard_memory_limit_enforced=bool(
                     metadata_payload.get("hard_memory_limit_enforced", False)
                 ),
+                memory_limit_kind=(
+                    str(metadata_payload["memory_limit_kind"])
+                    if metadata_payload.get("memory_limit_kind") is not None
+                    else None
+                ),
+                memory_baseline_bytes=(
+                    int(metadata_payload["memory_baseline_bytes"])
+                    if metadata_payload.get("memory_baseline_bytes") is not None
+                    else None
+                ),
+                memory_ceiling_bytes=(
+                    int(metadata_payload["memory_ceiling_bytes"])
+                    if metadata_payload.get("memory_ceiling_bytes") is not None
+                    else None
+                ),
+                memory_limit_diagnostic=(
+                    str(metadata_payload["memory_limit_diagnostic"])
+                    if metadata_payload.get("memory_limit_diagnostic") is not None
+                    else None
+                ),
             )
             return ExecutionResult(
                 value=self._metadata,
@@ -626,7 +750,14 @@ class ProgramWorker:
                 return self._error_result(error, (time.perf_counter() - started) * 1_000)
 
             elapsed_ms = (time.perf_counter() - started) * 1_000
-            if not isinstance(response, dict) or response.get("request_id") != request_id:
+            terminal_memory = (
+                isinstance(response, dict)
+                and response.get("request_id") == -1
+                and response.get("kind") == WorkerErrorKind.MEMORY.value
+            )
+            if not isinstance(response, dict) or (
+                response.get("request_id") != request_id and not terminal_memory
+            ):
                 self._terminate_process()
                 error = WorkerError(WorkerErrorKind.PROTOCOL, "mismatched worker response")
                 self._terminal_error = error
@@ -638,7 +769,7 @@ class ProgramWorker:
                 kind = WorkerErrorKind(response.get("kind", WorkerErrorKind.EXECUTION.value))
             except ValueError:
                 kind = WorkerErrorKind.PROTOCOL
-            return self._error_result(
+            result = self._error_result(
                 WorkerError(
                     kind=kind,
                     message=str(response.get("message", "generated-program execution failed")),
@@ -646,6 +777,13 @@ class ProgramWorker:
                 ),
                 child_elapsed_ms,
             )
+            if terminal_memory:
+                self._terminate_process()
+                self._terminal_error = WorkerError(
+                    WorkerErrorKind.UNAVAILABLE,
+                    "worker exited after exhausting its memory headroom",
+                )
+            return result
 
     def predict(self, history: Any, action: Any) -> ExecutionResult[Any]:
         return self._call("predict", history=history, action=action)
@@ -700,6 +838,7 @@ __all__ = [
     "DEFAULT_MEMORY_LIMIT_MB",
     "DEFAULT_STARTUP_TIMEOUT_SECONDS",
     "DEFAULT_TIMEOUT_SECONDS",
+    "RLIMIT_DATA_HEADROOM_KIND",
     "ExecutionResult",
     "ProgramWorker",
     "WorkerError",

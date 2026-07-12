@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "status": "diagnostic_only_rerun_required",
+  "started_from_git_commit": "6b62c84e2bd8e29067c1f105176421497185980c",
+  "game_id": "bp35-0a0ad940",
+  "seed": 11,
+  "matrix_path": "artifacts/development_matrix.json",
+  "completed_diagnostic_run": {
+    "run_id": "development-bp35-0a0ad940-11-D-2fdf174a",
+    "config_sha256": "2fdf174a8b1cda9fbb0b9e0e4a0ea532e972bd71bad907989b3d3f470760de03",
+    "summary_path": "runs/diagnostics/pre-worker-memory-fix/development-bp35-0a0ad940-11-D-2fdf174a.json",
+    "summary_bytes": 1112,
+    "summary_sha256": "67327a2cf7ba676be2f6f9c7930dcd994ab3e9b6db097beb951b6b2932bd06f7",
+    "trace_path": "runs/diagnostics/pre-worker-memory-fix/development-bp35-0a0ad940-11-D-2fdf174a.jsonl",
+    "trace_bytes": 24197439,
+    "trace_sha256": "c682a92efd5954c4d5de7b2ed66bdbb91fa5a7ddc71f7f1af86246ffb25bc2bc",
+    "termination_reason": "budget_exhausted",
+    "rhae": 0.0,
+    "levels_completed": 0,
+    "environment_actions": 256,
+    "generated_tokens": 4044,
+    "wall_seconds": 443.1553326310004,
+    "peak_vram_gb": 9.323947429656982,
+    "direct_fallbacks": 253,
+    "game_over_steps": [
+      64,
+      129,
+      194
+    ],
+    "reset_steps": [
+      65,
+      130,
+      195
+    ],
+    "reset_lifecycle_audit_passed": true
+  },
+  "interrupted_run": {
+    "run_id": "development-bp35-0a0ad940-11-S-e9cfb883",
+    "config_sha256": "e9cfb883b32db54b589748668fb3f79889b18d922775a8d5694b0500806f55f3",
+    "environment_actions_committed": 0,
+    "summary_written": false,
+    "trace_written": false,
+    "failure_artifact_written": false,
+    "manual_interrupt": true,
+    "interrupt_reason": "stop before M/X consumed actions under a known-broken Linux worker limit",
+    "failure": {
+      "process_name": "arc3-hypothesis-b506a36b",
+      "exception": "MemoryError",
+      "location": "src/arc3_voi/runtime/worker.py:_worker_main connection.recv",
+      "transport_frame": "multiprocessing.connection._recv -> buf.write(chunk)"
+    }
+  },
+  "root_cause_measurements": {
+    "configured_memory_budget_mib": 256,
+    "old_absolute_rlimit_data_bytes": 268435456,
+    "wsl_worker_import_vmdata_kib": 1321116,
+    "wsl_cli_import_vmdata_kib": 1325600,
+    "wsl_arc_sdk_plus_worker_vmdata_kib": 1365236,
+    "diagnosis": "the old absolute RLIMIT_DATA ceiling was below the trusted NumPy/runtime baseline, so a later pipe-buffer allocation failed"
+  },
+  "recovery_contract": {
+    "memory_budget_mib_unchanged": 256,
+    "prediction_timeout_ms_unchanged": 100,
+    "frozen_config_hashes_unchanged": true,
+    "frozen_matrix_regeneration_required": false,
+    "implementation_change": "measure trusted Linux VmData after program initialization and hard-limit additional worker-lifetime data allocation to 256 MiB",
+    "required_before_retry": [
+      "full eight-frame 64x64 int16 transport regression passes",
+      "over-budget generated allocation returns a typed memory error",
+      "WSL grounding evidence is regenerated under the corrected runtime",
+      "all four seed-11 variants are rerun from one clean post-fix commit"
+    ]
+  }
+}

@@ -26,12 +26,13 @@ does not contain code from Duck or other competition entries.
   Dependency consistency and a BF16 CUDA operation pass. See `artifacts/wsl_stack_check.json`.
 - Retained the v1 WSL capacity pass and failed grounding gate as diagnostics: its safe
   programs collapsed to one behavioral no-op class, so it did not authorize gameplay.
-- Passed the fair-v2 WSL gates. The model preflight produced 3/4 valid programs with no
-  truncation at 28.85 tokens/s and 9.38 GiB peak. The frozen-history grounding gate produced
-  3 safe, 3 distinct, action-sensitive programs with no palette or coordinate conflicts;
-  POSIX data-segment limits were enforced for all three. See
-  `artifacts/model_gate_live8_wsl.json` and
-  `artifacts/prompt_grounding_bp35_seed11_wsl.json`.
+- Passed the fair-v2 WSL model gate: 3/4 valid programs, no truncation, 28.85 tokens/s,
+  and 9.38 GiB peak. The original one-frame grounding pass is now explicitly superseded:
+  the seed-11 pilot exposed that its absolute 256 MiB `RLIMIT_DATA` ceiling was below the
+  trusted NumPy runtime's existing data segment. The runtime now hard-limits allocation
+  headroom to 256 MiB above a measured baseline and records both values. The old evidence is
+  retained at `artifacts/prompt_grounding_bp35_seed11_wsl_pre_worker_memory_fix.json`; a
+  schema-v3 WSL grounding remeasurement is required before retrying gameplay.
 - Passed the same fair-v2 gates on native Windows. The model preflight produced 2/4 valid
   programs with no truncation at 21.40 tokens/s and 10.78 GiB peak. The frozen-history gate
   produced 2 safe, 2 distinct, action-sensitive programs with no palette or coordinate
@@ -40,6 +41,11 @@ does not contain code from Duck or other competition entries.
   fixture, model revision, and weight manifest match WSL; generated source is not claimed to
   be bit-identical across platforms. See `artifacts/model_gate_live8_windows.json` and
   `artifacts/prompt_grounding_bp35_seed11_windows.json`.
+- The first corrected seed-11 pilot produced a valid but diagnostic-only D run, then exposed
+  the Linux worker-memory defect before S committed an environment action. D was archived so
+  all four variants can be rerun from one post-fix commit; the controlled matrix is again
+  180/180 pending. Exact hashes, reset audit, measurements, and recovery conditions are in
+  `artifacts/pilot_seed11_worker_memory_incident.json`.
 - The first D/S/M/X pilot is retained only as a pre-grounding diagnostic. Its renderer
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
