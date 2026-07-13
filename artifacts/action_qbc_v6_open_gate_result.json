@@ -1,0 +1,219 @@
+{
+  "schema_version": "action-qbc-v6-open-gate-result-v1",
+  "treatment_id": "action-qbc-v6-finite-grid-evidence-v1",
+  "runtime_id": "crosslevel-voi-runtime-v6",
+  "preregistration_commit": "a7f4da2d1e4773c3396243b12e983df910941c0c",
+  "preregistration_tag": "prereg-action-qbc-v6-finite-grid-evidence-v1",
+  "date": "2026-07-14",
+  "platform": {
+    "environment": "WSL2 Debian",
+    "python": "3.12.13",
+    "architecture": "x86_64"
+  },
+  "disposition": "negative_open_gate",
+  "authoritative_matrix": {
+    "families": [
+      "homologue",
+      "containment",
+      "reflection"
+    ],
+    "completed_planning_snapshots": 15,
+    "completed_scene_rows": 30,
+    "completed_controls": 20,
+    "visual_rows": 12,
+    "passing_visual_rows": 3,
+    "failing_visual_rows": 9,
+    "passing_rows": [
+      "homologue/palette_bijection",
+      "containment/palette_bijection",
+      "reflection/palette_bijection"
+    ],
+    "translation_overflow_nonbackground_total": 107
+  },
+  "failing_visuals": [
+    {
+      "family": "homologue",
+      "transform_name": "translation_row_plus_3_col_plus_5",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 54,
+        "reasons": [
+          "translation_prediction_overflow",
+          "mapped_prediction_grid_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "homologue",
+      "transform_name": "translation_row_minus_3_col_minus_5",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 0,
+        "reasons": [
+          "mapped_prediction_grid_mismatch",
+          "selector_disposition_or_rank_mismatch",
+          "mapped_myopic_utility_set_mismatch",
+          "mapped_cross_level_utility_set_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "homologue",
+      "transform_name": "scale_2_nearest_neighbor",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 0,
+        "reasons": [
+          "selector_disposition_or_rank_mismatch",
+          "mapped_myopic_utility_set_mismatch",
+          "mapped_cross_level_utility_set_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "containment",
+      "transform_name": "translation_row_plus_3_col_plus_5",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 29,
+        "reasons": [
+          "translation_prediction_overflow",
+          "mapped_prediction_grid_mismatch",
+          "selector_disposition_or_rank_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "containment",
+      "transform_name": "translation_row_minus_3_col_minus_5",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 0,
+        "reasons": [
+          "mapped_prediction_grid_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "containment",
+      "transform_name": "scale_2_nearest_neighbor",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 0,
+        "reasons": [
+          "selector_disposition_or_rank_mismatch",
+          "mapped_myopic_utility_set_mismatch",
+          "mapped_cross_level_utility_set_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "reflection",
+      "transform_name": "translation_row_plus_3_col_plus_5",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 24,
+        "reasons": [
+          "translation_prediction_overflow",
+          "mapped_prediction_grid_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "reflection",
+      "transform_name": "translation_row_minus_3_col_minus_5",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 0,
+        "reasons": [
+          "mapped_prediction_grid_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    },
+    {
+      "family": "reflection",
+      "transform_name": "scale_2_nearest_neighbor",
+      "comparison": {
+        "status": "evaluated",
+        "semantics_id": "action-qbc-v6-padded-finite-grid-v1",
+        "mapped_action_count": 12,
+        "unmapped_action_count": 0,
+        "prediction_pair_count": 48,
+        "overflow_nonbackground_count": 0,
+        "reasons": [
+          "mapped_myopic_utility_set_mismatch",
+          "mapped_cross_level_utility_set_mismatch"
+        ],
+        "passes": false,
+        "parity": null
+      }
+    }
+  ],
+  "failure_vector_sha256": "589070b5ba1dbe5c400ec462a41ea0e8098462fc59f041b673e99da823370055",
+  "verification": {
+    "windows": "49 passed, 1 expected Linux-only skip",
+    "linux_combined": "1 failed, 48 passed in 283.94 seconds",
+    "linux_authoritative_diagnostic": "1 failed in 352.07 seconds",
+    "legacy_v5": "60 passed, 2 skipped, 2 expected fail-closed inventory rejections after adding the two preregistered v6 package files"
+  },
+  "implementation_freeze_authorized": false,
+  "v2_generation_authorized": false,
+  "sealed_execution_authorized": false,
+  "known_implementation_blockers": [
+    "addressable scientific-record schema replacement is incomplete",
+    "exact 140-row global fallback payload construction is absent",
+    "payload-cap boundary implementation and tests are absent",
+    "completed visual-row exact-schema validation is incomplete",
+    "registration binding is not yet independently frozen",
+    "two-process canonical payload identity gate is absent",
+    "registered diagnostic CLI and open-gate attestation are absent"
+  ]
+}
