@@ -106,7 +106,7 @@ def test_template_matrix_command_creates_separate_source_aware_arms(tmp_path) ->
     assert len({row["config_hash"] for row in rows}) == 4
     assert all(row["identity_version"] == "source-v2" for row in rows)
 
-    with pytest.raises(ValueError, match="registration-only until the admission gate"):
+    with pytest.raises(ValueError, match="registration-only; run-matrix execution remains"):
         main(
             [
                 "run-matrix",
@@ -145,6 +145,29 @@ def test_locked_qwen_matrix_bytes_remain_frozen() -> None:
                 "--dry-run",
             ]
         )
+
+
+def test_blocked_template_artifact_does_not_unlock_checked_in_matrix(tmp_path: Path) -> None:
+    artifact = Path("artifacts/template_v1_runtime_admission_v2_bp35_seed11.json")
+    assert json.loads(artifact.read_text(encoding="utf-8"))["status"] == "pilot_blocked"
+
+    with pytest.raises(ValueError, match="registration-only; run-matrix execution remains"):
+        main(
+            [
+                "run-matrix",
+                "--matrix",
+                "artifacts/development_matrix_template_v1.json",
+                "--config",
+                "configs/local_4b.yaml",
+                "--metadata",
+                str(tmp_path / "must-not-be-read.json"),
+                "--output",
+                str(tmp_path / "must-not-be-created"),
+                "--dry-run",
+            ]
+        )
+
+    assert not (tmp_path / "must-not-be-created").exists()
 
 
 def test_select_hyperparameters_command(tmp_path, capsys) -> None:
@@ -191,7 +214,7 @@ def test_run_rejects_template_source_before_backend_or_environment_creation(
     monkeypatch.setattr(cli_module, "_model_backend", unexpected_backend)
     monkeypatch.setattr(cli_module, "ArcCompetitionClient", UnexpectedClient)
 
-    with pytest.raises(ValueError, match="registration-only pending the offline admission gate"):
+    with pytest.raises(ValueError, match="registration-only; live producer wiring"):
         main(
             [
                 "run",

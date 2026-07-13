@@ -117,8 +117,9 @@ does not contain code from Duck or other competition entries.
   New identities explicitly encode `hypothesis_source` and arm labels. A separate 180-row
   registration manifest contains D-Q/S-T/M-T/X-T, with M-T versus X-T as the controlled
   cross-level contrast. It has no completed or executable rows: `run-matrix` fails closed
-  on every non-Qwen source until offline admission passes. Cross-source results are not
-  same-backbone evidence. See `docs/experiment_amendment_2026-07-13.md` and
+  on every non-Qwen source, and a future gate pass would still require separately reviewed
+  live-producer wiring. Cross-source results are not same-backbone evidence. See
+  `docs/experiment_amendment_2026-07-13.md` and
   `artifacts/development_matrix_template_v1.json`.
 - Implemented the amendment's scene-conditioned four-role topology compiler and
   source-neutral salience frontier under implementation contract
@@ -129,15 +130,17 @@ does not contain code from Duck or other competition entries.
   palette, unclipped interior-translation, and topology-preserving integer-scale checks pass
   exactly on the scoped synthetic fixture; structural ties, frame boundaries, clipping, and
   topology-changing scales remain unverified. Candidate/compiler identities are included in
-  configuration hashes. The separate
-  source-v2 matrix is still registration-only pending a clean-commit admission artifact;
-  no template gameplay is authorized.
-- Hardened the canonical scene-topology admission harness to bind the registered `X-T`
-  config, emit portable deterministic schema-v2 evidence through an atomic exclusive write,
-  require two eligible graded roles, and require exact Linux `RLIMIT_DATA` +256 MiB worker
-  allocation headroom. Windows diagnostics cannot satisfy that canonical memory gate. A passing report
-  would authorize only the fixed bp35 seed-11 pilot after a template runtime is wired—not
-  the full development matrix.
+  configuration hashes.
+- Ran the canonical scene-topology admission harness from clean commit
+  `46bf052cd9254a8837f27db9119ffdc34c46cb65` on Linux. All four programs were eligible,
+  selected, behaviorally distinct, and plannable; all three graded roles qualified; and all
+  four persistent workers enforced exactly 268,435,456 bytes of `RLIMIT_DATA` allocation
+  headroom. The decision gate nevertheless blocked: agreement and indifference were 1.0,
+  every program's action costs were flat, maximum EVSI was 0.0, both maximum M and X probe
+  utilities were -1.0, and no X-only probe existed. The byte-reproduced schema-v2 artifact
+  has SHA-256 `546cf508fa36e1d0ddd39b16e79c35f79fc597577609b3350add8f1c146e1033`.
+  It is offline negative mechanism evidence only and authorizes no pilot, gameplay, or
+  matrix execution. See `artifacts/template_v1_runtime_admission_v2_bp35_seed11.json`.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its

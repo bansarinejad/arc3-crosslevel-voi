@@ -160,7 +160,7 @@ def test_build_agent_rejects_registration_only_source_before_backend_use() -> No
 
     with pytest.raises(
         HypothesisSourceNotAdmittedError,
-        match="registration-only pending the offline admission gate",
+        match="registration-only; live producer wiring",
     ):
         build_agent(backend, config)
 

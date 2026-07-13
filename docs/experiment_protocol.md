@@ -59,6 +59,18 @@ authorize only the frozen bp35 seed-11 S-T/M-T/X-T pilot after an artifact-pinne
 template producer exists; it cannot unlock the 180-row matrix, and the Qwen path must never
 execute under a template label.
 
+The canonical audit ran on 13 July 2026 from clean commit
+`46bf052cd9254a8837f27db9119ffdc34c46cb65`. Its four programs were eligible, selected,
+behaviorally distinct, and planning-valid; all three graded roles qualified; and each
+selected persistent Linux worker enforced exactly 268,435,456 bytes of
+`RLIMIT_DATA` allocation headroom. `offline=true` and `planner_error=null`. The structural
+checks passed, but every program's cost vector was action-flat: agreement and indifference
+were 1.0, there were no differing optimal sets, maximum EVSI was 0.0, and both maximum
+myopic and cross-level utilities were -1.0. The report therefore has
+`status=pilot_blocked` and authorizes zero environment actions. It is preserved at
+`artifacts/template_v1_runtime_admission_v2_bp35_seed11.json`, SHA-256
+`546cf508fa36e1d0ddd39b16e79c35f79fc597577609b3350add8f1c146e1033`.
+
 Development uses seeds `11, 23, 47`. Confirmation uses `101, 211, 307, 401, 503` and
 compares `X` only to the strongest development comparator. If projected local compute
 exceeds 80 GPU-hours, the frozen fallback uses the first two and first three seeds.
@@ -154,6 +166,15 @@ not described as learned, scene-compiled, or empirically accurate; palette-tie a
 equivariance also remain unverified. The clean-commit report is
 `artifacts/structured_prior_admission_v1.json`. It is excluded from performance aggregates
 and does not unlock or regenerate `development_matrix.json`.
+
+The later scene-conditioned topology compiler likewise passed the structural portion of
+the canonical Linux gate but failed its decision-relevance requirement. Four selected
+programs formed four eligible behavior classes and the persistent workers met the exact
+hard-memory contract, yet all four plan-cost vectors were action-invariant. Agreement and
+indifference were 1.0, maximum EVSI was 0.0, both M and X maximum probe utilities were
+-1.0, and no X-only probe existed. This clean-commit negative result is the artifact named
+above; it leaves the fixed pilot, the template runtime, and all 180 registered template
+rows locked.
 
 The maximum-shape WSL planner benchmark did not authorize concurrent committee
 evaluation: its three order-alternated trials produced identical snapshots and no

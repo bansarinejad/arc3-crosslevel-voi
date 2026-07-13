@@ -1,0 +1,1060 @@
+{
+  "admission_overlay_sha256": "2992fa00f5e688bba4cef6f5be4f101528c25896d0bb74a28346fb1685822a12",
+  "admission_overlay_version": "scene-topology-admission-v1",
+  "contract": {
+    "admission_rule": "shared runtime-admission-v2 role checks, behavioral deduplication, depth-four planning, and X-only probe opportunity",
+    "agreement_threshold": 0.8,
+    "beam_width": 8,
+    "eligible_graded_roles": [
+      "topology_contact",
+      "homology_alignment",
+      "symmetry_completion"
+    ],
+    "execution_platform": "linux",
+    "expected_allocation_headroom_bytes": 268435456,
+    "initial_cross_level_persistence": 0.5,
+    "interpretation": "counterfactual capability diagnostic only; not transition accuracy, gameplay readiness, or evidence of model-generated induction",
+    "material_evsi_threshold_actions": 0.05,
+    "minimum_eligible_graded_roles": 2,
+    "overlay_rule": "registered X-T config and frozen bp35 fixture; at least two eligible graded roles; selected persistent workers exactly identified and, for canonical evidence, Linux RLIMIT_DATA hard headroom exactly equal to the configured 256 MiB allocation budget",
+    "planning_depth": 4,
+    "require_linux_memory": true,
+    "required_memory_limit_kind": "rlimit_data_baseline_plus_budget"
+  },
+  "contract_version": "runtime-admission-v2",
+  "gate": {
+    "passes": false,
+    "reasons": [
+      "no X-only probe opportunity: require one action with low committee agreement, material EVSI, positive cross-level utility, and non-positive myopic utility"
+    ]
+  },
+  "git": {
+    "commit": "46bf052cd9254a8837f27db9119ffdc34c46cb65",
+    "dirty": false,
+    "status_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "tracked_diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "inputs": {
+    "arm_label": "X-T",
+    "candidate_policy": "source-neutral candidates_from_history with scene-compiler points as the proposal frontier",
+    "candidate_policy_sha256": "a9220009c5fd4b6da602580db439e25f9acaef74799de050a7a56e6c64bba82c",
+    "candidate_policy_version": "salience-frontier-v1",
+    "candidate_set": [
+      {
+        "col": null,
+        "kind": 3,
+        "row": null
+      },
+      {
+        "col": null,
+        "kind": 4,
+        "row": null
+      },
+      {
+        "col": null,
+        "kind": 7,
+        "row": null
+      },
+      {
+        "col": 2,
+        "kind": 6,
+        "row": 1
+      },
+      {
+        "col": 15,
+        "kind": 6,
+        "row": 3
+      },
+      {
+        "col": 22,
+        "kind": 6,
+        "row": 38
+      },
+      {
+        "col": 21,
+        "kind": 6,
+        "row": 38
+      },
+      {
+        "col": 22,
+        "kind": 6,
+        "row": 39
+      },
+      {
+        "col": 21,
+        "kind": 6,
+        "row": 37
+      },
+      {
+        "col": 8,
+        "kind": 6,
+        "row": 1
+      },
+      {
+        "col": 21,
+        "kind": 6,
+        "row": 40
+      },
+      {
+        "col": 21,
+        "kind": 6,
+        "row": 3
+      }
+    ],
+    "candidate_set_sha256": "27015da2bc051f4761c4f9d6764ace0520a9778719b40c74fe9cf498e5f8ed72",
+    "config": "configs/template_v1_x.yaml",
+    "config_file_sha256": "0ec730e8bd56752da905070e56d4c36dea062db4b126ca9a97e897d1f98a215a",
+    "config_sha256": "aa33d464cc7cae07607689e351bcbc9aadba61c9990d5150441dc5f31e367708",
+    "controller_variant": "X",
+    "fixture": "fixtures/grounding/bp35_seed11_initial_history.json",
+    "fixture_sha256": "ecb67dbe088efcc79c7b786447bf81796a42a08417d64972042571d128258d75",
+    "history_canonical_sha256": "de73a63399b6618b7a127d69f2ea75c1b83cea4f597c1993a0267e1da17c3fb4",
+    "hypothesis_source": "template_v1",
+    "latest_grid_sha256": "c17580ec4fbde531065cfa0291956c644e7d09884a7a60dd35ed40361094e8f0",
+    "registered_matrix": "artifacts/development_matrix_template_v1.json",
+    "registered_matrix_sha256": "6878b39d2379d6ffc11d45953db046883a8622ac529e3702efb679b3d9f6978b"
+  },
+  "offline": true,
+  "planner_error": null,
+  "planning": {
+    "actions": [
+      {
+        "action": "ACTION3",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION4",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION7",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION6(1,2)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "6a3767b754ca883f335cdf5330ea78b3487b5254725cddf201158b13301e577e",
+          "2c55d8e75c3705b5fdab2b7ca5512b64c47ed6e14bf0170d6ebdc9b0081ab187",
+          "24a151a77ce8aef489e30f860e0d828fe64f3e19e81c4ae96147c54762e0080f"
+        ]
+      },
+      {
+        "action": "ACTION6(3,15)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "0f63dfe423eab5d9a0e3ccb692e1076e8ed57d0be748e7a7e91d365799328d67",
+          "45f7a92b333810e4d23a63a4ef9a063519e69bfb6edb95c85eabf271a9839ae4",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      },
+      {
+        "action": "ACTION6(38,22)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "6537d5f914d5439fe88db7eb3a18820c16206701e30deb98bfde8ba87f36949d",
+          "bf64e3fab333751b427464ac8e78ef837207ed8a63f4a79756dcb39bbb3a7797",
+          "4b3f3c33081f4fd6407c916a445ad094dd0622042951406456d22e285daa9033"
+        ]
+      },
+      {
+        "action": "ACTION6(38,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "e0be39b7032c73551744796e3c2629d9880525080a4c329791738d55facc4b39",
+          "0032214b3904a7bb1507e03a181c3c014a7b7c8849e9a895f52e751bc4c19726",
+          "6537d5f914d5439fe88db7eb3a18820c16206701e30deb98bfde8ba87f36949d"
+        ]
+      },
+      {
+        "action": "ACTION6(39,22)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "6537d5f914d5439fe88db7eb3a18820c16206701e30deb98bfde8ba87f36949d",
+          "bf64e3fab333751b427464ac8e78ef837207ed8a63f4a79756dcb39bbb3a7797",
+          "4b3f3c33081f4fd6407c916a445ad094dd0622042951406456d22e285daa9033"
+        ]
+      },
+      {
+        "action": "ACTION6(37,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "e0be39b7032c73551744796e3c2629d9880525080a4c329791738d55facc4b39",
+          "0032214b3904a7bb1507e03a181c3c014a7b7c8849e9a895f52e751bc4c19726",
+          "6537d5f914d5439fe88db7eb3a18820c16206701e30deb98bfde8ba87f36949d"
+        ]
+      },
+      {
+        "action": "ACTION6(1,8)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "17c1a76e2d82cdaba3d298c36830d4670ab3520ce9463f44e9159b72671798f8",
+          "0c75b880f3fb86af827f33dce4320fc8895ff613f7bea10496b19a327625a0b6",
+          "9d510b2053db026798168093f9bf8eaf714d30dad082bf84b5d836ebffd0c988"
+        ]
+      },
+      {
+        "action": "ACTION6(40,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "e0be39b7032c73551744796e3c2629d9880525080a4c329791738d55facc4b39",
+          "0032214b3904a7bb1507e03a181c3c014a7b7c8849e9a895f52e751bc4c19726",
+          "6537d5f914d5439fe88db7eb3a18820c16206701e30deb98bfde8ba87f36949d"
+        ]
+      },
+      {
+        "action": "ACTION6(3,21)",
+        "catastrophe_probability": 0.0,
+        "costs": [
+          8.0,
+          4.3478260869565215,
+          5.333333333333334,
+          4.3478260869565215
+        ],
+        "cross_level_utility": -1.0,
+        "evsi": 0.0,
+        "myopic_utility": -1.0,
+        "prediction_signatures": [
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8",
+          "9495d29e3515325de71e86ba9a8e4e60a3a75f3991dcdc7fc7be19c4f8ab56c8",
+          "47d28949cb8e075962aa9fd943086435b1d51e81d7744dc499eb1f726b805c34",
+          "4554c6a1ae953a891caa90d799cda303aa0231b1d27d812fee776b40d76e74c8"
+        ]
+      }
+    ],
+    "agreement": 1.0,
+    "cross_level_multiplier": 23.0,
+    "differing_optimal_sets": false,
+    "hypothesis_ids": [
+      "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8",
+      "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59",
+      "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863",
+      "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db"
+    ],
+    "indifference": 1.0,
+    "invalid_hypothesis_ids": [],
+    "maximum_cross_level_utility": -1.0,
+    "maximum_evsi": 0.0,
+    "maximum_myopic_utility": -1.0,
+    "myopic_multiplier": 1.0,
+    "optimal_action_sets": {
+      "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(1,2)",
+        "ACTION6(3,15)",
+        "ACTION6(38,22)",
+        "ACTION6(38,21)",
+        "ACTION6(39,22)",
+        "ACTION6(37,21)",
+        "ACTION6(1,8)",
+        "ACTION6(40,21)",
+        "ACTION6(3,21)"
+      ],
+      "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(1,2)",
+        "ACTION6(3,15)",
+        "ACTION6(38,22)",
+        "ACTION6(38,21)",
+        "ACTION6(39,22)",
+        "ACTION6(37,21)",
+        "ACTION6(1,8)",
+        "ACTION6(40,21)",
+        "ACTION6(3,21)"
+      ],
+      "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(1,2)",
+        "ACTION6(3,15)",
+        "ACTION6(38,22)",
+        "ACTION6(38,21)",
+        "ACTION6(39,22)",
+        "ACTION6(37,21)",
+        "ACTION6(1,8)",
+        "ACTION6(40,21)",
+        "ACTION6(3,21)"
+      ],
+      "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db": [
+        "ACTION3",
+        "ACTION4",
+        "ACTION7",
+        "ACTION6(1,2)",
+        "ACTION6(3,15)",
+        "ACTION6(38,22)",
+        "ACTION6(38,21)",
+        "ACTION6(39,22)",
+        "ACTION6(37,21)",
+        "ACTION6(1,8)",
+        "ACTION6(40,21)",
+        "ACTION6(3,21)"
+      ]
+    },
+    "per_hypothesis_cost_variation": {
+      "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 8.0,
+        "minimum": 8.0,
+        "range": 0.0
+      },
+      "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 5.333333333333334,
+        "minimum": 5.333333333333334,
+        "range": 0.0
+      },
+      "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 4.3478260869565215,
+        "minimum": 4.3478260869565215,
+        "range": 0.0
+      },
+      "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db": {
+        "action_varying": false,
+        "distinct_costs": 1,
+        "maximum": 4.3478260869565215,
+        "minimum": 4.3478260869565215,
+        "range": 0.0
+      }
+    },
+    "weights": [
+      0.4116174747472121,
+      0.22410046565918698,
+      0.20604497263252872,
+      0.1582370869610722
+    ],
+    "x_only_probe_actions": []
+  },
+  "producer": {
+    "backbone_used": false,
+    "budget_scope": "offline capability audit; not a live controller run",
+    "compiler_code_sha256": "e77e4db0ad743f5ed5f076f716806c342c4bf8c4a5953747dc332b7097ed299f",
+    "compiler_contract_sha256": "eeccd86db3346fd15d2e3dbc8e82ee2bb60e23bc30c0490750a7a0fbaa9e14e5",
+    "generated_tokens": 0,
+    "instantiation_policy": "compile four deterministic restricted programs from the latest observable scene; bind palette-relative four-connected topology, containment, rarity, homologous shape repetition, symmetry, and relative geometry; install the most recent representable recorded transition ahead of every generic prior",
+    "instantiation_policy_sha256": "976fda886c6d73baa6e6c17cec061eee5ff416f466e5d79c709a62da8afa6fe1",
+    "instantiation_sha256": "c2c6aa75083a8a0c44360cb956de8b03d71754338070cc9263fb9f88995da436",
+    "model_calls": 0,
+    "model_id": null,
+    "producer_contract_sha256": "9045ea2b450bc4d7c129e03b745afa5898c129d6d44739597012f24f32302b42",
+    "producer_id": "arc3_voi.topology_compiler.compile_topology_programs",
+    "producer_invocations": 1,
+    "producer_kind": "deterministic_scene_topology_compiler",
+    "producer_version": "scene-topology-compiler-v1",
+    "proposal_batches_charged": 0
+  },
+  "programs": [
+    {
+      "assigned_role": "conservative_evidence",
+      "ast_nodes": 820,
+      "behavior_signature": "44e600c3b0158ebbed5b6eadf3b7312da04056867058e7bfdf0f1e21b81b6094",
+      "binding_evidence": [
+        "background from border occupancy then area (5)",
+        "primary ranked by transition overlap, topological enclosure, rarity, repetition, symmetry, and translation-invariant shape",
+        "secondary from nearest topology-ranked relative object",
+        "relative geometry selects column midpoint axis",
+        "visible palette only (7 values)",
+        "no representable transition; generic topology remains defeasible"
+      ],
+      "candidate_index": 0,
+      "compiler_role": "conservative_evidence",
+      "eligibility": {
+        "action_sensitive": false,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": false,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "grounding_worker_memory": {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      "hypothesis_id": "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8",
+      "instantiation_bindings": {
+        "background_colour": 5,
+        "candidate_points": [
+          [
+            38,
+            22
+          ],
+          [
+            38,
+            21
+          ],
+          [
+            39,
+            22
+          ],
+          [
+            37,
+            21
+          ],
+          [
+            40,
+            21
+          ],
+          [
+            38,
+            20
+          ]
+        ],
+        "component_count": 190,
+        "containment_pair_count": 0,
+        "primary_area": 2,
+        "primary_bbox": [
+          38,
+          22,
+          39,
+          22
+        ],
+        "primary_centre": [
+          38,
+          22
+        ],
+        "primary_colour": 11,
+        "primary_contained_count": 0,
+        "primary_containment_depth": 0,
+        "primary_repeat_count": 1,
+        "primary_symmetry": [
+          1,
+          1,
+          1
+        ],
+        "recorded_action_kind": -1,
+        "recorded_changed_count": 0,
+        "recorded_patch_cells": 0,
+        "recorded_transition_index": -1,
+        "recorded_transition_used": false,
+        "relative_offset": [
+          0,
+          -1
+        ],
+        "repeated_shape_group_count": 2,
+        "secondary_bbox": [
+          37,
+          20,
+          40,
+          21
+        ],
+        "secondary_centre": [
+          38,
+          21
+        ],
+        "secondary_colour": 9,
+        "symmetry_axis": 1,
+        "symmetry_axis_sum": 42,
+        "target_colour": 9
+      },
+      "raw_source_sha256": "1a186b39341189cacfb715da8e8d25fa8d4dbab5bd5e6995e47bcce0ccb41048",
+      "recorded_transition_count": 0,
+      "recorded_transition_precedence_used": false,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": false,
+        "goal_conditioning": false
+      },
+      "role_version": 1,
+      "source_origin": "scene_conditioned_topology_compiler"
+    },
+    {
+      "assigned_role": "topology_contact",
+      "ast_nodes": 1124,
+      "behavior_signature": "d5d2ad93735cd212700b783e5c1dc60ae51b1393ef8849dcdc95467d05fe2b0d",
+      "binding_evidence": [
+        "background from border occupancy then area (5)",
+        "primary ranked by transition overlap, topological enclosure, rarity, repetition, symmetry, and translation-invariant shape",
+        "secondary from nearest topology-ranked relative object",
+        "relative geometry selects column midpoint axis",
+        "visible palette only (7 values)",
+        "no representable transition; generic topology remains defeasible"
+      ],
+      "candidate_index": 1,
+      "compiler_role": "topology_contact",
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "grounding_worker_memory": {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      "hypothesis_id": "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59",
+      "instantiation_bindings": {
+        "background_colour": 5,
+        "candidate_points": [
+          [
+            38,
+            22
+          ],
+          [
+            38,
+            21
+          ],
+          [
+            39,
+            22
+          ],
+          [
+            37,
+            21
+          ],
+          [
+            40,
+            21
+          ],
+          [
+            38,
+            20
+          ]
+        ],
+        "component_count": 190,
+        "containment_pair_count": 0,
+        "primary_area": 2,
+        "primary_bbox": [
+          38,
+          22,
+          39,
+          22
+        ],
+        "primary_centre": [
+          38,
+          22
+        ],
+        "primary_colour": 11,
+        "primary_contained_count": 0,
+        "primary_containment_depth": 0,
+        "primary_repeat_count": 1,
+        "primary_symmetry": [
+          1,
+          1,
+          1
+        ],
+        "recorded_action_kind": -1,
+        "recorded_changed_count": 0,
+        "recorded_patch_cells": 0,
+        "recorded_transition_index": -1,
+        "recorded_transition_used": false,
+        "relative_offset": [
+          0,
+          -1
+        ],
+        "repeated_shape_group_count": 2,
+        "secondary_bbox": [
+          37,
+          20,
+          40,
+          21
+        ],
+        "secondary_centre": [
+          38,
+          21
+        ],
+        "secondary_colour": 9,
+        "symmetry_axis": 1,
+        "symmetry_axis_sum": 42,
+        "target_colour": 9
+      },
+      "raw_source_sha256": "e7cf0b1f8265f5801ec3a541988c2e9ddeec22c9cdc58cfabb2c67fef2a7f878",
+      "recorded_transition_count": 0,
+      "recorded_transition_precedence_used": false,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      },
+      "role_version": 1,
+      "source_origin": "scene_conditioned_topology_compiler"
+    },
+    {
+      "assigned_role": "homology_alignment",
+      "ast_nodes": 1166,
+      "behavior_signature": "50c89c727fb40eca344b88c5b21d46d25aca38c973ee383e8e22ef2b6ed850ea",
+      "binding_evidence": [
+        "background from border occupancy then area (5)",
+        "primary ranked by transition overlap, topological enclosure, rarity, repetition, symmetry, and translation-invariant shape",
+        "secondary from nearest topology-ranked relative object",
+        "relative geometry selects column midpoint axis",
+        "visible palette only (7 values)",
+        "no representable transition; generic topology remains defeasible"
+      ],
+      "candidate_index": 2,
+      "compiler_role": "homology_alignment",
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "grounding_worker_memory": {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      "hypothesis_id": "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863",
+      "instantiation_bindings": {
+        "background_colour": 5,
+        "candidate_points": [
+          [
+            38,
+            22
+          ],
+          [
+            38,
+            21
+          ],
+          [
+            39,
+            22
+          ],
+          [
+            37,
+            21
+          ],
+          [
+            40,
+            21
+          ],
+          [
+            38,
+            20
+          ]
+        ],
+        "component_count": 190,
+        "containment_pair_count": 0,
+        "primary_area": 2,
+        "primary_bbox": [
+          38,
+          22,
+          39,
+          22
+        ],
+        "primary_centre": [
+          38,
+          22
+        ],
+        "primary_colour": 11,
+        "primary_contained_count": 0,
+        "primary_containment_depth": 0,
+        "primary_repeat_count": 1,
+        "primary_symmetry": [
+          1,
+          1,
+          1
+        ],
+        "recorded_action_kind": -1,
+        "recorded_changed_count": 0,
+        "recorded_patch_cells": 0,
+        "recorded_transition_index": -1,
+        "recorded_transition_used": false,
+        "relative_offset": [
+          0,
+          -1
+        ],
+        "repeated_shape_group_count": 2,
+        "secondary_bbox": [
+          37,
+          20,
+          40,
+          21
+        ],
+        "secondary_centre": [
+          38,
+          21
+        ],
+        "secondary_colour": 9,
+        "symmetry_axis": 1,
+        "symmetry_axis_sum": 42,
+        "target_colour": 9
+      },
+      "raw_source_sha256": "b40d98f917bf83ce3f5af942e2c21f12485299502d060a5f1ed1de640c617706",
+      "recorded_transition_count": 0,
+      "recorded_transition_precedence_used": false,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      },
+      "role_version": 1,
+      "source_origin": "scene_conditioned_topology_compiler"
+    },
+    {
+      "assigned_role": "symmetry_completion",
+      "ast_nodes": 1298,
+      "behavior_signature": "3ad50e18939e3cb6c74a8da178967cbe0fb63ee6dddf0d7ede1d1c028a20bb71",
+      "binding_evidence": [
+        "background from border occupancy then area (5)",
+        "primary ranked by transition overlap, topological enclosure, rarity, repetition, symmetry, and translation-invariant shape",
+        "secondary from nearest topology-ranked relative object",
+        "relative geometry selects column midpoint axis",
+        "visible palette only (7 values)",
+        "no representable transition; generic topology remains defeasible"
+      ],
+      "candidate_index": 3,
+      "compiler_role": "symmetry_completion",
+      "eligibility": {
+        "action_sensitive": true,
+        "all_actions_ok": true,
+        "eligible": true,
+        "goal_action_conditioned": true,
+        "goal_value_ok": true,
+        "palette_conflicts": 0,
+        "sandbox_valid": true
+      },
+      "grounding_worker_memory": {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      "hypothesis_id": "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db",
+      "instantiation_bindings": {
+        "background_colour": 5,
+        "candidate_points": [
+          [
+            38,
+            22
+          ],
+          [
+            38,
+            21
+          ],
+          [
+            39,
+            22
+          ],
+          [
+            37,
+            21
+          ],
+          [
+            40,
+            21
+          ],
+          [
+            38,
+            20
+          ]
+        ],
+        "component_count": 190,
+        "containment_pair_count": 0,
+        "primary_area": 2,
+        "primary_bbox": [
+          38,
+          22,
+          39,
+          22
+        ],
+        "primary_centre": [
+          38,
+          22
+        ],
+        "primary_colour": 11,
+        "primary_contained_count": 0,
+        "primary_containment_depth": 0,
+        "primary_repeat_count": 1,
+        "primary_symmetry": [
+          1,
+          1,
+          1
+        ],
+        "recorded_action_kind": -1,
+        "recorded_changed_count": 0,
+        "recorded_patch_cells": 0,
+        "recorded_transition_index": -1,
+        "recorded_transition_used": false,
+        "relative_offset": [
+          0,
+          -1
+        ],
+        "repeated_shape_group_count": 2,
+        "secondary_bbox": [
+          37,
+          20,
+          40,
+          21
+        ],
+        "secondary_centre": [
+          38,
+          21
+        ],
+        "secondary_colour": 9,
+        "symmetry_axis": 1,
+        "symmetry_axis_sum": 42,
+        "target_colour": 9
+      },
+      "raw_source_sha256": "dd71e05755d15ca53140ec7afd2715bd5e3dbad2426b8ea2ddf1b61af4d3a5e7",
+      "recorded_transition_count": 0,
+      "recorded_transition_precedence_used": false,
+      "recorded_transition_scoring_used": false,
+      "requirements": {
+        "action_sensitivity": true,
+        "goal_conditioning": true
+      },
+      "role_version": 1,
+      "source_origin": "scene_conditioned_topology_compiler"
+    }
+  ],
+  "scene_topology_compiler": {
+    "admission_contract_version": "runtime-admission-v2",
+    "admission_overlay_sha256": "2992fa00f5e688bba4cef6f5be4f101528c25896d0bb74a28346fb1685822a12",
+    "compiler_contract_sha256": "eeccd86db3346fd15d2e3dbc8e82ee2bb60e23bc30c0490750a7a0fbaa9e14e5",
+    "contract_version": "scene-topology-compiler-v1",
+    "coordinate_and_palette_policy": "derive all target coordinates and colours from History; no game IDs, hand-authored coordinates, or hand-authored palette identities",
+    "empirical_transition_grounding_claimed": false,
+    "history_conditioning": "bindings compiled from latest scene topology and the most recent representable recorded transition",
+    "instantiation_sha256": "c2c6aa75083a8a0c44360cb956de8b03d71754338070cc9263fb9f88995da436",
+    "known_unverified_properties": [
+      "palette-permutation equivariance under every structural tie",
+      "translation equivariance at frame boundaries",
+      "integer-scale equivariance when topology or clipping changes"
+    ],
+    "offline_only": true,
+    "report_requires_clean_commit": true,
+    "roles": [
+      "conservative_evidence",
+      "topology_contact",
+      "homology_alignment",
+      "symmetry_completion"
+    ],
+    "simple_action_policy": "opaque simple actions preserve the grid unless directly supported by a recorded transition",
+    "source_count": 4,
+    "source_manifest": [
+      {
+        "bindings_sha256": "89bca001b37f83873f0a26687299919190ecafea03bf8d3e898f7cdcc200cd32",
+        "compiler_role": "conservative_evidence",
+        "evidence_sha256": "4591b3205d8072e40b0094250451afb443e6f7ee1157f8ee29fffa721f78e52f",
+        "role_version": 1,
+        "source_sha256": "1a186b39341189cacfb715da8e8d25fa8d4dbab5bd5e6995e47bcce0ccb41048"
+      },
+      {
+        "bindings_sha256": "89bca001b37f83873f0a26687299919190ecafea03bf8d3e898f7cdcc200cd32",
+        "compiler_role": "topology_contact",
+        "evidence_sha256": "4591b3205d8072e40b0094250451afb443e6f7ee1157f8ee29fffa721f78e52f",
+        "role_version": 1,
+        "source_sha256": "e7cf0b1f8265f5801ec3a541988c2e9ddeec22c9cdc58cfabb2c67fef2a7f878"
+      },
+      {
+        "bindings_sha256": "89bca001b37f83873f0a26687299919190ecafea03bf8d3e898f7cdcc200cd32",
+        "compiler_role": "homology_alignment",
+        "evidence_sha256": "4591b3205d8072e40b0094250451afb443e6f7ee1157f8ee29fffa721f78e52f",
+        "role_version": 1,
+        "source_sha256": "b40d98f917bf83ce3f5af942e2c21f12485299502d060a5f1ed1de640c617706"
+      },
+      {
+        "bindings_sha256": "89bca001b37f83873f0a26687299919190ecafea03bf8d3e898f7cdcc200cd32",
+        "compiler_role": "symmetry_completion",
+        "evidence_sha256": "4591b3205d8072e40b0094250451afb443e6f7ee1157f8ee29fffa721f78e52f",
+        "role_version": 1,
+        "source_sha256": "dd71e05755d15ca53140ec7afd2715bd5e3dbad2426b8ea2ddf1b61af4d3a5e7"
+      }
+    ],
+    "terminal_policy": "preserve current state generically; replay terminal state only when direct recorded-transition evidence applies",
+    "tested_properties": [
+      "deterministic same-history compilation",
+      "recorded-transition precedence",
+      "restricted-AST and bounded-grid execution",
+      "visible-palette permutation equivariance on synthetic scenes",
+      "interior translation equivariance without clipping on synthetic scenes",
+      "uniform integer-scale equivariance on synthetic scenes"
+    ]
+  },
+  "schema_version": 2,
+  "selection": {
+    "behavioral_deduplicated_ids": [],
+    "distinct_selected_behavior_classes": 4,
+    "eligible_ids": [
+      "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8",
+      "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59",
+      "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863",
+      "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db"
+    ],
+    "filter_precedes_persistent_worker_construction": true,
+    "ineligible_ids": [],
+    "ineligible_selected_ids": [],
+    "selected_ids": [
+      "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8",
+      "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59",
+      "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863",
+      "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db"
+    ],
+    "selected_worker_memory": [
+      {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "hypothesis_id": "01e4f2432210b9cea810a07223ea4b1ccddb7953942641071bbe962efa71e3e8",
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "hypothesis_id": "7d912fa082ee43f9c1f6959cf0869808f79a451c0e575a99e880d97dd0339e59",
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "hypothesis_id": "3412888d98d63c3b9cc2593323740aae856a44cdb9dfbe92b1de76f89621a863",
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      },
+      {
+        "allocation_headroom_bytes": 268435456,
+        "diagnostic": null,
+        "hard_limit_enforced": true,
+        "hypothesis_id": "b851c09b355acf888ba42c15490ab0b6d12357100ec45ba201155a77fc34c9db",
+        "limit_kind": "rlimit_data_baseline_plus_budget"
+      }
+    ]
+  },
+  "status": "pilot_blocked"
+}

@@ -71,8 +71,14 @@ Windows and Linux.
 
 The 13 July proposal-source amendment preserves that matrix byte-for-byte and registers a
 separate 180-row template-v1 development matrix with arms D-Q, S-T, M-T, and X-T. All rows
-are pending and execution is disabled until the compiler and offline admission gates pass.
-Its controlled mechanism contrast is M-T versus X-T; no cross-source same-backbone claim is
+remain unexecuted and hard-disabled. The clean canonical Linux audit completed but blocked:
+agreement was 1.0, maximum EVSI was 0.0, maximum M and X probe utilities were both -1.0,
+and there was no X-only probe. Its immutable report is
+`template_v1_runtime_admission_v2_bp35_seed11.json`, SHA-256
+`546cf508fa36e1d0ddd39b16e79c35f79fc597577609b3350add8f1c146e1033`.
+The registered matrix hash and zero-run status did not change, and even a future admission
+pass would still require separately reviewed live-producer wiring before execution. Its
+controlled mechanism contrast is M-T versus X-T; no cross-source same-backbone claim is
 authorized. The pre-amendment matrix is now audit-only because changed implementation code
 cannot execute under its legacy hashes; `run-matrix` requires source-v2 identity. See
 `docs/experiment_amendment_2026-07-13.md`.

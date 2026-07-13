@@ -81,3 +81,15 @@ itself remains unchanged.
 This amendment changes the proposal substrate and run identity only. It does not change the
 frozen public split, seeds, action/token/wall-time budgets, controller equations, statistical
 unit, score gates, or the negative status of existing results.
+
+## Post-amendment admission result — 13 July 2026
+
+The canonical offline Linux audit subsequently ran from clean commit
+`46bf052cd9254a8837f27db9119ffdc34c46cb65`. Four eligible, behaviorally distinct programs
+and all three graded roles passed the structural checks, with exact hard 256 MiB allocation
+headroom on every selected persistent worker. The decision gate blocked because agreement
+and indifference were 1.0, all hypothesis cost vectors were action-flat, maximum EVSI was
+0.0, both maximum M and X utilities were -1.0, and there was no X-only probe. The report at
+`artifacts/template_v1_runtime_admission_v2_bp35_seed11.json` has SHA-256
+`546cf508fa36e1d0ddd39b16e79c35f79fc597577609b3350add8f1c146e1033`. This result does not
+alter the frozen amendment or matrix and authorizes no environment action.

@@ -364,8 +364,8 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
         )
     if any(row.hypothesis_source != "qwen" for row in matrix):
         raise ValueError(
-            "template_v1 matrices are registration-only until the admission gate passes; "
-            "run-matrix execution is disabled"
+            "template_v1 matrices are registration-only; run-matrix execution remains "
+            "disabled pending separately reviewed live-producer wiring and admission"
         )
     config = load_config(args.config)
     require_admitted_hypothesis_source(config)

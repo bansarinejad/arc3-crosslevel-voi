@@ -34,14 +34,14 @@ class HypothesisSourceNotAdmittedError(ValueError):
 
 
 def require_admitted_hypothesis_source(config: SystemConfig) -> None:
-    """Fail closed until a non-Qwen producer has passed the offline admission gate."""
+    """Fail closed until a non-Qwen live producer is explicitly admitted."""
 
     source = config.experiment.hypothesis_source
     if source != "qwen":
         raise HypothesisSourceNotAdmittedError(
-            f"hypothesis_source={source!r} is registration-only pending the offline "
-            "admission gate; live execution is disabled and no Qwen backend may execute "
-            "under this source label"
+            f"hypothesis_source={source!r} is registration-only; live producer wiring "
+            "and admission are not authorized, and no Qwen backend may execute under "
+            "this source label"
         )
 
 
