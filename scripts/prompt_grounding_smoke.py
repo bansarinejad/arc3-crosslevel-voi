@@ -56,6 +56,7 @@ def main() -> int:
     args = parser.parse_args()
 
     base_config = load_config(args.config)
+    require_live_execution_admitted(base_config)
     if base_config.model is None:
         raise ValueError("grounding smoke requires a model configuration")
     config = replace(
@@ -63,7 +64,6 @@ def main() -> int:
         experiment=replace(base_config.experiment, seed=args.seed),
         model=replace(base_config.model, offline=True),
     )
-    require_live_execution_admitted(config)
 
     if args.trace is not None:
         trace_sha = canonical_trace_hash(args.trace)

@@ -170,6 +170,99 @@ def test_build_agent_rejects_registration_only_source_before_backend_use() -> No
     assert not backend.closed
 
 
+@pytest.mark.parametrize(
+    "runtime_version",
+    ["crosslevel-voi-runtime-v5", "unregistered-runtime"],
+)
+@pytest.mark.parametrize(
+    "hypothesis_source",
+    ["qwen", "template_v1", "qwen_then_template_v1"],
+)
+def test_live_guard_rejects_unknown_runtime_before_source(
+    runtime_version: str,
+    hypothesis_source: str,
+) -> None:
+    config = SystemConfig(
+        experiment=ExperimentConfig(
+            variant="X",
+            hypothesis_source=cast(Any, hypothesis_source),
+            implementation_contract_version=runtime_version,
+        )
+    )
+
+    with pytest.raises(
+        TreatmentNotAdmittedError,
+        match="not in the exact live-contract allowlist",
+    ):
+        require_live_execution_admitted(config)
+
+
+@pytest.mark.parametrize(
+    "hypothesis_source",
+    ["qwen", "template_v1", "qwen_then_template_v1"],
+)
+def test_live_guard_preserves_permanent_v4_failure_before_source(
+    hypothesis_source: str,
+) -> None:
+    template = load_config("configs/template_v1_path_deficit_v2_x.yaml")
+    config = replace(
+        template,
+        experiment=replace(
+            template.experiment,
+            hypothesis_source=cast(Any, hypothesis_source),
+        ),
+    )
+
+    with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
+        require_live_execution_admitted(config)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("completion_cost_policy_version", "path-deficit-v2"),
+        ("completion_cost_policy_sha256", "0" * 64),
+    ],
+)
+def test_live_guard_rejects_completion_policy_identity_drift(
+    field: str,
+    value: str,
+) -> None:
+    config = SystemConfig(
+        experiment=ExperimentConfig(variant="X", hypothesis_source="template_v1")
+    )
+    object.__setattr__(config.planning, field, value)
+
+    with pytest.raises(
+        TreatmentNotAdmittedError,
+        match="not the admitted endpoint-v1 contract",
+    ):
+        require_live_execution_admitted(config)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("probe_disagreement_policy_version", "unregistered-policy"),
+        ("probe_disagreement_policy_sha256", "0" * 64),
+    ],
+)
+def test_live_guard_rejects_probe_policy_identity_drift_before_source(
+    field: str,
+    value: str,
+) -> None:
+    config = SystemConfig(
+        experiment=ExperimentConfig(variant="X", hypothesis_source="template_v1")
+    )
+    object.__setattr__(config.planning, field, value)
+
+    with pytest.raises(
+        TreatmentNotAdmittedError,
+        match="not the admitted winning-action-agreement-v1 contract",
+    ):
+        require_live_execution_admitted(config)
+
+
 def test_qwen_producer_contract_is_controller_and_seed_independent() -> None:
     first = SystemConfig(experiment=ExperimentConfig(variant="M", seed=11))
     second = SystemConfig(experiment=ExperimentConfig(variant="X", seed=23))

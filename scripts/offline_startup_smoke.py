@@ -49,9 +49,9 @@ def smoke(bundle: Path, *, load_model_config: bool = True) -> None:
 
     config_path = bundle / manifest["provenance"]["selected_config"]
     config = load_config(config_path)
+    require_live_execution_admitted(config)
     if config.model is None or not config.model.offline:
         raise ValueError("Kaggle bundle config must set model.offline: true")
-    require_live_execution_admitted(config)
     backend = backend_from_config(config, model_path=bundle / "model")
     if Path(backend.model_path).resolve() != (bundle / "model").resolve():
         raise AssertionError("backend did not retain the bundled model path")

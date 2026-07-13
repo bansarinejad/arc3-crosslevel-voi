@@ -358,6 +358,8 @@ def _run_command(args: argparse.Namespace) -> int:
 
 
 def _run_matrix_command(args: argparse.Namespace) -> int:
+    config = load_config(args.config)
+    require_live_execution_admitted(config)
     matrix = load_matrix(args.matrix)
     if matrix[0].identity_version != "source-v2":
         raise ValueError(
@@ -369,8 +371,6 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
             "template_v1 matrices are registration-only; run-matrix execution remains "
             "disabled pending separately reviewed live-producer wiring and admission"
         )
-    config = load_config(args.config)
-    require_live_execution_admitted(config)
     producer_contract_sha256 = qwen_producer_contract_sha256(config)
     metadata = load_metadata(args.metadata)
     actual_snapshot_hash = metadata_hash(metadata)

@@ -16,6 +16,13 @@ from .planner import (
 )
 
 HypothesisSource = Literal["qwen", "template_v1", "qwen_then_template_v1"]
+ProbeDisagreementPolicy = Literal["winning-action-agreement-v1"]
+
+PROBE_DISAGREEMENT_POLICY_HASHES: Mapping[ProbeDisagreementPolicy, str] = {
+    "winning-action-agreement-v1": (
+        "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
+    )
+}
 
 SUPPORTED_CANDIDATE_POLICY = (
     "salience-frontier-v1",
@@ -169,6 +176,12 @@ class PlanningConfig:
     completion_cost_policy_sha256: str = COMPLETION_COST_POLICY_HASHES[
         ENDPOINT_COMPLETION_COST_POLICY
     ]
+    probe_disagreement_policy_version: ProbeDisagreementPolicy = (
+        "winning-action-agreement-v1"
+    )
+    probe_disagreement_policy_sha256: str = PROBE_DISAGREEMENT_POLICY_HASHES[
+        "winning-action-agreement-v1"
+    ]
 
     def __post_init__(self) -> None:
         for name in ("max_candidates", "depth", "beam_width", "max_probes_per_level"):
@@ -183,6 +196,15 @@ class PlanningConfig:
             != COMPLETION_COST_POLICY_HASHES[self.completion_cost_policy_version]
         ):
             raise ConfigError("completion-cost policy identity does not match this runtime")
+        if (
+            self.probe_disagreement_policy_version
+            not in PROBE_DISAGREEMENT_POLICY_HASHES
+            or self.probe_disagreement_policy_sha256
+            != PROBE_DISAGREEMENT_POLICY_HASHES[
+                self.probe_disagreement_policy_version
+            ]
+        ):
+            raise ConfigError("probe-disagreement policy identity does not match this runtime")
 
 
 @dataclass(frozen=True, slots=True)
@@ -400,6 +422,8 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                     "robust_std_coefficient",
                     "completion_cost_policy_version",
                     "completion_cost_policy_sha256",
+                    "probe_disagreement_policy_version",
+                    "probe_disagreement_policy_sha256",
                 }
             ),
             PlanningConfig,

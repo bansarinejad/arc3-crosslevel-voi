@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import inspect
 from dataclasses import replace
 
 import pytest
@@ -7,6 +9,7 @@ import pytest
 from arc3_voi.candidates import CANDIDATE_POLICY_HASH, CANDIDATE_POLICY_VERSION
 from arc3_voi.config import (
     PATH_DEFICIT_RUNTIME_VERSION,
+    PROBE_DISAGREEMENT_POLICY_HASHES,
     ConfigError,
     ExperimentConfig,
     PlanningConfig,
@@ -19,6 +22,7 @@ from arc3_voi.planner import (
     COMPLETION_COST_POLICY_HASHES,
     ENDPOINT_COMPLETION_COST_POLICY,
     PATH_DEFICIT_COMPLETION_COST_POLICY,
+    committee_agreement,
 )
 from arc3_voi.prompts import PROMPT_CONTRACT_SHA256, PROMPT_CONTRACT_VERSION
 from arc3_voi.rendering import PERCEPTION_CONTRACT_SHA256
@@ -106,6 +110,23 @@ def test_completion_cost_policy_hashes_are_frozen_content_identities() -> None:
             "055f52473893709d88beffed0b22fa035c24af7b9da3ce24306e481cf2abc670"
         ),
     }
+
+
+def test_probe_disagreement_policy_hash_pins_the_historical_function_source() -> None:
+    expected = "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
+
+    assert {
+        "winning-action-agreement-v1": expected
+    } == PROBE_DISAGREEMENT_POLICY_HASHES
+    assert hashlib.sha256(inspect.getsource(committee_agreement).encode()).hexdigest() == expected
+
+    planning = PlanningConfig()
+    assert (
+        planning.probe_disagreement_policy_version,
+        planning.probe_disagreement_policy_sha256,
+    ) == ("winning-action-agreement-v1", expected)
+    with pytest.raises(ConfigError, match="probe-disagreement policy identity"):
+        PlanningConfig(probe_disagreement_policy_sha256="0" * 64)
 
 
 def test_v3_source_and_legacy_config_hashes_remain_byte_stable() -> None:
@@ -211,6 +232,91 @@ def test_historical_hash_projection_rejects_invalid_explicit_policy_identity() -
             stable_config_hash(mapping)
         with pytest.raises(ValueError, match="historical completion-cost policy"):
             stable_config_hash(mapping, implicit_qwen_legacy=True)
+
+
+@pytest.mark.parametrize(
+    "runtime_version",
+    [
+        "crosslevel-voi-runtime-v2",
+        "crosslevel-voi-runtime-v3",
+        PATH_DEFICIT_RUNTIME_VERSION,
+    ],
+)
+def test_historical_hash_projection_strips_only_valid_probe_policy_identity(
+    runtime_version: str,
+) -> None:
+    policy = {
+        "probe_disagreement_policy_version": "winning-action-agreement-v1",
+        "probe_disagreement_policy_sha256": (
+            "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
+        ),
+    }
+    planning: dict[str, object] = dict(policy)
+    if runtime_version == PATH_DEFICIT_RUNTIME_VERSION:
+        planning.update(
+            {
+                "completion_cost_policy_version": PATH_DEFICIT_COMPLETION_COST_POLICY,
+                "completion_cost_policy_sha256": COMPLETION_COST_POLICY_HASHES[
+                    PATH_DEFICIT_COMPLETION_COST_POLICY
+                ],
+            }
+        )
+    with_policy = {
+        "experiment": {"implementation_contract_version": runtime_version},
+        "planning": planning,
+    }
+    without_policy = {
+        "experiment": {"implementation_contract_version": runtime_version},
+        "planning": {key: value for key, value in planning.items() if key not in policy},
+    }
+
+    assert stable_config_hash(with_policy) == stable_config_hash(without_policy)
+
+
+@pytest.mark.parametrize(
+    "planning",
+    [
+        {"probe_disagreement_policy_version": "winning-action-agreement-v1"},
+        {
+            "probe_disagreement_policy_version": "winning-action-agreement-v1",
+            "probe_disagreement_policy_sha256": "0" * 64,
+        },
+        {
+            "probe_disagreement_policy_version": "unknown-policy",
+            "probe_disagreement_policy_sha256": (
+                "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
+            ),
+        },
+    ],
+)
+def test_historical_hash_projection_rejects_invalid_probe_policy_identity(
+    planning: dict[str, object],
+) -> None:
+    mapping = {
+        "experiment": {"implementation_contract_version": "crosslevel-voi-runtime-v3"},
+        "planning": planning,
+    }
+
+    with pytest.raises(ValueError, match="historical probe-disagreement policy"):
+        stable_config_hash(mapping)
+
+
+def test_probe_policy_identity_is_not_projected_from_new_runtime_hashes() -> None:
+    base = {
+        "experiment": {"implementation_contract_version": "crosslevel-voi-runtime-v5"},
+        "planning": {},
+    }
+    identified = {
+        **base,
+        "planning": {
+            "probe_disagreement_policy_version": "winning-action-agreement-v1",
+            "probe_disagreement_policy_sha256": (
+                "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
+            ),
+        },
+    }
+
+    assert stable_config_hash(base) != stable_config_hash(identified)
 
 
 def test_runtime_v4_hash_retains_serialized_policy_identity() -> None:

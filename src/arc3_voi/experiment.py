@@ -568,14 +568,17 @@ def _implicit_qwen_projection(config: object) -> object:
     if isinstance(raw_planning, Mapping):
         planning = dict(raw_planning)
         _validate_historical_completion_cost_policy(planning)
+        _validate_historical_probe_disagreement_policy(planning)
         planning.pop("completion_cost_policy_version", None)
         planning.pop("completion_cost_policy_sha256", None)
+        planning.pop("probe_disagreement_policy_version", None)
+        planning.pop("probe_disagreement_policy_sha256", None)
         projected["planning"] = planning
     return projected
 
 
 def _historical_completion_cost_projection(config: object) -> object:
-    """Keep runtime-v2/v3 source identities byte-stable after policy versioning."""
+    """Keep runtime-v2/v3/v4 identities stable after policy versioning."""
 
     if is_dataclass(config) and not isinstance(config, type):
         projected: object = asdict(config)
@@ -589,15 +592,24 @@ def _historical_completion_cost_projection(config: object) -> object:
     raw_planning = projected.get("planning")
     if not isinstance(raw_experiment, Mapping) or not isinstance(raw_planning, Mapping):
         return config
-    if raw_experiment.get("implementation_contract_version") not in {
+    runtime_version = raw_experiment.get("implementation_contract_version")
+    if runtime_version not in {
         "crosslevel-voi-runtime-v2",
         "crosslevel-voi-runtime-v3",
+        "crosslevel-voi-runtime-v4",
     }:
         return projected
     planning = dict(raw_planning)
-    _validate_historical_completion_cost_policy(planning)
-    planning.pop("completion_cost_policy_version", None)
-    planning.pop("completion_cost_policy_sha256", None)
+    _validate_historical_probe_disagreement_policy(planning)
+    planning.pop("probe_disagreement_policy_version", None)
+    planning.pop("probe_disagreement_policy_sha256", None)
+    if runtime_version in {
+        "crosslevel-voi-runtime-v2",
+        "crosslevel-voi-runtime-v3",
+    }:
+        _validate_historical_completion_cost_policy(planning)
+        planning.pop("completion_cost_policy_version", None)
+        planning.pop("completion_cost_policy_sha256", None)
     projected["planning"] = planning
     return projected
 
@@ -622,6 +634,33 @@ def _validate_historical_completion_cost_policy(planning: Mapping[str, object]) 
     )
     if actual != expected:
         raise ValueError("historical completion-cost policy identity must be endpoint-v1")
+
+
+def _validate_historical_probe_disagreement_policy(
+    planning: Mapping[str, object],
+) -> None:
+    policy_keys = {
+        "probe_disagreement_policy_version",
+        "probe_disagreement_policy_sha256",
+    }
+    present = policy_keys.intersection(planning)
+    if not present:
+        return
+    if present != policy_keys:
+        raise ValueError("historical probe-disagreement policy identity is incomplete")
+    expected = (
+        "winning-action-agreement-v1",
+        "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a",
+    )
+    actual = (
+        planning["probe_disagreement_policy_version"],
+        planning["probe_disagreement_policy_sha256"],
+    )
+    if actual != expected:
+        raise ValueError(
+            "historical probe-disagreement policy identity must be "
+            "winning-action-agreement-v1"
+        )
 
 
 def _game_version(game: str, versions: Mapping[str, str] | None) -> str:

@@ -9,7 +9,11 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .candidates import candidates_from_history
-from .config import PATH_DEFICIT_RUNTIME_VERSION, SystemConfig
+from .config import (
+    PATH_DEFICIT_RUNTIME_VERSION,
+    PROBE_DISAGREEMENT_POLICY_HASHES,
+    SystemConfig,
+)
 from .controller import (
     Controller,
     ControllerConfig,
@@ -37,6 +41,17 @@ class TreatmentNotAdmittedError(ValueError):
     """Raised before live resources are created for a frozen treatment."""
 
 
+LIVE_IMPLEMENTATION_CONTRACT_VERSION = "crosslevel-voi-runtime-v3"
+LIVE_COMPLETION_COST_POLICY_IDENTITY = (
+    "endpoint-v1",
+    "c12daf008d7ee6792b3ade429dacb8a65a108b9d5eb8ea8d1f5e78552dd2e95a",
+)
+LIVE_PROBE_DISAGREEMENT_POLICY_IDENTITY = (
+    "winning-action-agreement-v1",
+    PROBE_DISAGREEMENT_POLICY_HASHES["winning-action-agreement-v1"],
+)
+
+
 def require_admitted_hypothesis_source(config: SystemConfig) -> None:
     """Fail closed until a non-Qwen live producer is explicitly admitted."""
 
@@ -50,15 +65,45 @@ def require_admitted_hypothesis_source(config: SystemConfig) -> None:
 
 
 def require_live_execution_admitted(config: SystemConfig) -> None:
-    """Fail closed on both unadmitted producers and frozen runtime treatments."""
+    """Admit only the exact runtime-v3/Qwen/endpoint live contract."""
 
-    require_admitted_hypothesis_source(config)
-    if config.experiment.implementation_contract_version == PATH_DEFICIT_RUNTIME_VERSION:
+    runtime_version = config.experiment.implementation_contract_version
+    if runtime_version == PATH_DEFICIT_RUNTIME_VERSION:
         raise TreatmentNotAdmittedError(
             "crosslevel-voi-runtime-v4/path-deficit-v2 failed its preregistered "
             "synthetic gate and is frozen; model preflight, live execution, and "
             "matrix execution are not authorized under any hypothesis source"
         )
+    if runtime_version != LIVE_IMPLEMENTATION_CONTRACT_VERSION:
+        raise TreatmentNotAdmittedError(
+            f"implementation_contract_version={runtime_version!r} is not in the exact "
+            "live-contract allowlist; model preflight, live execution, matrix execution, "
+            "and live artifact output are not authorized under any hypothesis source"
+        )
+
+    configured_identity = (
+        config.planning.completion_cost_policy_version,
+        config.planning.completion_cost_policy_sha256,
+    )
+    if configured_identity != LIVE_COMPLETION_COST_POLICY_IDENTITY:
+        raise TreatmentNotAdmittedError(
+            "completion-cost policy identity is not the admitted endpoint-v1 contract; "
+            "model preflight, live execution, matrix execution, and live artifact output "
+            "are not authorized"
+        )
+
+    configured_probe_identity = (
+        config.planning.probe_disagreement_policy_version,
+        config.planning.probe_disagreement_policy_sha256,
+    )
+    if configured_probe_identity != LIVE_PROBE_DISAGREEMENT_POLICY_IDENTITY:
+        raise TreatmentNotAdmittedError(
+            "probe-disagreement policy identity is not the admitted "
+            "winning-action-agreement-v1 contract; model preflight, live execution, "
+            "matrix execution, and live artifact output are not authorized"
+        )
+
+    require_admitted_hypothesis_source(config)
 
 
 def qwen_producer_contract_sha256(config: SystemConfig) -> str:

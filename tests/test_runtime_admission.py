@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+import arc3_voi.runtime_admission as runtime_admission_module
 from arc3_voi.config import (
     PATH_DEFICIT_RUNTIME_VERSION,
     ExperimentConfig,
@@ -25,6 +26,7 @@ from arc3_voi.runtime_admission import (
     construct_eligible_hypotheses,
     evaluate_source_programs,
     role_requirements,
+    run_runtime_admission_audit,
     x_only_probe_actions,
 )
 from arc3_voi.types import Action, ActionKind, GameState, History, Observation, Prediction
@@ -52,6 +54,36 @@ class _FakeHypothesis:
 
     def close(self) -> None:
         self.closed = True
+
+
+@pytest.mark.parametrize(
+    "runtime_version",
+    ["crosslevel-voi-runtime-v5", "unregistered-runtime"],
+)
+def test_legacy_runtime_audit_rejects_new_or_unknown_runtime_before_input_reads(
+    runtime_version: str,
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = SystemConfig(
+        experiment=ExperimentConfig(implementation_contract_version=runtime_version)
+    )
+    reads: list[object] = []
+
+    def unexpected_read(path: object) -> object:
+        reads.append(path)
+        raise AssertionError("legacy runtime audit must classify runtime before input reads")
+
+    monkeypatch.setattr(runtime_admission_module, "_load_json_object", unexpected_read)
+
+    with pytest.raises(ValueError, match="runtime-admission entrypoint"):
+        run_runtime_admission_audit(
+            grounding_artifact_path=tmp_path / "must-not-read-grounding.json",
+            fixture_path=tmp_path / "must-not-read-fixture.json",
+            config=config,
+        )
+
+    assert reads == []
 
 
 def test_role_requirements_reserve_only_candidate_zero_as_conservative() -> None:

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from arc3_voi.agent import build_agent
+from arc3_voi.agent import build_agent, require_live_execution_admitted
 from arc3_voi.arc_adapter import ArcCompetitionClient
 from arc3_voi.config import ExperimentConfig, SystemConfig
 from arc3_voi.model import ScriptedBackend
@@ -12,9 +12,6 @@ from arc3_voi.runner import run_game
 
 
 def main() -> int:
-    backend = ScriptedBackend(
-        action_policy=lambda _history, valid: {"kind": valid[0].split("(", 1)[0]}
-    )
     config = SystemConfig(
         experiment=ExperimentConfig(
             variant="D",
@@ -22,6 +19,10 @@ def main() -> int:
             max_generated_tokens=16,
             max_wall_seconds=20,
         )
+    )
+    require_live_execution_admitted(config)
+    backend = ScriptedBackend(
+        action_policy=lambda _history, valid: {"kind": valid[0].split("(", 1)[0]}
     )
     session = ArcCompetitionClient().make("ls20", seed=0)
     with build_agent(backend, config) as agent:
@@ -43,4 +44,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

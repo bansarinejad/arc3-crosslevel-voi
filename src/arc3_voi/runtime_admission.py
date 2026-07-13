@@ -409,6 +409,21 @@ def run_runtime_admission_audit(
 ) -> dict[str, Any]:
     """Re-run grounding, selection, and planning without model or environment calls."""
 
+    runtime_version = config.experiment.implementation_contract_version
+    if runtime_version not in {
+        "crosslevel-voi-runtime-v2",
+        "crosslevel-voi-runtime-v3",
+        "crosslevel-voi-runtime-v4",
+    }:
+        if runtime_version == "crosslevel-voi-runtime-v5":
+            raise ValueError(
+                "runtime-v5 requires the separately authorized v5 audit path; the legacy "
+                "runtime-admission entrypoint will not read grounding or fixture inputs"
+            )
+        raise ValueError(
+            f"implementation_contract_version={runtime_version!r} is unsupported by the "
+            "legacy runtime-admission entrypoint; grounding and fixture inputs were not read"
+        )
     grounding_artifact = _load_json_object(grounding_artifact_path)
     fixture = _load_json_object(fixture_path)
     _grounding_schema_version(grounding_artifact)
