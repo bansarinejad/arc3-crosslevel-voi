@@ -1,0 +1,9 @@
+extends: template_v1_path_deficit_v2_x.yaml
+
+experiment:
+  implementation_contract_version: crosslevel-voi-runtime-v5
+
+planning:
+  probe_disagreement_policy_version: action-conditional-outcome-qbc-v1
+  probe_disagreement_policy_sha256: a2d36168936f433157052e07d7eafca4f8a65fb49c0bb61800fe53744f2d5a9d
+  outcome_concentration_threshold: 0.8

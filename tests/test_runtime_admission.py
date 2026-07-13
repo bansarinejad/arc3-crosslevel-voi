@@ -13,6 +13,7 @@ from arc3_voi.config import (
     ExperimentConfig,
     PlanningConfig,
     SystemConfig,
+    load_config,
 )
 from arc3_voi.planner import (
     COMPLETION_COST_POLICY_HASHES,
@@ -65,8 +66,12 @@ def test_legacy_runtime_audit_rejects_new_or_unknown_runtime_before_input_reads(
     tmp_path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    config = SystemConfig(
-        experiment=ExperimentConfig(implementation_contract_version=runtime_version)
+    config = (
+        load_config("configs/template_v1_action_conditional_qbc_v1_x.yaml")
+        if runtime_version == "crosslevel-voi-runtime-v5"
+        else SystemConfig(
+            experiment=ExperimentConfig(implementation_contract_version=runtime_version)
+        )
     )
     reads: list[object] = []
 

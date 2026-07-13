@@ -6,6 +6,12 @@ from dataclasses import replace
 
 import pytest
 
+from arc3_voi.action_qbc_policy import (
+    ACTION_QBC_POLICY_SHA256,
+    ACTION_QBC_POLICY_VERSION,
+    ACTION_QBC_RUNTIME_VERSION,
+    OUTCOME_CONCENTRATION_THRESHOLD,
+)
 from arc3_voi.candidates import CANDIDATE_POLICY_HASH, CANDIDATE_POLICY_VERSION
 from arc3_voi.config import (
     PATH_DEFICIT_RUNTIME_VERSION,
@@ -116,7 +122,8 @@ def test_probe_disagreement_policy_hash_pins_the_historical_function_source() ->
     expected = "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
 
     assert {
-        "winning-action-agreement-v1": expected
+        "winning-action-agreement-v1": expected,
+        ACTION_QBC_POLICY_VERSION: ACTION_QBC_POLICY_SHA256,
     } == PROBE_DISAGREEMENT_POLICY_HASHES
     assert hashlib.sha256(inspect.getsource(committee_agreement).encode()).hexdigest() == expected
 
@@ -127,6 +134,107 @@ def test_probe_disagreement_policy_hash_pins_the_historical_function_source() ->
     ) == ("winning-action-agreement-v1", expected)
     with pytest.raises(ConfigError, match="probe-disagreement policy identity"):
         PlanningConfig(probe_disagreement_policy_sha256="0" * 64)
+
+
+def test_runtime_v5_config_pins_the_new_policy_and_every_fixed_factor() -> None:
+    config = load_config("configs/template_v1_action_conditional_qbc_v1_x.yaml")
+
+    assert config.experiment.implementation_contract_version == ACTION_QBC_RUNTIME_VERSION
+    assert config.planning.completion_cost_policy_version == (
+        PATH_DEFICIT_COMPLETION_COST_POLICY
+    )
+    assert (
+        config.planning.probe_disagreement_policy_version,
+        config.planning.probe_disagreement_policy_sha256,
+        config.planning.outcome_concentration_threshold,
+    ) == (
+        ACTION_QBC_POLICY_VERSION,
+        ACTION_QBC_POLICY_SHA256,
+        OUTCOME_CONCENTRATION_THRESHOLD,
+    )
+    assert config.hypotheses.max_hypotheses == 4
+    assert config.hypotheses.eta == 5.0
+    assert config.hypotheses.complexity_lambda == 0.002
+    assert config.planning.max_candidates == 12
+    assert config.planning.depth == 4
+    assert config.planning.beam_width == 8
+    assert config.sandbox.timeout_ms == 100
+    assert config.sandbox.memory_mb == 256
+
+
+def test_runtime_v5_rejects_policy_threshold_cost_and_fixed_factor_drift() -> None:
+    config = load_config("configs/template_v1_action_conditional_qbc_v1_x.yaml")
+    with pytest.raises(ConfigError, match="action-conditional outcome-QBC"):
+        replace(
+            config,
+            planning=replace(
+                config.planning,
+                probe_disagreement_policy_version="winning-action-agreement-v1",
+                probe_disagreement_policy_sha256=PROBE_DISAGREEMENT_POLICY_HASHES[
+                    "winning-action-agreement-v1"
+                ],
+            ),
+        )
+    with pytest.raises(ConfigError, match=r"fixed at 0\.8"):
+        replace(
+            config,
+            planning=replace(config.planning, outcome_concentration_threshold=None),
+        )
+    with pytest.raises(ConfigError, match=r"fixed at 0\.8"):
+        replace(
+            config,
+            planning=replace(config.planning, outcome_concentration_threshold=0.79),
+        )
+    with pytest.raises(ConfigError, match="completion-cost policy"):
+        replace(
+            config,
+            planning=replace(
+                config.planning,
+                completion_cost_policy_version=ENDPOINT_COMPLETION_COST_POLICY,
+                completion_cost_policy_sha256=COMPLETION_COST_POLICY_HASHES[
+                    ENDPOINT_COMPLETION_COST_POLICY
+                ],
+            ),
+        )
+    with pytest.raises(ConfigError, match="fixed-factor drift"):
+        replace(
+            config,
+            planning=replace(config.planning, max_candidates=11),
+        )
+    with pytest.raises(ConfigError, match="fixed-factor drift"):
+        replace(
+            config,
+            hypotheses=replace(config.hypotheses, loss_refresh_threshold=0.2),
+        )
+    with pytest.raises(ConfigError, match="fixed-factor drift"):
+        replace(
+            config,
+            generation=replace(config.generation, temperature=0.5),
+        )
+
+
+def test_v5_policy_and_threshold_are_retained_in_complete_config_hash() -> None:
+    config = load_config("configs/template_v1_action_conditional_qbc_v1_x.yaml")
+    baseline = stable_config_hash(config)
+    raw = {
+        "experiment": {"implementation_contract_version": ACTION_QBC_RUNTIME_VERSION},
+        "planning": {
+            "probe_disagreement_policy_version": ACTION_QBC_POLICY_VERSION,
+            "probe_disagreement_policy_sha256": ACTION_QBC_POLICY_SHA256,
+            "outcome_concentration_threshold": 0.79,
+        },
+    }
+
+    assert stable_config_hash(raw) != baseline
+    assert stable_config_hash(raw) != stable_config_hash(
+        {
+            **raw,
+            "planning": {
+                **raw["planning"],
+                "outcome_concentration_threshold": OUTCOME_CONCENTRATION_THRESHOLD,
+            },
+        }
+    )
 
 
 def test_v3_source_and_legacy_config_hashes_remain_byte_stable() -> None:
@@ -299,6 +407,18 @@ def test_historical_hash_projection_rejects_invalid_probe_policy_identity(
 
     with pytest.raises(ValueError, match="historical probe-disagreement policy"):
         stable_config_hash(mapping)
+
+
+def test_historical_hash_projection_rejects_nonnull_outcome_threshold() -> None:
+    mapping = {
+        "experiment": {"implementation_contract_version": "crosslevel-voi-runtime-v3"},
+        "planning": {"outcome_concentration_threshold": 0.8},
+    }
+
+    with pytest.raises(ValueError, match="historical outcome-concentration threshold"):
+        stable_config_hash(mapping)
+    with pytest.raises(ValueError, match="historical outcome-concentration threshold"):
+        stable_config_hash(mapping, implicit_qwen_legacy=True)
 
 
 def test_probe_policy_identity_is_not_projected_from_new_runtime_hashes() -> None:

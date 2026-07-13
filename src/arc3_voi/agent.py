@@ -103,6 +103,13 @@ def require_live_execution_admitted(config: SystemConfig) -> None:
             "matrix execution, and live artifact output are not authorized"
         )
 
+    if config.planning.outcome_concentration_threshold is not None:
+        raise TreatmentNotAdmittedError(
+            "outcome-concentration threshold is not part of the admitted runtime-v3 "
+            "contract; model preflight, live execution, matrix execution, and live "
+            "artifact output are not authorized"
+        )
+
     require_admitted_hypothesis_source(config)
 
 

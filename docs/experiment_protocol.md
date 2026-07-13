@@ -310,3 +310,57 @@ model, GPU, environment, reward/RHAE observation, EVSI/utility calculation, pass
 other scientific diagnostic. The generator and wrapper are now permanently frozen. This
 record authorizes only runtime-v5 implementation and open-fixture tests at the next stage;
 it does not authorize a sealed audit, model call, gameplay pilot, or matrix row.
+
+### Pre-audit metadata-search incident — 13 July 2026
+
+During runtime-v5 code review, one broad repository `rg` search unintentionally traversed
+the registered artifact before the code/config/zero-run freeze. The returned matches were
+limited to already-frozen top-level identity and data-only-boundary text: no scene grid,
+component, transform payload, program, prediction, cost, signature, concentration, EVSI,
+utility, decision, or pass/fail diagnostic was displayed or computed. No compiler,
+candidate builder, planner, controller, worker, model, GPU, or environment operation ran.
+The search is not a sealed-audit start and supplies no scientific result. It is recorded
+here rather than silently omitted. A repository `.rgignore` now excludes the registered
+artifact from broad searches; all further pre-authorization inspection must name exact
+source, test, configuration, or documentation paths.
+
+## Runtime-v5 implementation and zero-run registration — 13 July 2026
+
+The dormant `crosslevel-voi-runtime-v5` implementation now uses one content-addressed,
+pure paired M/X selector over a single filtered `PlanningSnapshot`. An independent
+pre-freeze audit found and corrected two attribution defects before any sealed execution:
+committee weights had been normalized once by the selector and again by helper functions,
+and trace validation did not re-derive the deterministic robust exploit argmin. Regression
+tests now cover a non-idempotent weight tuple, a higher-score exploit forgery, and a
+candidate-order tied-later exploit forgery.
+
+The resulting registered identities are:
+
+- action-conditional selector SHA-256:
+  `a2d36168936f433157052e07d7eafca4f8a65fb49c0bb61800fe53744f2d5a9d`;
+- v5 configuration file SHA-256:
+  `b5067f34dc7934d93b798217ff9e9c29cdc4c5c7af9ab2391d47189012908d11`;
+- zero-run development manifest SHA-256:
+  `6fb58e3c44d9b2cc3a71e12366cd86d3dca7a140df0b120a074e9d01a1d4efe2`;
+- D-Q, S-T, M-T, and X-T semantic configuration hashes, respectively:
+  `8247eb92b176d471bba365856e28d441b186ddf0396b6fccd9a79b7636f22381`,
+  `0c4dee3abaec89b6b42c75e60fee823099e3a95e49dffda84206fac7079a1094`,
+  `2981a4d4209a7de924e16278eea180d2e4ab1c9b58359733f8c6be1900e4a3fa`,
+  and `e612be62a2cebca81062c5791f07af9b5b5c088f565b5cf25852aa41f859d60a`.
+
+The manifest contains exactly 180 collision-free rows: 15 development games, seeds
+`11`, `23`, and `47`, and the four D-Q/S-T/M-T/X-T arms. Every execution, model, token,
+GPU, environment-action, reward, RHAE, and output counter is zero; execution remains
+unauthorized. Runtime-v5 is absent from the live agent, single-game, model-smoke, and
+matrix allowlists.
+
+The separately gated sealed audit is registered as exactly 140 scientific records:
+12 base scenes, 48 visual transforms, 60 order transforms, and 20 fixed controls. Its
+successful-path counter contract requires 60 compiler/grounding/planning snapshots,
+48 candidate-frontier builds, 480 total transient-plus-persistent worker starts,
+96 controller snapshot replays, 12 v4 counterfactuals, and 235 pure-selector calls,
+while model, token, GPU, environment, reward, RHAE, and network counts remain zero.
+The dedicated audit registration is intentionally content-addressed after this protocol
+text is frozen; its file SHA and tagged commit are derived during capability issuance and
+recorded in the external primary/replica permit ledger, avoiding a self-referential hash.
+No registered scene has been compiled, planned, scored, or dispositioned at this stage.

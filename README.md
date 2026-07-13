@@ -164,6 +164,20 @@ does not contain code from Duck or other competition entries.
   prevented the replacement bp35 audit, gameplay, model calls, and the remaining
   planner-level metamorphic acceptance condition from being run.
   See `artifacts/template_v1_path_deficit_v2_synthetic_admission.json`.
+- Froze the third treatment's data-only 12-scene action-QBC lockbox exactly once, before
+  implementing runtime-v5 behavior. Its 47,241,363-byte artifact has SHA-256
+  `d2e84af6527b1dfe686d3113000e0e0b72925c0a8735228da0d3f3c094975953`; the
+  top-level content hash transitively pins every scene, visual transform, action/cell map,
+  and order table. The freeze ran no compiler, planner, selector, model, environment, or
+  scientific diagnostic. The generator and registered seeds are permanently frozen.
+- Implemented the still-dormant `crosslevel-voi-runtime-v5` path: one shared filtered
+  planning snapshot, exact action-conditional outcome concentration, paired M/X utility,
+  controller replay attribution, structured trace validation, and an exact zero-execution
+  180-row D-Q/S-T/M-T/X-T manifest. Independent pre-freeze review corrected weight
+  double-normalization and enforced deterministic exploit attribution before any sealed
+  run. Windows and Linux pass the same runtime-v5 core test slice. Runtime-v5 remains
+  absent from all live/model/game/matrix allowlists; the dedicated 140-record sealed audit
+  must be frozen, tagged, and reproduced twice before it can authorize anything further.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
@@ -236,6 +250,8 @@ The core test suite imports neither Torch nor the ARC SDK. Heavy model loading i
 
 See [the experiment protocol](docs/experiment_protocol.md) and
 [submission checklist](docs/submission_checklist.md) before producing any reported result.
+The irreversible runtime-v5 two-start procedure is specified separately in the
+[sealed-audit operator runbook](docs/action_qbc_v5_sealed_audit_runbook.md).
 The formal assumptions and proofs are in [theory](docs/theory.md). Offline release
 assembly, hashing, and network-disabled startup are specified in
 [offline packaging](docs/offline_packaging.md); exact license evidence is tracked in

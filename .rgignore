@@ -1,0 +1,3 @@
+# The registered action-QBC payload is sealed until the clean tagged audit freeze.
+# Search exact source/docs paths instead; never traverse this artifact in broad searches.
+artifacts/action_conditional_qbc_v1_lockbox.json

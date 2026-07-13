@@ -13,7 +13,15 @@ from typing import Any, cast
 from .config import HypothesisSource
 from .experiment import GateResult, ScoreGateInput, arm_label_for, evaluate_score_gate
 from .experiment import Variant as ExperimentVariant
-from .run_store import TRACE_ARTIFACT_KEY, publish_run_artifacts, read_complete_run
+from .run_store import (
+    TRACE_ARTIFACT_KEY,
+    V5_POLICY_IDENTITY_KEYS,
+    publish_run_artifacts,
+    read_complete_run,
+    validate_action_qbc_candidate_rows,
+    validate_config_bound_v5_policy_identity,
+    validate_v5_policy_identity,
+)
 from .statistics import (
     PairedSummary,
     ScoreObservation,
@@ -61,6 +69,39 @@ class StepRecord:
     # ``elapsed_seconds`` retains its legacy environment-step meaning.
     controller_decision_seconds: float | None = None
     environment_step_seconds: float | None = None
+    # Dormant runtime-v5 attribution.  Historical trace rows omit these fields
+    # when serialized; v5 rows must carry the complete identity tuple.
+    implementation_contract_version: str | None = None
+    completion_cost_policy_version: str | None = None
+    completion_cost_policy_sha256: str | None = None
+    probe_disagreement_policy_version: str | None = None
+    probe_disagreement_policy_sha256: str | None = None
+    outcome_concentration_threshold: float | None = None
+    action_qbc_candidate_rows: tuple[dict[str, Any], ...] | None = None
+    post_refresh_mode: str | None = None
+
+    def __post_init__(self) -> None:
+        is_v5 = validate_v5_policy_identity(
+            {
+                key: getattr(self, key)
+                for key in V5_POLICY_IDENTITY_KEYS
+                if getattr(self, key) is not None
+            },
+            context="step record",
+        )
+        if not is_v5 and (
+            self.action_qbc_candidate_rows is not None
+            or self.post_refresh_mode is not None
+        ):
+            raise ValueError(
+                "action-QBC attribution fields require a runtime-v5 step identity"
+            )
+        if self.action_qbc_candidate_rows is not None:
+            validate_action_qbc_candidate_rows(
+                self.action_qbc_candidate_rows, context="step record"
+            )
+        if self.post_refresh_mode not in {None, "exploit", "probe"}:
+            raise ValueError("step record has invalid post_refresh_mode")
 
 
 @dataclass(slots=True)
@@ -107,6 +148,14 @@ class RunMetrics:
     rhae: float | None = None
     termination_reason: str | None = None
     error: str | None = None
+    # Optional trailing fields preserve positional compatibility for historical
+    # callers while binding every runtime-v5 summary to its exact policy tuple.
+    implementation_contract_version: str | None = None
+    completion_cost_policy_version: str | None = None
+    completion_cost_policy_sha256: str | None = None
+    probe_disagreement_policy_version: str | None = None
+    probe_disagreement_policy_sha256: str | None = None
+    outcome_concentration_threshold: float | None = None
 
     def __post_init__(self) -> None:
         if self.variant not in {"D", "S", "M", "X"}:
@@ -143,6 +192,17 @@ class RunMetrics:
                 )
         elif not _is_sha256(self.producer_contract_sha256):
             raise ValueError("producer_contract_sha256 must be a lowercase SHA-256 digest")
+        validate_config_bound_v5_policy_identity(
+            {
+                "config_hash": self.config_hash,
+                **{
+                    key: getattr(self, key)
+                    for key in V5_POLICY_IDENTITY_KEYS
+                    if getattr(self, key) is not None
+                },
+            },
+            context="run metrics",
+        )
 
     def finalize(self, baseline_actions: list[int] | tuple[int, ...] | None = None) -> None:
         self.decision_points = len(self.steps)
@@ -175,6 +235,9 @@ class RunMetrics:
     def summary(self) -> dict[str, Any]:
         value = asdict(self)
         value.pop("steps")
+        if self.implementation_contract_version is None:
+            for key in V5_POLICY_IDENTITY_KEYS:
+                value.pop(key)
         return value
 
 
@@ -214,7 +277,7 @@ def game_rhae(
 def write_run(metrics: RunMetrics, directory: str | Path) -> tuple[Path, Path]:
     return publish_run_artifacts(
         metrics.summary(),
-        tuple(asdict(record) for record in metrics.steps),
+        tuple(_step_record_payload(record) for record in metrics.steps),
         directory,
     )
 
@@ -236,6 +299,7 @@ def load_run(summary_path: str | Path, trace_path: str | Path | None = None) -> 
         if TRACE_ARTIFACT_KEY in payload:
             raise ValueError("run summary and trace are incomplete or inconsistent")
     payload.pop(TRACE_ARTIFACT_KEY, None)
+    validate_config_bound_v5_policy_identity(payload, context="run summary")
     source_identity_keys = {
         "hypothesis_source",
         "arm_label",
@@ -275,8 +339,24 @@ def load_run(summary_path: str | Path, trace_path: str | Path | None = None) -> 
         # historical meaning was the environment/session step duration.
         value.setdefault("controller_decision_seconds", None)
         value.setdefault("environment_step_seconds", value["elapsed_seconds"])
+        for key in V5_POLICY_IDENTITY_KEYS:
+            value.setdefault(key, None)
+        value.setdefault("action_qbc_candidate_rows", None)
+        value.setdefault("post_refresh_mode", None)
+        if value["action_qbc_candidate_rows"] is not None:
+            value["action_qbc_candidate_rows"] = tuple(
+                dict(row) for row in value["action_qbc_candidate_rows"]
+            )
         metrics.steps.append(StepRecord(**value))
     return metrics
+
+
+def _step_record_payload(record: StepRecord) -> dict[str, Any]:
+    value = asdict(record)
+    if record.implementation_contract_version is None:
+        for key in (*V5_POLICY_IDENTITY_KEYS, "action_qbc_candidate_rows", "post_refresh_mode"):
+            value.pop(key)
+    return value
 
 
 @dataclass(frozen=True, slots=True)

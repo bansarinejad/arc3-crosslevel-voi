@@ -429,6 +429,13 @@ def validate_matrix(
     hashes = {next(iter(values)) for values in arm_hashes.values()}
     if len(hashes) != len(arm_hashes):
         raise ValueError("arm config hashes must be distinct")
+    prefixes: dict[str, set[str]] = defaultdict(set)
+    for digest in hashes:
+        prefixes[digest[:8]].add(digest)
+    if any(len(values) > 1 for values in prefixes.values()):
+        raise ValueError(
+            "distinct full config hashes must not share a registered eight-hex prefix"
+        )
     reference_games = games_by_arm[next(iter(typed_arms))]
     if any(games != reference_games for games in games_by_arm.values()):
         raise ValueError("arms must cover identical game sets")
@@ -569,10 +576,12 @@ def _implicit_qwen_projection(config: object) -> object:
         planning = dict(raw_planning)
         _validate_historical_completion_cost_policy(planning)
         _validate_historical_probe_disagreement_policy(planning)
+        _validate_historical_outcome_concentration_threshold(planning)
         planning.pop("completion_cost_policy_version", None)
         planning.pop("completion_cost_policy_sha256", None)
         planning.pop("probe_disagreement_policy_version", None)
         planning.pop("probe_disagreement_policy_sha256", None)
+        planning.pop("outcome_concentration_threshold", None)
         projected["planning"] = planning
     return projected
 
@@ -601,8 +610,10 @@ def _historical_completion_cost_projection(config: object) -> object:
         return projected
     planning = dict(raw_planning)
     _validate_historical_probe_disagreement_policy(planning)
+    _validate_historical_outcome_concentration_threshold(planning)
     planning.pop("probe_disagreement_policy_version", None)
     planning.pop("probe_disagreement_policy_sha256", None)
+    planning.pop("outcome_concentration_threshold", None)
     if runtime_version in {
         "crosslevel-voi-runtime-v2",
         "crosslevel-voi-runtime-v3",
@@ -660,6 +671,18 @@ def _validate_historical_probe_disagreement_policy(
         raise ValueError(
             "historical probe-disagreement policy identity must be "
             "winning-action-agreement-v1"
+        )
+
+
+def _validate_historical_outcome_concentration_threshold(
+    planning: Mapping[str, object],
+) -> None:
+    if (
+        "outcome_concentration_threshold" in planning
+        and planning["outcome_concentration_threshold"] is not None
+    ):
+        raise ValueError(
+            "historical outcome-concentration threshold must be absent or null"
         )
 
 

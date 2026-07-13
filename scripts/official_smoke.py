@@ -3,10 +3,16 @@
 from __future__ import annotations
 
 import json
+from typing import cast
 
-from arc3_voi.agent import build_agent, require_live_execution_admitted
+from arc3_voi.agent import (
+    build_agent,
+    qwen_producer_contract_sha256,
+    require_live_execution_admitted,
+)
 from arc3_voi.arc_adapter import ArcCompetitionClient
 from arc3_voi.config import ExperimentConfig, SystemConfig
+from arc3_voi.experiment import Variant, arm_label_for
 from arc3_voi.model import ScriptedBackend
 from arc3_voi.runner import run_game
 
@@ -21,6 +27,7 @@ def main() -> int:
         )
     )
     require_live_execution_admitted(config)
+    producer_contract_sha256 = qwen_producer_contract_sha256(config)
     backend = ScriptedBackend(
         action_policy=lambda _history, valid: {"kind": valid[0].split("(", 1)[0]}
     )
@@ -34,6 +41,13 @@ def main() -> int:
             variant="D",
             model_profile="scripted-smoke",
             config_hash="smoke",
+            hypothesis_source=config.experiment.hypothesis_source,
+            arm_label=arm_label_for(
+                cast(Variant, config.experiment.variant),
+                config.experiment.hypothesis_source,
+            ),
+            identity_version="source-v2",
+            producer_contract_sha256=producer_contract_sha256,
             max_environment_actions=1,
             max_generated_tokens=16,
             max_wall_seconds=20,

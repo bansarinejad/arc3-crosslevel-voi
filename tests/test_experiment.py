@@ -183,6 +183,23 @@ def test_matrix_rejects_shared_variant_hash() -> None:
         validate_matrix(matrix)
 
 
+def test_matrix_rejects_distinct_full_hashes_with_same_run_id_prefix() -> None:
+    matrix = build_development_matrix(
+        ("g",),
+        model_profile="p",
+        config_hashes={
+            "D": "12345678" + "a" * 56,
+            "S": "12345678" + "b" * 56,
+            "M": "c" * 64,
+            "X": "d" * 64,
+        },
+        game_versions={"g": "v1"},
+        snapshot_hash="b" * 64,
+    )
+    with pytest.raises(ValueError, match="eight-hex prefix"):
+        validate_matrix(matrix)
+
+
 def test_resume_requires_exact_clean_summary(tmp_path) -> None:
     matrix = build_confirmation_matrix(
         ("g",),

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import sys
+from contextlib import nullcontext
 from dataclasses import replace
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -29,7 +31,15 @@ def _unadmitted_runtime_config(
     runtime_version: str,
     hypothesis_source: HypothesisSource,
 ):
-    base = load_config("configs/local_4b.yaml")
+    local = load_config("configs/local_4b.yaml")
+    base = (
+        replace(
+            load_config("configs/template_v1_action_conditional_qbc_v1_x.yaml"),
+            model=local.model,
+        )
+        if runtime_version == "crosslevel-voi-runtime-v5"
+        else local
+    )
     return replace(
         base,
         experiment=replace(
@@ -59,6 +69,46 @@ def test_model_smoke_rejects_frozen_treatment_before_backend_or_session(
 
     with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
         model_smoke.main()
+
+
+def test_model_smoke_passes_complete_source_identity_to_runner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    config = load_config("configs/local_4b.yaml")
+    controller = object()
+    captured: dict[str, object] = {}
+    metrics = SimpleNamespace(
+        total_actions=1,
+        error=None,
+        summary=lambda: {},
+    )
+    monkeypatch.setattr(model_smoke, "load_config", lambda _path: config)
+    monkeypatch.setattr(model_smoke, "backend_from_config", lambda *_args, **_kwargs: object())
+    monkeypatch.setattr(
+        model_smoke,
+        "ArcCompetitionClient",
+        lambda: SimpleNamespace(make=lambda *_args, **_kwargs: object()),
+    )
+    monkeypatch.setattr(
+        model_smoke,
+        "build_agent",
+        lambda *_args, **_kwargs: nullcontext(SimpleNamespace(controller=controller)),
+    )
+
+    def capture_run(_session: object, observed_controller: object, **kwargs: object):
+        assert observed_controller is controller
+        captured.update(kwargs)
+        return metrics
+
+    monkeypatch.setattr(model_smoke, "run_game", capture_run)
+    monkeypatch.setattr(sys, "argv", ["model_smoke.py"])
+
+    assert model_smoke.main() == 0
+    assert captured["hypothesis_source"] == "qwen"
+    assert captured["arm_label"] == "X-Q"
+    assert captured["identity_version"] == "source-v2"
+    assert isinstance(captured["producer_contract_sha256"], str)
+    assert len(captured["producer_contract_sha256"]) == 64
 
 
 def test_grounding_smoke_rejects_frozen_treatment_before_fixture_or_backend(
@@ -227,6 +277,39 @@ def test_official_smoke_rejects_before_scripted_backend_or_client(
         match="not in the exact live-contract allowlist",
     ):
         official_smoke.main()
+
+
+def test_official_smoke_passes_complete_source_identity_to_runner(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    controller = object()
+    captured: dict[str, object] = {}
+    metrics = SimpleNamespace(total_actions=1, summary=lambda: {})
+    monkeypatch.setattr(official_smoke, "ScriptedBackend", lambda **_kwargs: object())
+    monkeypatch.setattr(
+        official_smoke,
+        "ArcCompetitionClient",
+        lambda: SimpleNamespace(make=lambda *_args, **_kwargs: object()),
+    )
+    monkeypatch.setattr(
+        official_smoke,
+        "build_agent",
+        lambda *_args, **_kwargs: nullcontext(SimpleNamespace(controller=controller)),
+    )
+
+    def capture_run(_session: object, observed_controller: object, **kwargs: object):
+        assert observed_controller is controller
+        captured.update(kwargs)
+        return metrics
+
+    monkeypatch.setattr(official_smoke, "run_game", capture_run)
+
+    assert official_smoke.main() == 0
+    assert captured["hypothesis_source"] == "qwen"
+    assert captured["arm_label"] == "D-Q"
+    assert captured["identity_version"] == "source-v2"
+    assert isinstance(captured["producer_contract_sha256"], str)
+    assert len(captured["producer_contract_sha256"]) == 64
 
 
 def test_offline_startup_rejects_before_backend_or_entrypoint_import(

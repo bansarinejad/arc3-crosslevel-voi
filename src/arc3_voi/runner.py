@@ -11,6 +11,12 @@ from .arc_adapter import EnvironmentSession
 from .controller import ControllerBudgetExhausted, EpisodeComplete
 from .metrics import RunMetrics, StepRecord
 from .replay import action_to_record, history_to_records
+from .run_store import (
+    V5_POLICY_IDENTITY_KEYS,
+    parse_action_qbc_candidate_rows_json,
+    validate_action_qbc_attribution,
+    validate_v5_policy_identity,
+)
 from .types import Budget, Decision, DecisionMode, GameState, History, Observation
 
 
@@ -36,6 +42,12 @@ def run_game(
     arm_label: str,
     identity_version: str,
     producer_contract_sha256: str | None,
+    implementation_contract_version: str | None = None,
+    completion_cost_policy_version: str | None = None,
+    completion_cost_policy_sha256: str | None = None,
+    probe_disagreement_policy_version: str | None = None,
+    probe_disagreement_policy_sha256: str | None = None,
+    outcome_concentration_threshold: float | None = None,
     max_environment_actions: int = 256,
     max_generated_tokens: int = 12_288,
     max_wall_seconds: float = 1_200.0,
@@ -54,6 +66,12 @@ def run_game(
         arm_label=arm_label,
         identity_version=identity_version,
         producer_contract_sha256=producer_contract_sha256,
+        implementation_contract_version=implementation_contract_version,
+        completion_cost_policy_version=completion_cost_policy_version,
+        completion_cost_policy_sha256=completion_cost_policy_sha256,
+        probe_disagreement_policy_version=probe_disagreement_policy_version,
+        probe_disagreement_policy_sha256=probe_disagreement_policy_sha256,
+        outcome_concentration_threshold=outcome_concentration_threshold,
         controller_decision_seconds=0.0,
         environment_step_seconds=0.0,
     )
@@ -91,6 +109,7 @@ def run_game(
             persistence_estimate, persistence_successes, persistence_trials = (
                 _persistence_snapshot(controller)
             )
+            candidate_rows, post_refresh_mode = _v5_step_attribution(metrics, decision)
             environment_step_started = time.perf_counter()
             environment_diagnostics = {
                 key: value
@@ -163,6 +182,26 @@ def run_game(
                     observed_level_delta=level_delta,
                     controller_decision_seconds=decision_elapsed,
                     environment_step_seconds=environment_step_elapsed,
+                    implementation_contract_version=(
+                        metrics.implementation_contract_version
+                    ),
+                    completion_cost_policy_version=(
+                        metrics.completion_cost_policy_version
+                    ),
+                    completion_cost_policy_sha256=(
+                        metrics.completion_cost_policy_sha256
+                    ),
+                    probe_disagreement_policy_version=(
+                        metrics.probe_disagreement_policy_version
+                    ),
+                    probe_disagreement_policy_sha256=(
+                        metrics.probe_disagreement_policy_sha256
+                    ),
+                    outcome_concentration_threshold=(
+                        metrics.outcome_concentration_threshold
+                    ),
+                    action_qbc_candidate_rows=candidate_rows,
+                    post_refresh_mode=post_refresh_mode,
                 )
             )
             metrics.direct_fallbacks += decision.mode is DecisionMode.DIRECT_FALLBACK
@@ -339,6 +378,58 @@ def _consume_decision_diagnostics(metrics: RunMetrics, decision: Decision) -> No
         metrics.timeout_instrumentation_complete = (
             metrics.timeout_instrumentation_complete or complete
         )
+
+
+def _v5_step_attribution(
+    metrics: RunMetrics, decision: Decision
+) -> tuple[tuple[dict[str, Any], ...] | None, str | None]:
+    expected = {
+        key: getattr(metrics, key)
+        for key in V5_POLICY_IDENTITY_KEYS
+        if getattr(metrics, key) is not None
+    }
+    expected_is_v5 = validate_v5_policy_identity(
+        expected, context="runner policy identity"
+    )
+    observed = {
+        key: decision.diagnostics[key]
+        for key in V5_POLICY_IDENTITY_KEYS
+        if key in decision.diagnostics
+    }
+    observed_is_v5 = validate_v5_policy_identity(
+        observed, context="decision diagnostics"
+    )
+    if expected_is_v5 != observed_is_v5 or (
+        expected_is_v5
+        and tuple(expected[key] for key in V5_POLICY_IDENTITY_KEYS)
+        != tuple(observed[key] for key in V5_POLICY_IDENTITY_KEYS)
+    ):
+        raise ValueError("summary and decision runtime-v5 identities do not match")
+    if not expected_is_v5:
+        return None, None
+
+    post_refresh_mode = decision.diagnostics.get("post_refresh_mode")
+    raw_rows = decision.diagnostics.get("action_qbc_candidate_rows")
+    structured_rows = (
+        None
+        if raw_rows is None
+        else parse_action_qbc_candidate_rows_json(
+            raw_rows, context="runtime-v5 decision diagnostics"
+        )
+    )
+    candidate_rows = validate_action_qbc_attribution(
+        structured_rows,
+        variant=metrics.variant,
+        decision_mode=decision.mode.value,
+        decision_score=decision.score,
+        post_refresh_mode=post_refresh_mode,
+        action=action_to_record(decision.action),
+        decision_diagnostics=decision.diagnostics,
+        context="runtime-v5 decision diagnostics",
+    )
+    return candidate_rows, (
+        str(post_refresh_mode) if post_refresh_mode is not None else None
+    )
 
 
 def _persistence_snapshot(

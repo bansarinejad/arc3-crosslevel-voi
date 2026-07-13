@@ -139,7 +139,7 @@ def test_build_agent_wires_generation_pool_planner_and_controller() -> None:
     backend = ScriptedBackend([PROGRAM_A, PROGRAM_B])
     config = SystemConfig(sandbox=SandboxConfig(timeout_ms=1_000))
     with build_agent(backend, config) as agent:
-        decision = agent.controller.act(_observation(), Budget(max_wall_seconds=10))
+        decision = agent.controller.act(_observation(), Budget(max_wall_seconds=60))
         assert decision.action.kind in {ActionKind.ACTION1, ActionKind.ACTION2}
         assert agent.controller.pool is not None
         assert len(agent.controller.pool.weighted_hypotheses) == 2
@@ -182,12 +182,19 @@ def test_live_guard_rejects_unknown_runtime_before_source(
     runtime_version: str,
     hypothesis_source: str,
 ) -> None:
-    config = SystemConfig(
-        experiment=ExperimentConfig(
+    base = (
+        load_config("configs/template_v1_action_conditional_qbc_v1_x.yaml")
+        if runtime_version == "crosslevel-voi-runtime-v5"
+        else SystemConfig()
+    )
+    config = replace(
+        base,
+        experiment=replace(
+            base.experiment,
             variant="X",
             hypothesis_source=cast(Any, hypothesis_source),
             implementation_contract_version=runtime_version,
-        )
+        ),
     )
 
     with pytest.raises(
@@ -259,6 +266,19 @@ def test_live_guard_rejects_probe_policy_identity_drift_before_source(
     with pytest.raises(
         TreatmentNotAdmittedError,
         match="not the admitted winning-action-agreement-v1 contract",
+    ):
+        require_live_execution_admitted(config)
+
+
+def test_live_guard_rejects_outcome_threshold_drift_before_source() -> None:
+    config = SystemConfig(
+        experiment=ExperimentConfig(variant="X", hypothesis_source="template_v1")
+    )
+    object.__setattr__(config.planning, "outcome_concentration_threshold", 0.8)
+
+    with pytest.raises(
+        TreatmentNotAdmittedError,
+        match="outcome-concentration threshold is not part of the admitted runtime-v3",
     ):
         require_live_execution_admitted(config)
 

@@ -6,11 +6,16 @@ import argparse
 import json
 from dataclasses import replace
 from pathlib import Path
+from typing import cast
 
-from arc3_voi.agent import build_agent, require_live_execution_admitted
+from arc3_voi.agent import (
+    build_agent,
+    qwen_producer_contract_sha256,
+    require_live_execution_admitted,
+)
 from arc3_voi.arc_adapter import ArcCompetitionClient
 from arc3_voi.config import load_config
-from arc3_voi.experiment import stable_config_hash
+from arc3_voi.experiment import Variant, arm_label_for, stable_config_hash
 from arc3_voi.model import backend_from_config
 from arc3_voi.runner import run_game
 
@@ -24,6 +29,9 @@ def main() -> int:
     args = parser.parse_args()
 
     config = load_config(args.config)
+    # Reject dormant/unknown treatments before even deriving a smoke-only
+    # budget override from their configuration.
+    require_live_execution_admitted(config)
     config = replace(
         config,
         experiment=replace(
@@ -33,6 +41,7 @@ def main() -> int:
         ),
     )
     require_live_execution_admitted(config)
+    producer_contract_sha256 = qwen_producer_contract_sha256(config)
     backend = backend_from_config(config, model_path=args.model_path)
     session = ArcCompetitionClient().make(args.game, seed=args.seed)
     with build_agent(backend, config) as agent:
@@ -44,6 +53,13 @@ def main() -> int:
             variant=config.experiment.variant,
             model_profile=config.model.profile if config.model else "no-model",
             config_hash=stable_config_hash(config),
+            hypothesis_source=config.experiment.hypothesis_source,
+            arm_label=arm_label_for(
+                cast(Variant, config.experiment.variant),
+                config.experiment.hypothesis_source,
+            ),
+            identity_version="source-v2",
+            producer_contract_sha256=producer_contract_sha256,
             max_environment_actions=1,
             max_generated_tokens=config.experiment.max_generated_tokens,
             max_wall_seconds=config.experiment.max_wall_seconds,

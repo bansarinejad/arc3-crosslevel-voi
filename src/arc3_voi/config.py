@@ -8,6 +8,12 @@ from math import isfinite
 from pathlib import Path
 from typing import Any, Literal
 
+from .action_qbc_policy import (
+    ACTION_QBC_POLICY_SHA256,
+    ACTION_QBC_POLICY_VERSION,
+    ACTION_QBC_RUNTIME_VERSION,
+    OUTCOME_CONCENTRATION_THRESHOLD,
+)
 from .planner import (
     COMPLETION_COST_POLICY_HASHES,
     ENDPOINT_COMPLETION_COST_POLICY,
@@ -16,12 +22,15 @@ from .planner import (
 )
 
 HypothesisSource = Literal["qwen", "template_v1", "qwen_then_template_v1"]
-ProbeDisagreementPolicy = Literal["winning-action-agreement-v1"]
+ProbeDisagreementPolicy = Literal[
+    "winning-action-agreement-v1", "action-conditional-outcome-qbc-v1"
+]
 
 PROBE_DISAGREEMENT_POLICY_HASHES: Mapping[ProbeDisagreementPolicy, str] = {
     "winning-action-agreement-v1": (
         "5e659e6ad3a3f6e50dd4bfe709b901e29999b031ac5565c5469f0d66a216aa8a"
-    )
+    ),
+    ACTION_QBC_POLICY_VERSION: ACTION_QBC_POLICY_SHA256,
 }
 
 SUPPORTED_CANDIDATE_POLICY = (
@@ -182,6 +191,7 @@ class PlanningConfig:
     probe_disagreement_policy_sha256: str = PROBE_DISAGREEMENT_POLICY_HASHES[
         "winning-action-agreement-v1"
     ]
+    outcome_concentration_threshold: float | None = None
 
     def __post_init__(self) -> None:
         for name in ("max_candidates", "depth", "beam_width", "max_probes_per_level"):
@@ -190,6 +200,13 @@ class PlanningConfig:
             _non_negative_float(name, getattr(self, name))
         if not 0 <= self.agreement_threshold <= 1:
             raise ConfigError("agreement_threshold must be in [0, 1]")
+        if self.outcome_concentration_threshold is not None:
+            _non_negative_float(
+                "outcome_concentration_threshold",
+                self.outcome_concentration_threshold,
+            )
+            if self.outcome_concentration_threshold > 1:
+                raise ConfigError("outcome_concentration_threshold must be in [0, 1]")
         if (
             self.completion_cost_policy_version not in COMPLETION_COST_POLICY_HASHES
             or self.completion_cost_policy_sha256
@@ -291,15 +308,122 @@ class SystemConfig:
     model: ModelConfig | None = None
 
     def __post_init__(self) -> None:
+        runtime_version = self.experiment.implementation_contract_version
         expected_policy = (
             PATH_DEFICIT_COMPLETION_COST_POLICY
-            if self.experiment.implementation_contract_version
-            == PATH_DEFICIT_RUNTIME_VERSION
+            if runtime_version in {
+                PATH_DEFICIT_RUNTIME_VERSION,
+                ACTION_QBC_RUNTIME_VERSION,
+            }
             else ENDPOINT_COMPLETION_COST_POLICY
         )
         if self.planning.completion_cost_policy_version != expected_policy:
             raise ConfigError(
                 "completion-cost policy does not match the implementation contract"
+            )
+        disagreement_identity = (
+            self.planning.probe_disagreement_policy_version,
+            self.planning.probe_disagreement_policy_sha256,
+        )
+        historical_identity = (
+            "winning-action-agreement-v1",
+            PROBE_DISAGREEMENT_POLICY_HASHES["winning-action-agreement-v1"],
+        )
+        action_qbc_identity = (
+            ACTION_QBC_POLICY_VERSION,
+            PROBE_DISAGREEMENT_POLICY_HASHES[ACTION_QBC_POLICY_VERSION],
+        )
+        if runtime_version == ACTION_QBC_RUNTIME_VERSION:
+            if disagreement_identity != action_qbc_identity:
+                raise ConfigError(
+                    "runtime-v5 requires the action-conditional outcome-QBC policy"
+                )
+            if (
+                self.planning.outcome_concentration_threshold
+                != OUTCOME_CONCENTRATION_THRESHOLD
+            ):
+                raise ConfigError(
+                    "runtime-v5 outcome_concentration_threshold is fixed at 0.8"
+                )
+            self._validate_action_qbc_fixed_factors()
+        elif (
+            disagreement_identity != historical_identity
+            or self.planning.outcome_concentration_threshold is not None
+        ):
+            raise ConfigError(
+                "action-conditional disagreement fields require crosslevel-voi-runtime-v5"
+            )
+
+    def _validate_action_qbc_fixed_factors(self) -> None:
+        exact_values = {
+            "experiment.max_environment_actions": (
+                self.experiment.max_environment_actions,
+                256,
+            ),
+            "experiment.max_generated_tokens": (
+                self.experiment.max_generated_tokens,
+                12_288,
+            ),
+            "experiment.max_generation_batches": (
+                self.experiment.max_generation_batches,
+                3,
+            ),
+            "experiment.max_wall_seconds": (
+                self.experiment.max_wall_seconds,
+                1_200.0,
+            ),
+            "experiment.history_length": (self.experiment.history_length, 8),
+            "hypotheses.max_hypotheses": (self.hypotheses.max_hypotheses, 4),
+            "hypotheses.eta": (self.hypotheses.eta, 5.0),
+            "hypotheses.complexity_lambda": (
+                self.hypotheses.complexity_lambda,
+                0.002,
+            ),
+            "hypotheses.loss_refresh_threshold": (
+                self.hypotheses.loss_refresh_threshold,
+                0.25,
+            ),
+            "hypotheses.consecutive_loss_refreshes": (
+                self.hypotheses.consecutive_loss_refreshes,
+                2,
+            ),
+            "hypotheses.effective_pool_refresh_threshold": (
+                self.hypotheses.effective_pool_refresh_threshold,
+                1.5,
+            ),
+            "hypotheses.max_refreshes_per_level": (
+                self.hypotheses.max_refreshes_per_level,
+                1,
+            ),
+            "planning.max_candidates": (self.planning.max_candidates, 12),
+            "planning.depth": (self.planning.depth, 4),
+            "planning.beam_width": (self.planning.beam_width, 8),
+            "planning.agreement_threshold": (
+                self.planning.agreement_threshold,
+                0.8,
+            ),
+            "planning.max_probes_per_level": (
+                self.planning.max_probes_per_level,
+                3,
+            ),
+            "planning.risk_coefficient": (self.planning.risk_coefficient, 3.0),
+            "planning.robust_std_coefficient": (
+                self.planning.robust_std_coefficient,
+                0.5,
+            ),
+            "generation.temperature": (self.generation.temperature, 0.6),
+            "generation.top_p": (self.generation.top_p, 0.95),
+            "generation.max_new_tokens_per_hypothesis": (
+                self.generation.max_new_tokens_per_hypothesis,
+                1_536,
+            ),
+            "sandbox.timeout_ms": (self.sandbox.timeout_ms, 100),
+            "sandbox.memory_mb": (self.sandbox.memory_mb, 256),
+        }
+        drift = [name for name, (actual, expected) in exact_values.items() if actual != expected]
+        if drift:
+            raise ConfigError(
+                "runtime-v5 fixed-factor drift: " + ", ".join(sorted(drift))
             )
 
 
@@ -424,6 +548,7 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                     "completion_cost_policy_sha256",
                     "probe_disagreement_policy_version",
                     "probe_disagreement_policy_sha256",
+                    "outcome_concentration_threshold",
                 }
             ),
             PlanningConfig,
