@@ -26,6 +26,18 @@ use CC-BY-4.0. Model weights, toolkit code, wheels, and bundled assets retain th
 terms. The final release must include a generated inventory of every distributed third-
 party file rather than relying on this human-readable register alone.
 
+## Authored negative-treatment registration — 13 July 2026
+
+| Artifact | SHA-256 / semantic identity | Status |
+|---|---|---|
+| `configs/template_v1_path_deficit_v2_x.yaml` | File `26b02a26a7152597eb40164a3775e23f38750ea7891af9fa20b4c327af7cb090`; X-T semantics `de53f3dffe049ffa3a62eb49622c34f1233a0f86baf6622b42f006b9b1c1982a` | Authored runtime-v4/path-deficit-v2 treatment config; frozen after its synthetic gate failed. |
+| `artifacts/development_matrix_template_v1_path_deficit_v2.json` | `949fe7a7455e3637acdeb2ec278ff9822e78a15284854fd730e47a3c84775d5e` | Authored zero-run 180-row registration manifest; never executable, permanently abandoned. |
+
+These registered inputs contain no model weights, third-party source, model output,
+environment trace, reward, or RHAE observation. They are not themselves the result
+artifact. The deterministic synthetic failure awaits a one-time clean-commit Linux report;
+the treatment-level metamorphic condition stopped unrun after the earlier conjunct failed.
+
 ## Finalization checklist
 
 1. Record the immutable model revision from the downloaded snapshot metadata.

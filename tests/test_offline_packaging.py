@@ -55,15 +55,21 @@ def _wheel(path: Path, *, name: str = "dependency", version: str = "1.0") -> Pat
     return path
 
 
-def _runtime_wheel(path: Path) -> Path:
+def _runtime_wheel(path: Path, *, frozen_treatment: bool = False) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("arc3_voi/__init__.py", "")
         archive.writestr(
             "arc3_voi/config.py",
             "class Model:\n    offline = True\n"
-            "class Config:\n    model = Model()\n"
+            f"class Config:\n    model = Model()\n    frozen = {frozen_treatment!r}\n"
             "def load_config(path):\n    return Config()\n",
+        )
+        archive.writestr(
+            "arc3_voi/agent.py",
+            "def require_live_execution_admitted(config):\n"
+            "    if config.frozen:\n"
+            "        raise ValueError('frozen treatment rejected before backend')\n",
         )
         archive.writestr(
             "arc3_voi/model.py",
@@ -198,3 +204,40 @@ def test_network_disabled_startup_smoke_imports_exact_bundle(tmp_path: Path) -> 
 
     assert completed.returncode == 0, completed.stderr
     assert "offline startup smoke passed" in completed.stdout
+
+
+def test_offline_startup_rejects_frozen_treatment_before_backend(tmp_path: Path) -> None:
+    repository = tmp_path / "repository"
+    _repository(repository)
+    wheelhouse = tmp_path / "wheelhouse"
+    _wheel(wheelhouse / "dependency.whl")
+    model = tmp_path / "model"
+    _model(model)
+    output = tmp_path / "bundle"
+    assemble(
+        repository_root=repository,
+        project_wheel=_runtime_wheel(
+            tmp_path / "project.whl",
+            frozen_treatment=True,
+        ),
+        wheelhouse=wheelhouse,
+        model=model,
+        model_id="owner/model",
+        config=repository / "configs" / "kaggle.yaml",
+        output=output,
+    )
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(Path("scripts/offline_startup_smoke.py").resolve()),
+            str(output),
+            "--skip-model-config",
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode != 0
+    assert "frozen treatment rejected before backend" in completed.stderr

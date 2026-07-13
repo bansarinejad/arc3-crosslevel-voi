@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Sequence
+from dataclasses import replace
 from typing import Any, cast
 
 import numpy as np
@@ -9,10 +10,12 @@ import pytest
 
 from arc3_voi.agent import (
     HypothesisSourceNotAdmittedError,
+    TreatmentNotAdmittedError,
     build_agent,
     qwen_producer_contract_sha256,
+    require_live_execution_admitted,
 )
-from arc3_voi.config import ExperimentConfig, SandboxConfig, SystemConfig
+from arc3_voi.config import ExperimentConfig, SandboxConfig, SystemConfig, load_config
 from arc3_voi.hypothesis import Hypothesis, behavioral_deduplicate
 from arc3_voi.model import GenerationResult, ScriptedBackend
 from arc3_voi.program import ExecutableHypothesis
@@ -173,6 +176,36 @@ def test_qwen_producer_contract_is_controller_and_seed_independent() -> None:
 
     assert qwen_producer_contract_sha256(first) == qwen_producer_contract_sha256(second)
     assert len(qwen_producer_contract_sha256(first)) == 64
+
+
+def test_qwen_producer_identity_is_neutral_to_path_deficit_planning() -> None:
+    endpoint = load_config("configs/local_4b.yaml")
+    path_template = load_config("configs/template_v1_path_deficit_v2_x.yaml")
+    path_qwen = replace(
+        path_template,
+        experiment=replace(path_template.experiment, hypothesis_source="qwen"),
+    )
+
+    assert qwen_producer_contract_sha256(path_qwen) == qwen_producer_contract_sha256(
+        endpoint
+    )
+
+    with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
+        require_live_execution_admitted(path_qwen)
+
+
+def test_build_agent_rejects_failed_treatment_before_backend_use() -> None:
+    template = load_config("configs/template_v1_path_deficit_v2_x.yaml")
+    config = replace(
+        template,
+        experiment=replace(template.experiment, hypothesis_source="qwen"),
+    )
+    backend = ScriptedBackend([PROGRAM_A])
+
+    with pytest.raises(TreatmentNotAdmittedError, match="under any hypothesis source"):
+        build_agent(backend, config)
+
+    assert not backend.closed
 
 
 def test_live_grounding_rejects_ineligible_smaller_duplicate_before_dedup(

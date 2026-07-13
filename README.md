@@ -141,6 +141,20 @@ does not contain code from Duck or other competition entries.
   has SHA-256 `546cf508fa36e1d0ddd39b16e79c35f79fc597577609b3350add8f1c146e1033`.
   It is offline negative mechanism evidence only and authorizes no pilot, gameplay, or
   matrix execution. See `artifacts/template_v1_runtime_admission_v2_bp35_seed11.json`.
+- Implemented the separately frozen `path-deficit-v2` unresolved-cost treatment under
+  opt-in implementation contract `crosslevel-voi-runtime-v4`; historical configurations
+  remain on byte-compatible `endpoint-v1`. The treatment preserves early simulated
+  progress in depth-four costs, but its preregistered generic synthetic bridge failed under
+  the registered Gibbs/MDL weights. Four valid distinct programs survived and multiple
+  graded cost vectors varied by action, yet agreement was `0.8417629130389278` rather than
+  below `0.8`, maximum EVSI was `0.048123650158264475` actions rather than at least `0.05`,
+  and no X-only action existed. This is a deterministic negative regression pending its
+  one-time clean-commit evidence artifact, not an ARC result. The 180-row path-deficit
+  manifest is a zero-run abandoned registration artifact;
+  runtime-v4 is rejected before model preflight, backend/client construction, single-game
+  execution, and matrix execution under every proposal-source label. The conjunctive stop
+  prevented the replacement bp35 audit, gameplay, model calls, and the remaining
+  planner-level metamorphic acceptance condition from being run.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
@@ -164,8 +178,8 @@ does not contain code from Duck or other competition entries.
   disagreed with the official `arc-agi==0.9.9` palette at all 16 indices, so its zero
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
   matrix and gate are preserved with `_pre_grounding` suffixes.
-- Not yet completed: a decision-relevant prompt/grounding gate, a fresh four-run pilot,
-  all registered development runs, locked confirmation,
+- Not yet completed: any decision-relevant admission pass, a newly preregistered treatment
+  and matrix, a fresh four-run pilot, any controlled development run, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The old four-simultaneous-sequence 9B NF4 artifact remains a valid historical rejection
@@ -174,8 +188,11 @@ grounding instead. The official 4B BF16 fallback remains the selected local engi
 model because it retains two safe programs after repair, though it also fails the graded-role
 gate. There are deliberately no
 development aggregate or positive cross-level performance claim. Scale-up remains locked;
-the corrected admission ordering passed structurally, but both source committees failed
-the decision-diversity gate before a fresh pilot could be authorized.
+the corrected admission ordering passed structurally, both historical source committees
+failed the decision-diversity gate, and the path-deficit-v2 follow-up failed on its fixed
+synthetic scene, compiler, weights, and thresholds before a canonical audit or fresh pilot
+could be authorized. A future controlled run requires a separately frozen treatment and
+matrix; no existing matrix is pending execution.
 
 ## Quick start
 

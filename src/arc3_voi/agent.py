@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass
 from typing import Any
 
 from .candidates import candidates_from_history
-from .config import SystemConfig
+from .config import PATH_DEFICIT_RUNTIME_VERSION, SystemConfig
 from .controller import (
     Controller,
     ControllerConfig,
@@ -33,6 +33,10 @@ class HypothesisSourceNotAdmittedError(ValueError):
     """Raised before live resources are created for a registration-only source."""
 
 
+class TreatmentNotAdmittedError(ValueError):
+    """Raised before live resources are created for a frozen treatment."""
+
+
 def require_admitted_hypothesis_source(config: SystemConfig) -> None:
     """Fail closed until a non-Qwen live producer is explicitly admitted."""
 
@@ -45,6 +49,18 @@ def require_admitted_hypothesis_source(config: SystemConfig) -> None:
         )
 
 
+def require_live_execution_admitted(config: SystemConfig) -> None:
+    """Fail closed on both unadmitted producers and frozen runtime treatments."""
+
+    require_admitted_hypothesis_source(config)
+    if config.experiment.implementation_contract_version == PATH_DEFICIT_RUNTIME_VERSION:
+        raise TreatmentNotAdmittedError(
+            "crosslevel-voi-runtime-v4/path-deficit-v2 failed its preregistered "
+            "synthetic gate and is frozen; model preflight, live execution, and "
+            "matrix execution are not authorized under any hypothesis source"
+        )
+
+
 def qwen_producer_contract_sha256(config: SystemConfig) -> str:
     """Hash the source-producing Qwen contract independently of controller variant/seed."""
 
@@ -53,7 +69,11 @@ def qwen_producer_contract_sha256(config: SystemConfig) -> str:
     payload = {
         "contract_version": "qwen-executable-program-producer-v1",
         "generation": asdict(config.generation),
-        "implementation_contract_version": experiment.implementation_contract_version,
+        "implementation_contract_version": (
+            "crosslevel-voi-runtime-v3"
+            if experiment.implementation_contract_version == "crosslevel-voi-runtime-v4"
+            else experiment.implementation_contract_version
+        ),
         "max_generated_tokens": experiment.max_generated_tokens,
         "max_generation_batches": experiment.max_generation_batches,
         "model": None if config.model is None else asdict(config.model),
@@ -308,7 +328,7 @@ class _HypothesisGenerator:
 def build_agent(backend: ModelBackend, config: SystemConfig) -> GeneratedAgent:
     """Build D/S/M/X using the same model and resource contract."""
 
-    require_admitted_hypothesis_source(config)
+    require_live_execution_admitted(config)
     generator = _HypothesisGenerator(backend, config)
 
     def direct_policy(
@@ -357,6 +377,12 @@ def build_agent(backend: ModelBackend, config: SystemConfig) -> GeneratedAgent:
             robust_std_coefficient=config.planning.robust_std_coefficient,
             max_refreshes_per_level=config.hypotheses.max_refreshes_per_level,
             max_generation_batches=config.experiment.max_generation_batches,
+            completion_cost_policy_version=(
+                config.planning.completion_cost_policy_version
+            ),
+            completion_cost_policy_sha256=(
+                config.planning.completion_cost_policy_sha256
+            ),
         ),
         telemetry_callback=generator.telemetry,
     )

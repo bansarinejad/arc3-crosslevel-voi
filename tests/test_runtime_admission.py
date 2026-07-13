@@ -7,8 +7,19 @@ from types import SimpleNamespace
 import numpy as np
 import pytest
 
+from arc3_voi.config import (
+    PATH_DEFICIT_RUNTIME_VERSION,
+    ExperimentConfig,
+    PlanningConfig,
+    SystemConfig,
+)
+from arc3_voi.planner import (
+    COMPLETION_COST_POLICY_HASHES,
+    PATH_DEFICIT_COMPLETION_COST_POLICY,
+)
 from arc3_voi.runtime_admission import (
     EvaluatedSource,
+    _completion_cost_policy_metadata,
     _grounding_schema_version,
     admission_gate_reasons,
     construct_eligible_hypotheses,
@@ -54,6 +65,29 @@ def test_runtime_admission_accepts_historical_v4_and_multibatch_v5_schemas() -> 
     assert _grounding_schema_version({"schema_version": 5}) == 5
     with pytest.raises(ValueError, match="schema-v4 or schema-v5"):
         _grounding_schema_version({"schema_version": 6})
+
+
+def test_endpoint_admission_omits_policy_identity_but_runtime_v4_emits_it() -> None:
+    assert _completion_cost_policy_metadata(SystemConfig()) == {}
+    path = PlanningConfig(
+        completion_cost_policy_version=PATH_DEFICIT_COMPLETION_COST_POLICY,
+        completion_cost_policy_sha256=COMPLETION_COST_POLICY_HASHES[
+            PATH_DEFICIT_COMPLETION_COST_POLICY
+        ],
+    )
+    config = SystemConfig(
+        experiment=ExperimentConfig(
+            implementation_contract_version=PATH_DEFICIT_RUNTIME_VERSION
+        ),
+        planning=path,
+    )
+
+    assert _completion_cost_policy_metadata(config) == {
+        "completion_cost_policy_version": PATH_DEFICIT_COMPLETION_COST_POLICY,
+        "completion_cost_policy_sha256": COMPLETION_COST_POLICY_HASHES[
+            PATH_DEFICIT_COMPLETION_COST_POLICY
+        ],
+    }
 
 
 def test_schema_v5_batch_local_role_index_resets_candidate_zero() -> None:

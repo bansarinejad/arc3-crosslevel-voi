@@ -8,6 +8,9 @@ import numpy as np
 import pytest
 
 from arc3_voi.planner import (
+    COMPLETION_COST_POLICY_HASHES,
+    ENDPOINT_COMPLETION_COST_POLICY,
+    PATH_DEFICIT_COMPLETION_COST_POLICY,
     BeamSearchPlanner,
     NoValidHypotheses,
     PlanningError,
@@ -162,6 +165,21 @@ class _CountingHypothesis:
 
 
 @dataclass
+class _DelayedProgressHypothesis:
+    hypothesis_id: str = "delayed-progress"
+    ast_nodes: int = 1
+
+    def predict(self, history: History, action: Action) -> Prediction:
+        grid = np.array(history.latest_grid, copy=True)
+        if action.kind is ActionKind.ACTION1:
+            grid[:] = 1
+        return Prediction(grid, GameState.NOT_FINISHED, 0)
+
+    def goal_value(self, history: History) -> float:
+        return float(history.latest_grid[0, 0])
+
+
+@dataclass
 class _LateRootFailureHypothesis(_CountingHypothesis):
     def predict(self, history: History, action: Action) -> Prediction:
         self.prediction_calls += 1
@@ -186,7 +204,13 @@ def test_parallel_hypothesis_evaluation_is_opt_in() -> None:
     assert BeamSearchPlanner().parallel_hypotheses is False
 
 
-def test_beam_planner_assigns_one_to_immediate_completion() -> None:
+@pytest.mark.parametrize(
+    "completion_cost_policy",
+    (ENDPOINT_COMPLETION_COST_POLICY, PATH_DEFICIT_COMPLETION_COST_POLICY),
+)
+def test_beam_planner_assigns_one_to_immediate_completion(
+    completion_cost_policy: str,
+) -> None:
     observation = Observation(
         np.zeros((2, 2), dtype=np.int16),
         frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
@@ -196,7 +220,11 @@ def test_beam_planner_assigns_one_to_immediate_completion() -> None:
     )
     history = History.from_observation(observation)
     actions = (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2))
-    snapshot = BeamSearchPlanner(depth=4, beam_width=8).evaluate(
+    snapshot = BeamSearchPlanner(
+        depth=4,
+        beam_width=8,
+        completion_cost_policy=completion_cost_policy,  # type: ignore[arg-type]
+    ).evaluate(
         history,
         actions,
         ((_OneStepHypothesis(), 1.0),),
@@ -205,6 +233,118 @@ def test_beam_planner_assigns_one_to_immediate_completion() -> None:
     assert snapshot.costs[actions[0]] == (1.0,)
     # The depth-four search sees that ACTION2 can be followed by ACTION1.
     assert snapshot.costs[actions[1]] == (2.0,)
+
+
+def test_endpoint_policy_remains_default_and_forgets_delayed_progress() -> None:
+    observation = Observation(
+        np.zeros((2, 2), dtype=np.int16),
+        frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
+        GameState.NOT_FINISHED,
+        level=1,
+        win_levels=2,
+    )
+    history = History.from_observation(observation)
+    actions = (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2))
+
+    default = BeamSearchPlanner(depth=4, beam_width=8)
+    explicit = BeamSearchPlanner(
+        depth=4,
+        beam_width=8,
+        completion_cost_policy=ENDPOINT_COMPLETION_COST_POLICY,
+    )
+    default_snapshot = default.evaluate(
+        history,
+        actions,
+        ((_DelayedProgressHypothesis(), 1.0),),
+        win_levels=2,
+    )
+    explicit_snapshot = explicit.evaluate(
+        history,
+        actions,
+        ((_DelayedProgressHypothesis(), 1.0),),
+        win_levels=2,
+    )
+
+    assert default.completion_cost_policy == ENDPOINT_COMPLETION_COST_POLICY
+    assert default_snapshot.costs == explicit_snapshot.costs
+    assert default_snapshot.costs[actions[0]] == (4.0,)
+    assert default_snapshot.costs[actions[1]] == (4.0,)
+
+
+def test_path_deficit_policy_charges_delayed_progress_within_frozen_range() -> None:
+    observation = Observation(
+        np.zeros((2, 2), dtype=np.int16),
+        frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
+        GameState.NOT_FINISHED,
+        level=1,
+        win_levels=2,
+    )
+    history = History.from_observation(observation)
+    actions = (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2))
+    planner = BeamSearchPlanner(
+        depth=4,
+        beam_width=8,
+        completion_cost_policy=PATH_DEFICIT_COMPLETION_COST_POLICY,
+    )
+
+    snapshot = planner.evaluate(
+        history,
+        actions,
+        ((_DelayedProgressHypothesis(), 1.0),),
+        win_levels=2,
+    )
+    worst = planner.evaluate(
+        history,
+        actions,
+        ((_CountingHypothesis("no-progress"), 1.0),),
+        win_levels=2,
+    )
+
+    assert snapshot.costs[actions[0]] == (4.0,)
+    assert snapshot.costs[actions[1]] == (5.0,)
+    assert set(worst.costs.values()) == {(8.0,)}
+    assert all(4.0 <= cost <= 8.0 for row in snapshot.costs.values() for cost in row)
+
+
+def test_path_deficit_depth_one_matches_endpoint_mapping() -> None:
+    observation = Observation(
+        np.zeros((2, 2), dtype=np.int16),
+        frozenset({ActionKind.ACTION1, ActionKind.ACTION2}),
+        GameState.NOT_FINISHED,
+        level=1,
+        win_levels=2,
+    )
+    history = History.from_observation(observation)
+    actions = (Action(ActionKind.ACTION1), Action(ActionKind.ACTION2))
+    snapshots = tuple(
+        BeamSearchPlanner(
+            depth=1,
+            beam_width=8,
+            completion_cost_policy=policy,
+        ).evaluate(
+            history,
+            actions,
+            ((_DelayedProgressHypothesis(), 1.0),),
+            win_levels=2,
+        )
+        for policy in (
+            ENDPOINT_COMPLETION_COST_POLICY,
+            PATH_DEFICIT_COMPLETION_COST_POLICY,
+        )
+    )
+
+    assert snapshots[0].costs == snapshots[1].costs
+    assert snapshots[0].costs[actions[0]] == (4.0,)
+    assert snapshots[0].costs[actions[1]] == (8.0,)
+
+
+def test_completion_cost_policy_identities_are_distinct_content_hashes() -> None:
+    assert set(COMPLETION_COST_POLICY_HASHES) == {
+        ENDPOINT_COMPLETION_COST_POLICY,
+        PATH_DEFICIT_COMPLETION_COST_POLICY,
+    }
+    assert len(set(COMPLETION_COST_POLICY_HASHES.values())) == 2
+    assert all(len(value) == 64 for value in COMPLETION_COST_POLICY_HASHES.values())
 
 
 def test_root_prediction_failure_receives_zero_planning_mass() -> None:

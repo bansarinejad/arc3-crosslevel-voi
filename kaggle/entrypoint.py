@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 
+from arc3_voi.agent import require_live_execution_admitted
 from arc3_voi.arc_adapter import ArcCompetitionClient
 from arc3_voi.competition import run_scorecard
 from arc3_voi.config import load_config
@@ -17,7 +18,6 @@ def main() -> int:
     model_path_value = os.environ.get("ARC3_MODEL_PATH")
     output = Path(os.environ.get("ARC3_OUTPUT", "/kaggle/working/arc3-voi-runs"))
     global_wall = os.environ.get("ARC3_GLOBAL_WALL_SECONDS")
-    client = ArcCompetitionClient()
     encoded_ids = os.environ.get("ARC3_GAME_IDS")
     if not encoded_ids:
         raise RuntimeError(
@@ -28,10 +28,12 @@ def main() -> int:
     if not game_ids:
         raise RuntimeError("ARC3_GAME_IDS contains an empty manifest")
     config = load_config(config_path)
+    require_live_execution_admitted(config)
     backend = backend_from_config(
         config,
         model_path=None if model_path_value is None else Path(model_path_value),
     )
+    client = ArcCompetitionClient()
     result = run_scorecard(
         game_ids,
         backend,

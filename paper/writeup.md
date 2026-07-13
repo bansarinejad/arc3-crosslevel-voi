@@ -87,6 +87,16 @@ hidden state, and finite-depth goal values only approximate long-horizon cost.
 
 ## Results — target 350 words
 
+**Negative engineering gate.** A preregistered trajectory-sensitive unresolved-cost
+variant produced action-varying plan costs on its generic synthetic bridge, but under the
+registered Gibbs/MDL weights its agreement was `0.8417629` (required `<0.8`), maximum EVSI
+was `0.04812365` actions (required `>=0.05`), and it produced no X-only probe. We froze the
+variant before canonical audit, model inference, or gameplay. This is mechanism-debugging
+evidence only and is not part of the controlled or private score. The conjunctive stop also
+left the planned treatment-level palette/translation/scale/order metamorphic suite unrun.
+At this pre-results stage, the deterministic failure awaits its one-time clean-commit
+evidence artifact.
+
 **Linked submission.** Configuration **[COMMIT/MODEL/PROFILE]** obtains private RHAE
 **[SCORE]** with **[RUNTIME]** and no network access.
 
@@ -122,4 +132,5 @@ resource-efficient only relative to its declared hardware and budgets.
 Within those limits, the study tests a concrete thesis: uncertainty should remain explicit
 until an action matters, and information purchased early should be valued by the later
 decisions it can improve. Every positive sentence above is conditional on the frozen claim
-gates, and all configurations, failures, and traces are released for reuse.
+gates. The final submission will release every claim-bearing configuration, failure
+artifact, and trace that actually exists; no absent controlled trace is implied here.

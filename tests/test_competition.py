@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from dataclasses import replace
+
 import numpy as np
 import pytest
 
+from arc3_voi.agent import TreatmentNotAdmittedError
 from arc3_voi.competition import run_scorecard
-from arc3_voi.config import ExperimentConfig, SystemConfig
+from arc3_voi.config import ExperimentConfig, SystemConfig, load_config
 from arc3_voi.model import ScriptedBackend
 from arc3_voi.types import Action, ActionKind, GameState, Observation
 
@@ -54,6 +57,27 @@ def test_scorecard_reuses_backend_and_makes_each_game_once(tmp_path) -> None:
     assert client.made == ["a", "b"]
     assert len(result.runs) == 2
     assert not result.stopped_early
+
+
+def test_scorecard_rejects_failed_treatment_before_making_game(tmp_path) -> None:
+    template = load_config("configs/template_v1_path_deficit_v2_x.yaml")
+    config = replace(
+        template,
+        experiment=replace(template.experiment, hypothesis_source="qwen"),
+    )
+    client = Client()
+    backend = ScriptedBackend(action_policy=lambda _history, _valid: {"kind": "ACTION1"})
+
+    with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
+        run_scorecard(
+            ("must-not-run",),
+            backend,
+            config,
+            output_directory=tmp_path,
+            client=client,  # type: ignore[arg-type]
+        )
+
+    assert client.made == []
 
 
 def test_scorecard_resume_only_makes_the_missing_game(tmp_path) -> None:

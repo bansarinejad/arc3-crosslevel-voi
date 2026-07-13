@@ -13,7 +13,10 @@ from typing import TypeAlias
 from arc3_voi.candidates import Point, candidates_from_history
 from arc3_voi.hypothesis import CrossLevelPersistence, HypothesisPool, RecordedTransition
 from arc3_voi.planner import (
+    COMPLETION_COST_POLICY_HASHES,
+    ENDPOINT_COMPLETION_COST_POLICY,
     BeamSearchPlanner,
+    CompletionCostPolicy,
     NoValidHypotheses,
     PlanningError,
     best_probe,
@@ -168,6 +171,12 @@ class ControllerConfig:
     robust_std_coefficient: float = 0.5
     max_refreshes_per_level: int = 1
     max_generation_batches: int = 3
+    completion_cost_policy_version: CompletionCostPolicy = (
+        ENDPOINT_COMPLETION_COST_POLICY
+    )
+    completion_cost_policy_sha256: str = COMPLETION_COST_POLICY_HASHES[
+        ENDPOINT_COMPLETION_COST_POLICY
+    ]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "variant", Variant.coerce(self.variant))
@@ -185,6 +194,12 @@ class ControllerConfig:
             raise ValueError("agreement_threshold must be in [0, 1]")
         if self.risk_coefficient < 0 or self.robust_std_coefficient < 0:
             raise ValueError("controller cost coefficients must be non-negative")
+        if (
+            self.completion_cost_policy_version not in COMPLETION_COST_POLICY_HASHES
+            or self.completion_cost_policy_sha256
+            != COMPLETION_COST_POLICY_HASHES[self.completion_cost_policy_version]
+        ):
+            raise ValueError("controller completion-cost policy identity is invalid")
 
 
 class Controller:
@@ -214,8 +229,17 @@ class Controller:
         self.persistence = persistence or CrossLevelPersistence()
         self.cached_points = tuple(cached_points)
         self.planner = planner or BeamSearchPlanner(
-            depth=self.config.depth, beam_width=self.config.beam_width
+            depth=self.config.depth,
+            beam_width=self.config.beam_width,
+            completion_cost_policy=self.config.completion_cost_policy_version,
         )
+        if isinstance(self.planner, BeamSearchPlanner) and (
+            self.planner.completion_cost_policy
+            != self.config.completion_cost_policy_version
+            or self.planner.completion_cost_policy_sha256
+            != self.config.completion_cost_policy_sha256
+        ):
+            raise ValueError("planner and controller completion-cost policies differ")
         self.telemetry_callback = telemetry_callback
 
         self.history = History.empty()

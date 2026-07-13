@@ -12,6 +12,10 @@ from statistics import mean
 from typing import Any, Literal, cast
 
 from .config import HypothesisSource
+from .planner import (
+    COMPLETION_COST_POLICY_HASHES,
+    ENDPOINT_COMPLETION_COST_POLICY,
+)
 from .run_store import read_complete_run
 
 Variant = Literal["D", "S", "M", "X"]
@@ -155,7 +159,11 @@ class GateResult:
 
 
 def stable_config_hash(config: object, *, implicit_qwen_legacy: bool = False) -> str:
-    hash_input = _implicit_qwen_projection(config) if implicit_qwen_legacy else config
+    hash_input = (
+        _implicit_qwen_projection(config)
+        if implicit_qwen_legacy
+        else _historical_completion_cost_projection(config)
+    )
     payload = json.dumps(
         hash_input,
         separators=(",", ":"),
@@ -556,7 +564,64 @@ def _implicit_qwen_projection(config: object) -> object:
     ):
         experiment.pop(key, None)
     projected["experiment"] = experiment
+    raw_planning = projected.get("planning")
+    if isinstance(raw_planning, Mapping):
+        planning = dict(raw_planning)
+        _validate_historical_completion_cost_policy(planning)
+        planning.pop("completion_cost_policy_version", None)
+        planning.pop("completion_cost_policy_sha256", None)
+        projected["planning"] = planning
     return projected
+
+
+def _historical_completion_cost_projection(config: object) -> object:
+    """Keep runtime-v2/v3 source identities byte-stable after policy versioning."""
+
+    if is_dataclass(config) and not isinstance(config, type):
+        projected: object = asdict(config)
+    elif isinstance(config, Mapping):
+        projected = dict(config)
+    else:
+        return config
+    if not isinstance(projected, dict):  # pragma: no cover - guarded above
+        return config
+    raw_experiment = projected.get("experiment")
+    raw_planning = projected.get("planning")
+    if not isinstance(raw_experiment, Mapping) or not isinstance(raw_planning, Mapping):
+        return config
+    if raw_experiment.get("implementation_contract_version") not in {
+        "crosslevel-voi-runtime-v2",
+        "crosslevel-voi-runtime-v3",
+    }:
+        return projected
+    planning = dict(raw_planning)
+    _validate_historical_completion_cost_policy(planning)
+    planning.pop("completion_cost_policy_version", None)
+    planning.pop("completion_cost_policy_sha256", None)
+    projected["planning"] = planning
+    return projected
+
+
+def _validate_historical_completion_cost_policy(planning: Mapping[str, object]) -> None:
+    policy_keys = {
+        "completion_cost_policy_version",
+        "completion_cost_policy_sha256",
+    }
+    present = policy_keys.intersection(planning)
+    if not present:
+        return
+    if present != policy_keys:
+        raise ValueError("historical completion-cost policy identity is incomplete")
+    expected = (
+        ENDPOINT_COMPLETION_COST_POLICY,
+        COMPLETION_COST_POLICY_HASHES[ENDPOINT_COMPLETION_COST_POLICY],
+    )
+    actual = (
+        planning["completion_cost_policy_version"],
+        planning["completion_cost_policy_sha256"],
+    )
+    if actual != expected:
+        raise ValueError("historical completion-cost policy identity must be endpoint-v1")
 
 
 def _game_version(game: str, versions: Mapping[str, str] | None) -> str:

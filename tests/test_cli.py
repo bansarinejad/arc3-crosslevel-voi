@@ -2,17 +2,20 @@ from __future__ import annotations
 
 import hashlib
 import json
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 import arc3_voi.cli as cli_module
+from arc3_voi.agent import TreatmentNotAdmittedError
 from arc3_voi.cli import (
     _archive_resolved_failure,
     _validate_existing_manifest_artifacts,
     _validate_pending_artifacts,
     main,
 )
+from arc3_voi.config import load_config
 from arc3_voi.experiment import RunSpec
 
 PRODUCER_CONTRACT_SHA256 = "b" * 64
@@ -159,6 +162,105 @@ def test_blocked_template_artifact_does_not_unlock_checked_in_matrix(tmp_path: P
                 "artifacts/development_matrix_template_v1.json",
                 "--config",
                 "configs/local_4b.yaml",
+                "--metadata",
+                str(tmp_path / "must-not-be-read.json"),
+                "--output",
+                str(tmp_path / "must-not-be-created"),
+                "--dry-run",
+            ]
+        )
+
+    assert not (tmp_path / "must-not-be-created").exists()
+
+
+def test_failed_path_deficit_treatment_matrix_is_registration_only(tmp_path: Path) -> None:
+    with pytest.raises(ValueError, match="registration-only; run-matrix execution remains"):
+        main(
+            [
+                "run-matrix",
+                "--matrix",
+                "artifacts/development_matrix_template_v1_path_deficit_v2.json",
+                "--config",
+                "configs/local_4b.yaml",
+                "--metadata",
+                str(tmp_path / "must-not-be-read.json"),
+                "--output",
+                str(tmp_path / "must-not-be-created"),
+                "--dry-run",
+            ]
+        )
+
+    assert not (tmp_path / "must-not-be-created").exists()
+
+
+def test_failed_path_deficit_qwen_relabel_cannot_preflight_or_run(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    template = load_config("configs/template_v1_path_deficit_v2_x.yaml")
+    qwen_config = replace(
+        template,
+        experiment=replace(template.experiment, hypothesis_source="qwen"),
+    )
+    monkeypatch.setattr(cli_module, "load_config", lambda _path: qwen_config)
+
+    def backend_must_not_be_built(*_args: object, **_kwargs: object) -> object:
+        raise AssertionError("backend construction must follow treatment admission")
+
+    monkeypatch.setattr(cli_module, "_model_backend", backend_must_not_be_built)
+
+    with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
+        main(
+            [
+                "preflight",
+                "--config",
+                "ignored-by-test.yaml",
+                "--model-path",
+                str(tmp_path / "must-not-be-read"),
+            ]
+        )
+
+    with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
+        main(
+            [
+                "run",
+                "--config",
+                "ignored-by-test.yaml",
+                "--game",
+                "must-not-be-created",
+                "--seed",
+                "11",
+                "--run-id",
+                "must-not-run",
+                "--model-path",
+                str(tmp_path / "must-not-be-read"),
+                "--output",
+                str(tmp_path / "must-not-be-created"),
+            ]
+        )
+
+    qwen_row = RunSpec(
+        phase="development",
+        game_id="blocked",
+        seed=11,
+        variant="X",
+        model_profile="must-not-load",
+        config_hash="a" * 64,
+        game_version="v1",
+        snapshot_hash="b" * 64,
+        hypothesis_source="qwen",
+        arm_label="X-Q",
+        identity_version="source-v2",
+    )
+    monkeypatch.setattr(cli_module, "load_matrix", lambda _path: (qwen_row,))
+    with pytest.raises(TreatmentNotAdmittedError, match="failed its preregistered"):
+        main(
+            [
+                "run-matrix",
+                "--matrix",
+                "qwen-relabel-must-not-run.json",
+                "--config",
+                "ignored-by-test.yaml",
                 "--metadata",
                 str(tmp_path / "must-not-be-read.json"),
                 "--output",

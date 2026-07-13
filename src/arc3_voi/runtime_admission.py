@@ -16,6 +16,7 @@ from .experiment import stable_config_hash
 from .grounding import ProgramGroundingResult, evaluate_program_grounding
 from .hypothesis import HypothesisPool, behavioral_deduplicate
 from .planner import (
+    ENDPOINT_COMPLETION_COST_POLICY,
     BeamSearchPlanner,
     NoValidHypotheses,
     PlanningError,
@@ -36,6 +37,22 @@ from .types import Action, ActionKind, History, Prediction
 ADMISSION_CONTRACT_VERSION = "runtime-admission-v2"
 MATERIAL_EVSI_THRESHOLD = 0.05
 INITIAL_CROSS_LEVEL_PERSISTENCE = 0.5
+
+
+def _completion_cost_policy_metadata(config: SystemConfig) -> dict[str, str]:
+    """Emit policy identity only for post-endpoint admission contracts."""
+
+    if (
+        config.planning.completion_cost_policy_version
+        == ENDPOINT_COMPLETION_COST_POLICY
+    ):
+        return {}
+    return {
+        "completion_cost_policy_version": (
+            config.planning.completion_cost_policy_version
+        ),
+        "completion_cost_policy_sha256": config.planning.completion_cost_policy_sha256,
+    }
 
 
 @dataclass(frozen=True, slots=True)
@@ -311,6 +328,9 @@ def audit_source_batch(
                     depth=config.planning.depth,
                     beam_width=config.planning.beam_width,
                     parallel_hypotheses=False,
+                    completion_cost_policy=(
+                        config.planning.completion_cost_policy_version
+                    ),
                 ).evaluate(
                     history,
                     actions,
@@ -338,6 +358,7 @@ def audit_source_batch(
             risk_coefficient=config.planning.risk_coefficient,
             agreement_threshold=config.planning.agreement_threshold,
         )
+        planning.update(_completion_cost_policy_metadata(config))
         selected_ids = tuple(hypothesis.hypothesis_id for hypothesis in selected)
         selected_behavior_signatures = {
             item.result.behavior_signature
@@ -450,6 +471,7 @@ def run_runtime_admission_audit(
             "planning_depth": config.planning.depth,
             "beam_width": config.planning.beam_width,
             "agreement_threshold": config.planning.agreement_threshold,
+            **_completion_cost_policy_metadata(config),
             "material_evsi_threshold_actions": MATERIAL_EVSI_THRESHOLD,
             "initial_cross_level_persistence": INITIAL_CROSS_LEVEL_PERSISTENCE,
             "role_policy": (

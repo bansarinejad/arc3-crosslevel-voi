@@ -7,7 +7,7 @@ import json
 from dataclasses import replace
 from pathlib import Path
 
-from arc3_voi.agent import build_agent
+from arc3_voi.agent import build_agent, require_live_execution_admitted
 from arc3_voi.arc_adapter import ArcCompetitionClient
 from arc3_voi.config import load_config
 from arc3_voi.experiment import stable_config_hash
@@ -32,6 +32,7 @@ def main() -> int:
             max_environment_actions=1,
         ),
     )
+    require_live_execution_admitted(config)
     backend = backend_from_config(config, model_path=args.model_path)
     session = ArcCompetitionClient().make(args.game, seed=args.seed)
     with build_agent(backend, config) as agent:

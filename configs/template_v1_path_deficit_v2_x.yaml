@@ -1,0 +1,8 @@
+extends: template_v1_x.yaml
+
+experiment:
+  implementation_contract_version: crosslevel-voi-runtime-v4
+
+planning:
+  completion_cost_policy_version: path-deficit-v2
+  completion_cost_policy_sha256: 055f52473893709d88beffed0b22fa035c24af7b9da3ce24306e481cf2abc670

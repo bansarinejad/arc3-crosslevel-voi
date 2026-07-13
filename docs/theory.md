@@ -159,6 +159,18 @@ present the multiplier as an exact model of every ARC trajectory.
 
 ## Scope boundary
 
+### Empirical status of the construction
+
+The exact equal-weight unit construction gives EVSI `0.05`, agreement `0.5`, myopic
+utility `-0.95`, multiplier `23`, and cross-level utility `0.15`; it checks the equations,
+not the learned committee. The separately preregistered path-deficit-v2 synthetic bridge
+used the configured Gibbs/MDL weights and failed: agreement was `0.8417629130389278`,
+maximum EVSI was `0.048123650158264475`, and no X-only action passed the unchanged gate.
+No canonical audit or gameplay followed. The theory result therefore remains independent
+of, and does not rescue, the negative mechanism test. The planner-level palette,
+translation, scaling, and ordering metamorphic condition was not run after the conjunctive
+failure, so the treatment carries no empirical invariance claim.
+
 All statements above concern a finite deterministic shared-hypothesis decision model.
 They do not cover unrestricted hidden state, misspecified program pools, stochastic
 environments, arbitrary history dependence beyond the recorded eight frames, or the

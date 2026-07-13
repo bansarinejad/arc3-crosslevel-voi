@@ -12,6 +12,7 @@ from typing import Any
 
 import numpy as np
 
+from arc3_voi.agent import require_live_execution_admitted
 from arc3_voi.config import load_config
 from arc3_voi.experiment import stable_config_hash
 from arc3_voi.grounding import (
@@ -54,6 +55,16 @@ def main() -> int:
     parser.add_argument("--expected-canonical-trace-sha256")
     args = parser.parse_args()
 
+    base_config = load_config(args.config)
+    if base_config.model is None:
+        raise ValueError("grounding smoke requires a model configuration")
+    config = replace(
+        base_config,
+        experiment=replace(base_config.experiment, seed=args.seed),
+        model=replace(base_config.model, offline=True),
+    )
+    require_live_execution_admitted(config)
+
     if args.trace is not None:
         trace_sha = canonical_trace_hash(args.trace)
         transitions = load_transitions(args.trace)
@@ -78,14 +89,6 @@ def main() -> int:
         source_path = args.fixture
     if args.expected_canonical_trace_sha256 and trace_sha != args.expected_canonical_trace_sha256:
         raise ValueError("source trace does not match the expected canonical hash")
-    base_config = load_config(args.config)
-    if base_config.model is None:
-        raise ValueError("grounding smoke requires a model configuration")
-    config = replace(
-        base_config,
-        experiment=replace(base_config.experiment, seed=args.seed),
-        model=replace(base_config.model, offline=True),
-    )
     model_config = config.model
     assert model_config is not None
     backend = backend_from_config(config, model_path=args.model_path)

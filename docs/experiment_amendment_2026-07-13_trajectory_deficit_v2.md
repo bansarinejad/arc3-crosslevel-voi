@@ -1,8 +1,13 @@
 # Trajectory-deficit planner amendment — 13 July 2026
 
-Status: frozen at commit `9805e9e04f0e9d1a1fb7b6f0704697b1022bb736` before any
-planner implementation change, replacement admission report, model call, or environment
-action.
+Preregistration status: `9805e9e04f0e9d1a1fb7b6f0704697b1022bb736` was the clean
+pre-amendment HEAD. The first immutable snapshot containing the sections from **Reason for
+the amendment** through **Authorization limits** is commit
+`1302a05750f75d813fd3f84df13f0025e8050d9e`, where those bytes have SHA-256
+`a253ef9e432e1fa59363a007c7dd00f7cdcc9507747b6096c94aa697961265e3`.
+That snapshot preceded every planner implementation change, replacement admission report,
+model call, and environment action. The explicitly labeled outcome section was appended
+after observing the frozen synthetic test; it did not alter the preregistered terms.
 
 ## Reason for the amendment
 
@@ -120,3 +125,26 @@ producer wiring and the fixed bp35 seed-11 pilot. It cannot unlock the 180-row d
 matrix. The existing non-Qwen execution guard remains hard-coded throughout this amendment.
 A complete scientific failure is preserved and freezes this treatment; only infrastructure
 failure before report completion may be rerun unchanged.
+
+## Frozen synthetic result — 13 July 2026
+
+The treatment failed acceptance condition 5 under the registered Gibbs/MDL weights. It
+retained four valid, behaviorally distinct programs and at least two graded programs with
+action-varying depth-four costs, but committee agreement was
+`0.8417629130389278` (required: strictly below `0.8`) and maximum EVSI was
+`0.048123650158264475` actions (required: at least `0.05`). Consequently there was no
+X-only action under the unchanged admission rule.
+
+This is a scientific failure, not infrastructure failure. The scene, registered weights,
+thresholds, and treatment are frozen; they must not be tuned or weakened. The zero-run
+matrix remains registration-only and hard-disabled. No canonical bp35 audit, model call,
+GPU use, generated token, environment action, reward, RHAE observation, gameplay pilot, or
+development-matrix run is authorized for `path-deficit-v2`. One clean-commit Linux
+reproduction will publish the already-disposed negative result before any new treatment is
+proposed. This is provenance preservation while the report is still incomplete, not a
+rerun for tuning, re-admission, or a different gate outcome.
+
+Because acceptance was conjunctive, the stop occurred immediately after condition 5.
+Condition 6's planner-level palette, translation, scaling, and ordering metamorphic suite
+was not completed and is not claimed. Existing compiler-level metamorphic tests are not
+misrepresented as satisfying that planner-level requirement.

@@ -8,6 +8,13 @@ from math import isfinite
 from pathlib import Path
 from typing import Any, Literal
 
+from .planner import (
+    COMPLETION_COST_POLICY_HASHES,
+    ENDPOINT_COMPLETION_COST_POLICY,
+    PATH_DEFICIT_COMPLETION_COST_POLICY,
+    CompletionCostPolicy,
+)
+
 HypothesisSource = Literal["qwen", "template_v1", "qwen_then_template_v1"]
 
 SUPPORTED_CANDIDATE_POLICY = (
@@ -18,6 +25,7 @@ SUPPORTED_COMPILER_CONTRACT = (
     "scene-topology-compiler-v1",
     "eeccd86db3346fd15d2e3dbc8e82ee2bb60e23bc30c0490750a7a0fbaa9e14e5",
 )
+PATH_DEFICIT_RUNTIME_VERSION = "crosslevel-voi-runtime-v4"
 
 
 class ConfigError(ValueError):
@@ -119,7 +127,6 @@ class ExperimentConfig:
         if self.max_wall_seconds == 0:
             raise ConfigError("max_wall_seconds must be positive")
 
-
 @dataclass(frozen=True, slots=True)
 class HypothesisConfig:
     max_hypotheses: int = 4
@@ -156,6 +163,12 @@ class PlanningConfig:
     max_probes_per_level: int = 3
     risk_coefficient: float = 3.0
     robust_std_coefficient: float = 0.5
+    completion_cost_policy_version: CompletionCostPolicy = (
+        ENDPOINT_COMPLETION_COST_POLICY
+    )
+    completion_cost_policy_sha256: str = COMPLETION_COST_POLICY_HASHES[
+        ENDPOINT_COMPLETION_COST_POLICY
+    ]
 
     def __post_init__(self) -> None:
         for name in ("max_candidates", "depth", "beam_width", "max_probes_per_level"):
@@ -164,6 +177,12 @@ class PlanningConfig:
             _non_negative_float(name, getattr(self, name))
         if not 0 <= self.agreement_threshold <= 1:
             raise ConfigError("agreement_threshold must be in [0, 1]")
+        if (
+            self.completion_cost_policy_version not in COMPLETION_COST_POLICY_HASHES
+            or self.completion_cost_policy_sha256
+            != COMPLETION_COST_POLICY_HASHES[self.completion_cost_policy_version]
+        ):
+            raise ConfigError("completion-cost policy identity does not match this runtime")
 
 
 @dataclass(frozen=True, slots=True)
@@ -248,6 +267,18 @@ class SystemConfig:
     generation: GenerationConfig = field(default_factory=GenerationConfig)
     sandbox: SandboxConfig = field(default_factory=SandboxConfig)
     model: ModelConfig | None = None
+
+    def __post_init__(self) -> None:
+        expected_policy = (
+            PATH_DEFICIT_COMPLETION_COST_POLICY
+            if self.experiment.implementation_contract_version
+            == PATH_DEFICIT_RUNTIME_VERSION
+            else ENDPOINT_COMPLETION_COST_POLICY
+        )
+        if self.planning.completion_cost_policy_version != expected_policy:
+            raise ConfigError(
+                "completion-cost policy does not match the implementation contract"
+            )
 
 
 def _section[ConfigT](
@@ -367,6 +398,8 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                     "max_probes_per_level",
                     "risk_coefficient",
                     "robust_std_coefficient",
+                    "completion_cost_policy_version",
+                    "completion_cost_policy_sha256",
                 }
             ),
             PlanningConfig,

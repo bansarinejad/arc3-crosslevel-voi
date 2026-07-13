@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import hashlib
+import inspect
+import json
 import time
 from collections import defaultdict
 from collections.abc import Hashable, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from math import fsum, isclose, sqrt
-from typing import TypeAlias
+from typing import Literal, TypeAlias
 
 import numpy as np
 
@@ -16,6 +19,11 @@ from arc3_voi.hypothesis import Hypothesis
 from arc3_voi.types import Action, GameState, History, Observation, Prediction
 
 PredictionSignature: TypeAlias = tuple[object, ...]  # noqa: UP040 - pinned mypy
+CompletionCostPolicy: TypeAlias = Literal[  # noqa: UP040 - pinned mypy
+    "endpoint-v1", "path-deficit-v2"
+]
+ENDPOINT_COMPLETION_COST_POLICY: CompletionCostPolicy = "endpoint-v1"
+PATH_DEFICIT_COMPLETION_COST_POLICY: CompletionCostPolicy = "path-deficit-v2"
 
 
 class PlanningError(RuntimeError):
@@ -341,6 +349,7 @@ class PlanningSnapshot:
 class _BeamNode:
     history: History
     goal_value: float
+    cumulative_deficit: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -359,12 +368,22 @@ class BeamSearchPlanner:
         depth: int = 4,
         beam_width: int = 8,
         parallel_hypotheses: bool = False,
+        completion_cost_policy: CompletionCostPolicy = ENDPOINT_COMPLETION_COST_POLICY,
     ) -> None:
         if depth < 1 or beam_width < 1:
             raise ValueError("depth and beam_width must be positive")
         self.depth = depth
         self.beam_width = beam_width
         self.parallel_hypotheses = parallel_hypotheses
+        if completion_cost_policy not in COMPLETION_COST_POLICY_HASHES:
+            raise ValueError("unsupported completion-cost policy")
+        self.completion_cost_policy = completion_cost_policy
+
+    @property
+    def completion_cost_policy_sha256(self) -> str:
+        """Return the content identity of the selected unresolved-cost policy."""
+
+        return COMPLETION_COST_POLICY_HASHES[self.completion_cost_policy]
 
     def evaluate(
         self,
@@ -538,7 +557,8 @@ class BeamSearchPlanner:
         first_history = self._advance(
             history, first_action, actions, first_prediction, win_levels
         )
-        beam = [_BeamNode(first_history, self._goal_value(hypothesis, first_history))]
+        first_goal = self._goal_value(hypothesis, first_history)
+        beam = [_BeamNode(first_history, first_goal, 1.0 - first_goal)]
         if self.depth == 1:
             return 8.0 - 4.0 * beam[0].goal_value
 
@@ -562,18 +582,31 @@ class BeamSearchPlanner:
                     advanced = self._advance(
                         node.history, action, actions, prediction, win_levels
                     )
+                    goal = self._goal_value(hypothesis, advanced)
                     next_beam.append(
-                        _BeamNode(advanced, self._goal_value(hypothesis, advanced))
+                        _BeamNode(
+                            advanced,
+                            goal,
+                            node.cumulative_deficit + 1.0 - goal,
+                        )
                     )
             if not next_beam:
                 return 8.0
-            # Higher predicted goal value is better.  Python's stable sort keeps
-            # deterministic action/beam insertion order for exact ties.
-            next_beam.sort(key=lambda node: -node.goal_value)
+            # Python's stable sort keeps deterministic action/beam insertion
+            # order for exact ties under either frozen policy.
+            if self.completion_cost_policy == ENDPOINT_COMPLETION_COST_POLICY:
+                next_beam.sort(key=lambda node: -node.goal_value)
+            else:
+                next_beam.sort(
+                    key=lambda node: (node.cumulative_deficit, -node.goal_value)
+                )
             beam = next_beam[: self.beam_width]
 
-        best_goal = max(node.goal_value for node in beam)
-        return 8.0 - 4.0 * best_goal
+        if self.completion_cost_policy == ENDPOINT_COMPLETION_COST_POLICY:
+            best_goal = max(node.goal_value for node in beam)
+            return 8.0 - 4.0 * best_goal
+        best_deficit = min(node.cumulative_deficit for node in beam)
+        return 4.0 + 4.0 * best_deficit / self.depth
 
     @staticmethod
     def _check_deadline(deadline: float | None) -> None:
@@ -680,8 +713,35 @@ class BeamSearchPlanner:
         )
 
 
+def _completion_cost_policy_sha256(policy: CompletionCostPolicy) -> str:
+    payload = json.dumps(
+        {
+            "beam_node": inspect.getsource(_BeamNode),
+            "hypothesis_result": inspect.getsource(_HypothesisPlanningResult),
+            "planner": inspect.getsource(BeamSearchPlanner),
+            "policy": policy,
+        },
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
+
+
+COMPLETION_COST_POLICY_HASHES: Mapping[CompletionCostPolicy, str] = {
+    policy: _completion_cost_policy_sha256(policy)
+    for policy in (
+        ENDPOINT_COMPLETION_COST_POLICY,
+        PATH_DEFICIT_COMPLETION_COST_POLICY,
+    )
+}
+
+
 __all__ = [
+    "COMPLETION_COST_POLICY_HASHES",
+    "ENDPOINT_COMPLETION_COST_POLICY",
+    "PATH_DEFICIT_COMPLETION_COST_POLICY",
     "BeamSearchPlanner",
+    "CompletionCostPolicy",
     "ExploitChoice",
     "NoValidHypotheses",
     "PlanningError",

@@ -71,6 +71,34 @@ myopic and cross-level utilities were -1.0. The report therefore has
 `artifacts/template_v1_runtime_admission_v2_bp35_seed11.json`, SHA-256
 `546cf508fa36e1d0ddd39b16e79c35f79fc597577609b3350add8f1c146e1033`.
 
+### Frozen path-deficit-v2 treatment
+
+The second dated amendment is frozen in
+`docs/experiment_amendment_2026-07-13_trajectory_deficit_v2.md`. Historical runtime-v2/v3
+configurations retain `endpoint-v1`, which ranks unresolved paths and maps cost from the
+depth-four endpoint goal alone. The opt-in runtime-v4 treatment `path-deficit-v2` ranks by
+cumulative progress deficit and maps the full unresolved trajectory into the same `[4,8]`
+cost range. Its zero-run source-v2 manifest is
+`artifacts/development_matrix_template_v1_path_deficit_v2.json`, SHA-256
+`949fe7a7455e3637acdeb2ec278ff9822e78a15284854fd730e47a3c84775d5e`.
+
+The preregistered generic synthetic bridge was conjunctive. Structural checks succeeded:
+four valid behaviorally distinct programs survived, at least two graded programs had
+action-varying depth-four costs, and optimal sets differed. With the registered Gibbs/MDL
+weights, however, agreement was `0.8417629130389278` (required: `<0.8`), maximum EVSI was
+`0.048123650158264475` actions (required: `>=0.05`), and no X-only action existed. The
+treatment is therefore a frozen scientific failure. The scene, weights, thresholds, and
+implementation must not be retuned or rerun for admission; one identical clean Linux run
+is permitted only to publish the already-disposed result. The remaining planner-level
+metamorphic condition was not needed after the conjunctive failure and is not claimed as
+completed.
+
+No replacement bp35 audit, producer wiring, model preflight, model call, GPU use, generated
+token, environment action, reward/RHAE observation, gameplay pilot, or matrix row is
+authorized. Live boundaries reject runtime-v4 before backend or environment construction,
+even if its config is relabeled as Qwen. The zero-run manifest is abandoned negative
+registration evidence and cannot be revived by a later treatment.
+
 Development uses seeds `11, 23, 47`. Confirmation uses `101, 211, 307, 401, 503` and
 compares `X` only to the strongest development comparator. If projected local compute
 exceeds 80 GPU-hours, the frozen fallback uses the first two and first three seeds.
@@ -129,7 +157,7 @@ committee. Its four completed rows and the other 176 abandoned rows are preserve
 The pre-amendment runtime filtered role grounding before worker admission and deduplication,
 clamps EVSI magnitudes at or below `1e-12` to zero, labels mandatory RESET decisions as
 lifecycle, and separates controller-decision latency from environment latency. Its then-active
-`development_matrix.json` has 180 pending rows with new content-addressed IDs under
+`development_matrix.json` has 180 unexecuted rows with content-addressed IDs under
 implementation contract `crosslevel-voi-runtime-v2`. No row ran; the amendment preserves
 that manifest as audit-only.
 
@@ -141,8 +169,8 @@ costs over all twelve candidates. The Windows-source pool contained one program 
 small 0.02246-action cost range and differing optimal sets, but no observation partition
 changed the weighted optimal action, so EVSI was still zero. The gate blocked a fresh pilot. See
 `artifacts/runtime_admission_goal_v3_wsl.json` and
-`artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked while the
-replacement evidence-first v5 prompt/grounding contract is tested. Its offline grounding
+`artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remained locked while the
+replacement evidence-first v5 prompt/grounding contract was tested. Its offline grounding
 smoke requires two eligible graded-role programs, while the stricter runtime-admission v2
 gate requires at least one material low-agreement probe with positive X utility and
 non-positive M utility. The v5/runtime-v2 path adds at most one grounding-repair batch with

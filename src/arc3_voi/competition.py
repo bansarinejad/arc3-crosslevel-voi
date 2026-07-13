@@ -10,7 +10,7 @@ from typing import cast
 from .agent import (
     build_agent,
     qwen_producer_contract_sha256,
-    require_admitted_hypothesis_source,
+    require_live_execution_admitted,
 )
 from .arc_adapter import ArcCompetitionClient
 from .config import SystemConfig
@@ -46,7 +46,7 @@ def run_scorecard(
 
     if len(game_ids) != len(set(game_id.split("-", 1)[0] for game_id in game_ids)):
         raise ValueError("game manifest contains duplicate stable IDs")
-    require_admitted_hypothesis_source(config)
+    require_live_execution_admitted(config)
     producer_contract_sha256 = qwen_producer_contract_sha256(config)
     arm_label = arm_label_for(cast(Variant, config.experiment.variant), "qwen")
     arcade = client or ArcCompetitionClient()

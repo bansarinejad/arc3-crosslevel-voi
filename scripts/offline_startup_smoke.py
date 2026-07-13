@@ -43,6 +43,7 @@ def smoke(bundle: Path, *, load_model_config: bool = True) -> None:
     sys.path.insert(0, str(wheels[0]))
     disable_python_network()
 
+    from arc3_voi.agent import require_live_execution_admitted
     from arc3_voi.config import load_config
     from arc3_voi.model import backend_from_config
 
@@ -50,6 +51,7 @@ def smoke(bundle: Path, *, load_model_config: bool = True) -> None:
     config = load_config(config_path)
     if config.model is None or not config.model.offline:
         raise ValueError("Kaggle bundle config must set model.offline: true")
+    require_live_execution_admitted(config)
     backend = backend_from_config(config, model_path=bundle / "model")
     if Path(backend.model_path).resolve() != (bundle / "model").resolve():
         raise AssertionError("backend did not retain the bundled model path")

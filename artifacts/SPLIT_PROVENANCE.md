@@ -25,6 +25,9 @@ embeds every full game version and the immutable metadata snapshot hash.
   `ea2dbc2eec0159e63452ab805545021d5101a17882402dd3bc9869fc39241147`
 - Registered source-aware template-v1 matrix `development_matrix_template_v1.json` SHA-256:
   `6878b39d2379d6ffc11d45953db046883a8622ac529e3702efb679b3d9f6978b`
+- Frozen zero-run path-deficit-v2 matrix
+  `development_matrix_template_v1_path_deficit_v2.json` SHA-256:
+  `949fe7a7455e3637acdeb2ec278ff9822e78a15284854fd730e47a3c84775d5e`
 
 The unchanged split first fed the fair-v2 manifest. Its corrected four-row seed-11
 D/S/M/X pilot is retained as negative engineering evidence; the other 176 fair-v2 rows
@@ -82,3 +85,18 @@ controlled mechanism contrast is M-T versus X-T; no cross-source same-backbone c
 authorized. The pre-amendment matrix is now audit-only because changed implementation code
 cannot execute under its legacy hashes; `run-matrix` requires source-v2 identity. See
 `docs/experiment_amendment_2026-07-13.md`.
+
+The later path-deficit-v2 amendment registered a separate 180-row source-v2 manifest over
+the same 15 development games, seeds `11`, `23`, and `47`, and arms D-Q/S-T/M-T/X-T. Its
+single semantic hash per arm is D-Q
+`0c91334b067b82d3e5196d8f2802918ec5227e673365eaa9eca1cca158317a34`, S-T
+`a2f2e298d28ef4d17b41a117a473133c9ed5628554a66c6d10cd80bda5b1b50d`, M-T
+`5f0bb945c65cb1c7db015eaea2602cc07fd2976b0dc86ab9738ae26302f4251a`, and X-T
+`de53f3dffe049ffa3a62eb49622c34f1233a0f86baf6622b42f006b9b1c1982a`.
+All 180 run IDs are unique and collide with neither earlier matrix. Every row is
+unexecuted and permanently locked: the preregistered synthetic bridge failed at agreement
+`0.8417629130389278`, maximum EVSI `0.048123650158264475`, and zero X-only actions.
+Runtime-v4 is rejected at all live/model boundaries under every source label. This matrix
+is an abandoned registered input, not a result artifact, pending experiment, or empirical
+ARC result. The treatment stopped before its planner-level metamorphic condition, so the
+matrix supplies no invariance evidence.

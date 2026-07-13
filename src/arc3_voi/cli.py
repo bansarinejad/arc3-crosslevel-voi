@@ -12,7 +12,7 @@ from typing import Any, cast
 from .agent import (
     build_agent,
     qwen_producer_contract_sha256,
-    require_admitted_hypothesis_source,
+    require_live_execution_admitted,
 )
 from .arc_adapter import ArcCompetitionClient
 from .config import HypothesisSource, SystemConfig, load_config
@@ -274,6 +274,8 @@ def _arm_hashes(
 
 def _preflight_command(args: argparse.Namespace) -> None:
     config = load_config(args.config)
+    # Freeze failed treatments before model/backend construction or generation.
+    require_live_execution_admitted(config)
     if config.model is None:
         raise ValueError("preflight requires a model profile")
     durations = None
@@ -315,7 +317,7 @@ def _run_command(args: argparse.Namespace) -> int:
         experiment = replace(experiment, variant=args.variant)
     config = replace(config, experiment=experiment)
     # This check must precede both model/backend and environment construction.
-    require_admitted_hypothesis_source(config)
+    require_live_execution_admitted(config)
     producer_contract_sha256 = qwen_producer_contract_sha256(config)
     backend = _model_backend(config, args.model_path)
     client = ArcCompetitionClient()
@@ -368,7 +370,7 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
             "disabled pending separately reviewed live-producer wiring and admission"
         )
     config = load_config(args.config)
-    require_admitted_hypothesis_source(config)
+    require_live_execution_admitted(config)
     producer_contract_sha256 = qwen_producer_contract_sha256(config)
     metadata = load_metadata(args.metadata)
     actual_snapshot_hash = metadata_hash(metadata)
@@ -566,7 +568,7 @@ def _execute_manifest_row(
     # Keep the per-row guard even though run-matrix validates the complete
     # manifest: this function is also a useful unit boundary and must never
     # relabel Qwen-generated programs as template/hybrid proposals.
-    require_admitted_hypothesis_source(config)
+    require_live_execution_admitted(config)
     producer_contract_sha256 = qwen_producer_contract_sha256(config)
     backend = _model_backend(config, model_path)
     session = ArcCompetitionClient().make(row.full_game_id, seed=row.seed)

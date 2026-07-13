@@ -10,8 +10,17 @@
 - The design is reproducible with a local open-weight model and offline Kaggle runtime.
 
 The final two performance/reproducibility sentences are prohibited until their named
-gates and a network-disabled full rehearsal pass. As of 12 July 2026, no performance gate
+gates and a network-disabled full rehearsal pass. As of 13 July 2026, no performance gate
 has passed and no private score exists.
+
+The path-deficit-v2 amendment supplies only a negative synthetic mechanism result. It
+showed varied depth-four cost vectors, but its registered committee missed both the strict
+agreement and material-EVSI thresholds and produced no X-only action. It does not establish
+decision-relevant exploration, runtime admission, transition accuracy, gameplay benefit,
+or general planner inferiority. The equal-weight EVSI construction remains theory/unit-test
+evidence and must not be substituted for the failed registered-weight gate.
+The treatment stopped before its planner-level palette, translation, scaling, and ordering
+metamorphic condition; do not claim those invariances from the compiler-level tests.
 
 ## Never claim
 
@@ -21,6 +30,8 @@ has passed and no private score exists.
 - Public-game performance as genuine unseen generalization.
 - ARC-AGI-2 as evidence for active exploration.
 - A positive effect if either development or confirmation claim gate fails.
+- That path-deficit-v2 passed admission, produced an ARC result, or may be revived by
+  changing its frozen scene, weights, or thresholds.
 
 ## Closest prior work
 
