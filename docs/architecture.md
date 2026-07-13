@@ -18,8 +18,9 @@ default and uses only the horizon endpoint goal for unresolved paths. The opt-in
 `path-deficit-v2` policy accumulates unresolved progress deficit along the simulated path
 while retaining exact completion costs and the `[4,8]` unresolved range. It belongs only
 to `crosslevel-voi-runtime-v4`, whose fixed synthetic scene/compiler/registered-weight gate
-failed and is pending one-time clean-commit preservation. It is not an admitted live
-runtime. Its planner-level palette, translation, scaling, and ordering metamorphic suite
+failed and was preserved from clean Linux commit `989c321` in the content-addressed
+synthetic admission report. It is not an admitted live runtime. Its planner-level palette,
+translation, scaling, and ordering metamorphic suite
 was not run, so no such invariance is attributed to the treatment.
 
 Environment observations are 64×64 symbolic grids. `History` retains eight stable frames,

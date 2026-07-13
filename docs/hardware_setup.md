@@ -96,9 +96,8 @@ admission audits over the historical WSL and Windows source batches verified cle
 eligible-only selection and zero planner failures, but both blocked on decision diversity:
 agreement was 1.0, EVSI was 0.0, and cross-level probe utility was -1.0. See
 `artifacts/runtime_admission_goal_v3_wsl.json` and
-`artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked pending a
-new Windows/WSL grounding smoke and runtime-admission v2 pass for the repair-enabled evidence-first v5
-prompt contract, and then a fresh four-run pilot.
+`artifacts/runtime_admission_goal_v3_windows.json`. Scale-up remains locked; subsequent
+v5 and path-deficit-v2 evidence below supersedes the earlier pending-gate sequence.
 
 The repair-enabled v5 native-Windows gates separate compute capacity from program quality.
 Qwen3.5-4B BF16 used two batches, 3,665 output tokens, 163.17 generation seconds,
@@ -109,3 +108,10 @@ the old 9B four-simultaneous-sequence compute rejection for the serial profile, 
 eight 9B candidates failed grounding. Neither result authorizes gameplay. See
 `artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_windows.json` and
 `artifacts/prompt_grounding_bp35_seed11_visible_causal_v5_9b_windows.json`.
+
+The topology-v1 canonical synthetic audit was subsequently blocked on decision diversity.
+The separately frozen path-deficit-v2 treatment then failed its fixed Linux synthetic gate
+before a canonical audit, model call, or gameplay: weighted agreement was
+`0.8417629130389278`, maximum EVSI was `0.048123650158264475`, and no X-only probe existed.
+That treatment and its zero-run matrix are permanently frozen. There is no active or
+pending experiment matrix; another attempt requires a separately preregistered treatment.

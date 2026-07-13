@@ -148,13 +148,22 @@ does not contain code from Duck or other competition entries.
   the registered Gibbs/MDL weights. Four valid distinct programs survived and multiple
   graded cost vectors varied by action, yet agreement was `0.8417629130389278` rather than
   below `0.8`, maximum EVSI was `0.048123650158264475` actions rather than at least `0.05`,
-  and no X-only action existed. This is a deterministic negative regression pending its
-  one-time clean-commit evidence artifact, not an ARC result. The 180-row path-deficit
-  manifest is a zero-run abandoned registration artifact;
+  and no X-only action existed. The first clean Linux execution from commit `989c321` was
+  the preregistered preservation run. Before any code or input change, two additional
+  deterministic executions—one isolated duplicate and one exclusive-write publication—
+  were made solely to verify and publish identical bytes. Running three executions rather
+  than the authorized one is a disclosed protocol deviation; there was no tuning,
+  inspection-driven change, model call, or gameplay between them. All three outputs were
+  byte-identical and passed the infrastructure gate for all four grounding and four
+  persistent workers. The published artifact's SHA-256 is
+  `0a81a4a9d42bba1a80b747838bb51d06fae86827909c792d2afe5a2d14aa880a`.
+  This is provenance-complete negative synthetic evidence, not an ARC result. The 180-row
+  path-deficit manifest is a zero-run abandoned registration artifact;
   runtime-v4 is rejected before model preflight, backend/client construction, single-game
   execution, and matrix execution under every proposal-source label. The conjunctive stop
   prevented the replacement bp35 audit, gameplay, model calls, and the remaining
   planner-level metamorphic acceptance condition from being run.
+  See `artifacts/template_v1_path_deficit_v2_synthetic_admission.json`.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its

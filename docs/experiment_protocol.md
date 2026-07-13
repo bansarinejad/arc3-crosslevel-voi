@@ -88,8 +88,9 @@ action-varying depth-four costs, and optimal sets differed. With the registered 
 weights, however, agreement was `0.8417629130389278` (required: `<0.8`), maximum EVSI was
 `0.048123650158264475` actions (required: `>=0.05`), and no X-only action existed. The
 treatment is therefore a frozen scientific failure. The scene, weights, thresholds, and
-implementation must not be retuned or rerun for admission; one identical clean Linux run
-is permitted only to publish the already-disposed result. The remaining planner-level
+implementation must not be retuned or rerun for admission. The preregistration permitted
+exactly one identical clean Linux execution solely to publish the already-disposed result.
+The remaining planner-level
 metamorphic condition was not needed after the conjunctive failure and is not claimed as
 completed.
 
@@ -98,6 +99,22 @@ token, environment action, reward/RHAE observation, gameplay pilot, or matrix ro
 authorized. Live boundaries reject runtime-v4 before backend or environment construction,
 even if its config is relabeled as Qwen. The zero-run manifest is abandoned negative
 registration evidence and cannot be revived by a later treatment.
+
+The authorized provenance-preservation execution completed on Ubuntu 24.04.1/Python
+3.12.3 from clean commit `989c3211044b7d004e43f7a84f8a4b77567568da`. Before any code
+or input change, two extra deterministic executions were then made: one isolated duplicate
+and one exclusive-write publication. Performing three executions rather than the
+preregistered one is a protocol deviation. It is disclosed here; the extra executions did
+not tune or change the implementation, inputs, gates, or claims. All three outputs were
+byte-identical. All four grounding and four persistent workers enforced exactly
+268,435,456 bytes of `RLIMIT_DATA` allocation headroom; model calls, generated tokens, GPU
+use, environment actions, reward observations, and RHAE observations were all zero. The
+blocked report is
+`artifacts/template_v1_path_deficit_v2_synthetic_admission.json`, SHA-256
+`0a81a4a9d42bba1a80b747838bb51d06fae86827909c792d2afe5a2d14aa880a`.
+The amendment document remains byte-frozen at the input SHA recorded by that report; this
+protocol paragraph records completion and the deviation rather than retroactively editing
+the audit input.
 
 Development uses seeds `11, 23, 47`. Confirmation uses `101, 211, 307, 401, 503` and
 compares `X` only to the strongest development comparator. If projected local compute

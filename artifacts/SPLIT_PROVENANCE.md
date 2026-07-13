@@ -100,3 +100,13 @@ Runtime-v4 is rejected at all live/model boundaries under every source label. Th
 is an abandoned registered input, not a result artifact, pending experiment, or empirical
 ARC result. The treatment stopped before its planner-level metamorphic condition, so the
 matrix supplies no invariance evidence.
+The associated clean Linux synthetic report is
+`template_v1_path_deficit_v2_synthetic_admission.json`, SHA-256
+`0a81a4a9d42bba1a80b747838bb51d06fae86827909c792d2afe5a2d14aa880a`.
+It records clean commit `989c3211044b7d004e43f7a84f8a4b77567568da`, an exact
+eight-worker `RLIMIT_DATA` infrastructure pass, zero model/gameplay resources, and the
+frozen blocked disposition. The first execution was the authorized preservation run; an
+isolated duplicate and exclusive-write publication were then executed with no intervening
+code or input change. All three outputs were byte-identical. Running three times rather
+than the preregistered once is disclosed as a protocol deviation and supplied no tuning or
+additional empirical evidence.

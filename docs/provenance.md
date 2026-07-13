@@ -32,11 +32,12 @@ party file rather than relying on this human-readable register alone.
 |---|---|---|
 | `configs/template_v1_path_deficit_v2_x.yaml` | File `26b02a26a7152597eb40164a3775e23f38750ea7891af9fa20b4c327af7cb090`; X-T semantics `de53f3dffe049ffa3a62eb49622c34f1233a0f86baf6622b42f006b9b1c1982a` | Authored runtime-v4/path-deficit-v2 treatment config; frozen after its synthetic gate failed. |
 | `artifacts/development_matrix_template_v1_path_deficit_v2.json` | `949fe7a7455e3637acdeb2ec278ff9822e78a15284854fd730e47a3c84775d5e` | Authored zero-run 180-row registration manifest; never executable, permanently abandoned. |
+| `artifacts/template_v1_path_deficit_v2_synthetic_admission.json` | `0a81a4a9d42bba1a80b747838bb51d06fae86827909c792d2afe5a2d14aa880a` | Authored deterministic report from clean Linux commit `989c321`; infrastructure passed, synthetic mechanism gate blocked, zero model/gameplay resources. Three byte-identical executions were made (one authorized preservation run plus an isolated duplicate and publication run), a disclosed one-execution protocol deviation with no intervening change. |
 
-These registered inputs contain no model weights, third-party source, model output,
-environment trace, reward, or RHAE observation. They are not themselves the result
-artifact. The deterministic synthetic failure awaits a one-time clean-commit Linux report;
-the treatment-level metamorphic condition stopped unrun after the earlier conjunct failed.
+These artifacts contain no model weights, third-party source, model output, environment
+trace, reward, or RHAE observation. The config and matrix are registered inputs; the
+content-addressed Linux JSON is the result artifact. The treatment-level metamorphic
+condition stopped unrun after the earlier conjunct failed.
 
 ## Finalization checklist
 

@@ -94,8 +94,12 @@ was `0.04812365` actions (required `>=0.05`), and it produced no X-only probe. W
 variant before canonical audit, model inference, or gameplay. This is mechanism-debugging
 evidence only and is not part of the controlled or private score. The conjunctive stop also
 left the planned treatment-level palette/translation/scale/order metamorphic suite unrun.
-At this pre-results stage, the deterministic failure awaits its one-time clean-commit
-evidence artifact.
+The deterministic failure is preserved by a byte-reproduced clean Linux artifact; it
+records zero model, GPU, environment, reward, and RHAE usage. Three no-change executions
+were made rather than the single preregistered preservation execution—an isolated
+duplicate and the exclusive-write publication followed the authorized run. This protocol
+deviation is disclosed; all three outputs were byte-identical, and no tuning or
+inspection-driven change occurred between them.
 
 **Linked submission.** Configuration **[COMMIT/MODEL/PROFILE]** obtains private RHAE
 **[SCORE]** with **[RUNTIME]** and no network access.

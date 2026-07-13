@@ -19,6 +19,8 @@ agreement and material-EVSI thresholds and produced no X-only action. It does no
 decision-relevant exploration, runtime admission, transition accuracy, gameplay benefit,
 or general planner inferiority. The equal-weight EVSI construction remains theory/unit-test
 evidence and must not be substituted for the failed registered-weight gate.
+The clean Linux report preserving this result has SHA-256
+`0a81a4a9d42bba1a80b747838bb51d06fae86827909c792d2afe5a2d14aa880a`.
 The treatment stopped before its planner-level palette, translation, scaling, and ordering
 metamorphic condition; do not claim those invariances from the compiler-level tests.
 
