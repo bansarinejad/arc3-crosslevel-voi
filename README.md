@@ -15,11 +15,11 @@ does not contain code from Duck or other competition entries.
   beam planning, D/S/M/X controllers, direct fallback, trace replay, RHAE/statistics,
   competition lifecycle, and lazy Qwen backends.
 - Frozen: the dated 25-game metadata snapshot and deterministic 15/10 split. The
-  active 180-run development matrix under `artifacts/` uses prompt/grounding contract
+  pre-amendment 180-run Qwen development matrix under `artifacts/` uses prompt/grounding contract
   `evidence-first-visible-causal-alternatives-v5`, implementation contract
   `crosslevel-voi-runtime-v2`, and identical 256-action, 12,288-token, and 1,200-second
-  caps. All 180 active rows (15 games x seeds 11/23/47 x D/S/M/X) are pending; they
-  have new content-addressed run IDs and no active-matrix gameplay has run.
+  caps. All 180 rows (15 games x seeds 11/23/47 x D/S/M/X) remain unexecuted and are
+  now audit-only; the byte-frozen artifact and its legacy run IDs remain unchanged.
 - Verified pre-grounding engineering smoke: the official anonymous endpoint accepted one
   action through the 4B committee on frozen `ls20-9607627b`, with two-or-more valid
   programs and no fallback/timeouts/errors. It validates lifecycle wiring only; see
@@ -95,7 +95,7 @@ does not contain code from Duck or other competition entries.
   probe that X would take while M would reject. The repair-enabled runtime may make exactly
   one additional source-free grounding-repair call, charged to the same token, wall, and
   three-batch game caps; it preserves batch-local roles and rejects backend over-reporting.
-  No v5 model or runtime gate pass is yet claimed; the 180-row active matrix remains locked.
+  No v5 model or runtime gate pass is claimed; that unexecuted matrix is now audit-only.
 - Ran clean repair-enabled v5 model gates on both local backbones. The 4B produced two
   safe, behaviorally distinct programs after repair and passed compute at 22.46 tokens/s
   and 9.65 GiB, but produced zero eligible graded roles. The serial 9B NF4 profile now
@@ -110,9 +110,28 @@ does not contain code from Duck or other competition entries.
   All four priors were sandbox-valid, role-eligible, behaviorally distinct, and plannable,
   but agreement was 0.84758, maximum EVSI was only 0.00572 actions, maximum cross-level
   utility was -0.86841, and there was no X-only probe. The runtime-v2 gate therefore
-  blocked exactly as intended. No model, GPU, environment, gameplay, active-matrix,
+  blocked exactly as intended. No model, GPU, environment, gameplay, pre-amendment matrix,
   configuration, or paper-claim change resulted. See
   `artifacts/structured_prior_admission_v1.json`.
+- Froze the 13 July proposal-source amendment without changing the locked Qwen matrix.
+  New identities explicitly encode `hypothesis_source` and arm labels. A separate 180-row
+  registration manifest contains D-Q/S-T/M-T/X-T, with M-T versus X-T as the controlled
+  cross-level contrast. It has no completed or executable rows: `run-matrix` fails closed
+  on every non-Qwen source until offline admission passes. Cross-source results are not
+  same-backbone evidence. See `docs/experiment_amendment_2026-07-13.md` and
+  `artifacts/development_matrix_template_v1.json`.
+- Implemented the amendment's scene-conditioned four-role topology compiler and
+  source-neutral salience frontier under implementation contract
+  `crosslevel-voi-runtime-v3`. The candidate frontier separates structural and recent-change
+  evidence, round-robins normalized-shape families, requires true enclosure membership,
+  and suppresses cross-level/reset change evidence. The compiler uses visible topology,
+  relative geometry, latest-transition precedence, and proposal-frontier points. Exact
+  palette, unclipped interior-translation, and topology-preserving integer-scale checks pass
+  exactly on the scoped synthetic fixture; structural ties, frame boundaries, clipping, and
+  topology-changing scales remain unverified. Candidate/compiler identities are included in
+  configuration hashes. The separate
+  source-v2 matrix is still registration-only pending a clean-commit admission artifact;
+  no template gameplay is authorized.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its
@@ -121,7 +140,7 @@ does not contain code from Duck or other competition entries.
   equivalent to M after timing and variant labels were removed. The other 176 fair-v2 rows
   were superseded and abandoned after goal-function invalidation, probe telemetry, and planning
   cost-collapse corrections changed the prompt/config contract. They are not pending rows
-  in the active matrix. Exact run hashes and audits are in
+  in either registered matrix. Exact run hashes and audits are in
   `artifacts/pilot_bp35_seed11_fair_v2.json`; the preceding worker-memory incident remains in
   `artifacts/pilot_seed11_worker_memory_incident.json`.
 - Profiled the planner at its maximum registered shape on WSL: four programs, eight
@@ -137,7 +156,7 @@ does not contain code from Duck or other competition entries.
   scores and mechanism telemetry are excluded from controlled evidence. The superseded
   matrix and gate are preserved with `_pre_grounding` suffixes.
 - Not yet completed: a decision-relevant prompt/grounding gate, a fresh four-run pilot,
-  all 180 active development runs, locked confirmation,
+  all registered development runs, locked confirmation,
   the Kaggle-hardware 27B/9B transfer gate, a private score, and any ARC-AGI-2 evaluation.
 
 The old four-simultaneous-sequence 9B NF4 artifact remains a valid historical rejection

@@ -13,10 +13,13 @@ from arc3_voi.provenance import GitProvenance
 from arc3_voi.runtime.sandbox import validate_program
 from arc3_voi.runtime_admission import ADMISSION_CONTRACT_VERSION
 from arc3_voi.structured_templates import (
+    STRUCTURED_PRIOR_CONTRACT_SHA256,
     STRUCTURED_PRIOR_CONTRACT_VERSION,
+    STRUCTURED_PRIOR_ROLES,
     instantiate_structured_priors,
     run_structured_prior_audit,
 )
+from arc3_voi.topology_compiler import TOPOLOGY_COMPILER_CODE_SHA256
 from arc3_voi.types import Action, ActionKind, GameState, History, Observation
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -36,7 +39,7 @@ def _history(grid: np.ndarray) -> History:
     )
 
 
-def test_library_emits_exactly_four_restricted_history_invariant_sources() -> None:
+def test_compiler_emits_four_restricted_scene_conditioned_sources() -> None:
     history = _history(
         np.array(
             [
@@ -50,30 +53,37 @@ def test_library_emits_exactly_four_restricted_history_invariant_sources() -> No
         )
     )
     sources = instantiate_structured_priors(history)
-    unrelated_sources = instantiate_structured_priors(
-        _history(np.zeros((3, 7), dtype=np.int16))
-    )
+    unrelated_sources = instantiate_structured_priors(_history(np.zeros((3, 7), dtype=np.int16)))
 
     assert len(sources) == 4
-    assert [item.role for item in sources] == [
-        "conservative_no_effect",
-        "local_action6_contact",
-        "action6_component_selection",
-        "action6_component_state",
-    ]
+    assert (
+        tuple(item.role for item in sources)
+        == STRUCTURED_PRIOR_ROLES
+        == (
+            "conservative_evidence",
+            "topology_contact",
+            "homology_alignment",
+            "symmetry_completion",
+        )
+    )
+    assert len(STRUCTURED_PRIOR_CONTRACT_SHA256) == 64
+    assert TOPOLOGY_COMPILER_CODE_SHA256 == (
+        "e77e4db0ad743f5ed5f076f716806c342c4bf8c4a5953747dc332b7097ed299f"
+    )
+    assert STRUCTURED_PRIOR_CONTRACT_SHA256 == (
+        "eeccd86db3346fd15d2e3dbc8e82ee2bb60e23bc30c0490750a7a0fbaa9e14e5"
+    )
     assert len({item.source for item in sources}) == 4
-    assert sources == unrelated_sources
+    assert sources != unrelated_sources
     for item in sources:
         validated = validate_program(item.source)
         assert validated.node_count <= 4096
-        assert candidate_points_from_source(item.source) == ()
+        assert candidate_points_from_source(item.source)
+        assert dict(item.bindings)["component_count"] >= 1
+        assert len(item.evidence) >= 6
         tree = ast.parse(item.source)
-        assert not any(
-            isinstance(node, ast.Import | ast.ImportFrom) for node in ast.walk(tree)
-        )
-        assert '"WIN"' not in item.source
-        assert '"GAME_OVER"' not in item.source
-        assert '"level_delta": 0' in item.source
+        assert not any(isinstance(node, ast.Import | ast.ImportFrom) for node in ast.walk(tree))
+        assert "bp35" not in item.source.lower()
 
 
 def test_structured_sources_preserve_simple_actions_and_existing_palette() -> None:
@@ -127,32 +137,40 @@ def test_frozen_fixture_runs_shared_runtime_admission_v2_without_writing_artifac
     assert report["structured_prior_library"]["contract_version"] == (
         STRUCTURED_PRIOR_CONTRACT_VERSION
     )
+    assert report["producer"]["compiler_contract_sha256"] == (STRUCTURED_PRIOR_CONTRACT_SHA256)
     assert report["structured_prior_library"]["source_count"] == 4
-    assert report["producer"]["producer_kind"] == (
-        "deterministic_structured_prior_library"
-    )
+    assert report["producer"]["producer_kind"] == ("deterministic_scene_topology_compiler")
     assert report["producer"]["model_id"] is None
     assert report["producer"]["model_calls"] == 0
     assert report["producer"]["generated_tokens"] == 0
     assert report["producer"]["backbone_used"] is False
     assert len(report["programs"]) == 4
+    assert all(report_row["instantiation_bindings"] for report_row in report["programs"])
+    assert all(report_row["binding_evidence"] for report_row in report["programs"])
+    graded = [
+        row
+        for row in report["programs"]
+        if row["template_id"] != "conservative_evidence"
+    ]
+    assert sum(row["eligibility"]["eligible"] for row in graded) >= 2
+    compiled_points = {
+        tuple(point)
+        for point in report["programs"][0]["instantiation_bindings"]["candidate_points"]
+    }
+    frontier_points = {
+        (row["row"], row["col"])
+        for row in report["inputs"]["candidate_set"]
+        if row["kind"] == int(ActionKind.ACTION6)
+    }
+    assert compiled_points.intersection(frontier_points)
     assert report["contract"]["planning_depth"] == 4
     assert report["planning"]["cross_level_multiplier"] == pytest.approx(23.0)
-    assert len(report["selection"]["eligible_ids"]) == 4
-    assert len(report["selection"]["selected_ids"]) == 4
-    assert report["selection"]["distinct_selected_behavior_classes"] == 4
-    assert report["planning"]["agreement"] >= 0.8
-    assert report["planning"]["maximum_evsi"] < 0.05
-    assert report["planning"]["x_only_probe_actions"] == []
-    assert report["status"] == "pilot_blocked"
-    assert report["gate"] == {
-        "passes": False,
-        "reasons": [
-            "no X-only probe opportunity: require one action with low committee "
-            "agreement, material EVSI, positive cross-level utility, and non-positive "
-            "myopic utility"
-        ],
-    }
+    assert report["structured_prior_library"]["history_conditioning"].startswith(
+        "bindings compiled"
+    )
+    assert report["structured_prior_library"]["empirical_transition_grounding_claimed"] is False
+    assert all(row["recorded_transition_scoring_used"] is False for row in report["programs"])
+    assert report["status"] in {"pilot_admitted", "pilot_blocked"}
 
 
 def test_audit_rejects_tampered_canonical_history_digest(tmp_path: Path) -> None:

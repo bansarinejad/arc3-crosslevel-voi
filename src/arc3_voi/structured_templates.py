@@ -1,9 +1,8 @@
-"""Offline-only executable priors over generic visual transformations.
+"""Offline-only scene-conditioned executable topology hypotheses.
 
-This module is deliberately disconnected from the live controller.  It provides a
-fixed deterministic source library for testing whether generic structured alternatives
-can clear the existing grounding and cross-level value-of-information admission gates.
-The sources are not inferred from transitions and are not evidence of model induction.
+This module remains disconnected from the live controller. It compiles inspectable
+bindings from finite observable history and evaluates them through the shared admission
+path. The deterministic sources are not evidence of model-generated induction.
 """
 
 from __future__ import annotations
@@ -13,7 +12,7 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from time import perf_counter
-from typing import Any
+from typing import Any, cast
 
 from .candidates import candidates_from_history
 from .config import SystemConfig
@@ -26,210 +25,68 @@ from .runtime_admission import (
     MATERIAL_EVSI_THRESHOLD,
     audit_source_batch,
 )
+from .topology_compiler import (
+    TOPOLOGY_COMPILER_ALGORITHM_VERSION,
+    TOPOLOGY_COMPILER_CODE_SHA256,
+    BindingValue,
+    compile_topology_programs,
+)
 from .types import History
 
-STRUCTURED_PRIOR_CONTRACT_VERSION = "generic-visual-priors-v1"
+STRUCTURED_PRIOR_CONTRACT_VERSION = "scene-topology-compiler-v1"
 _INSTANTIATION_POLICY = (
-    "emit the same four runtime-grounded generic priors for every non-empty 2-D history; "
-    "embed no observed coordinate, palette value, game ID, or transition-derived binding"
+    "compile four deterministic restricted programs from the latest observable scene; "
+    "bind palette-relative four-connected topology, containment, rarity, homologous "
+    "shape repetition, symmetry, and relative geometry; install the most recent "
+    "representable recorded transition ahead of every generic prior"
 )
+STRUCTURED_PRIOR_ROLES = (
+    "conservative_evidence",
+    "topology_contact",
+    "homology_alignment",
+    "symmetry_completion",
+)
+STRUCTURED_PRIOR_CONTRACT_SHA256 = hashlib.sha256(
+    json.dumps(
+        {
+            "compiler_contract_version": STRUCTURED_PRIOR_CONTRACT_VERSION,
+            "instantiation_policy": _INSTANTIATION_POLICY,
+            "roles": STRUCTURED_PRIOR_ROLES,
+            "template_version": 1,
+            "topology_algorithm_version": TOPOLOGY_COMPILER_ALGORITHM_VERSION,
+            "topology_compiler_code_sha256": TOPOLOGY_COMPILER_CODE_SHA256,
+        },
+        separators=(",", ":"),
+        sort_keys=True,
+    ).encode("utf-8")
+).hexdigest()
 
 
 @dataclass(frozen=True, slots=True)
 class StructuredPriorSource:
-    """One fixed generic-prior role and its restricted Python source."""
+    """One compiled role, its source, and auditable scene bindings."""
 
     role: str
     source: str
-
-
-_CONSERVATIVE_SOURCE = '''\
-def predict(history, action):
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    return {
-        "next_grid": grid,
-        "game_state": history.game_states[-1],
-        "level_delta": 0,
-        "memory": {},
-    }
-
-def goal_value(history):
-    return 0.0
-'''
-
-
-_LOCAL_CONTACT_SOURCE = '''\
-def predict(history, action):
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    kind = int(action.kind)
-    if kind == 6:
-        row = int(action.row)
-        col = int(action.col)
-        height, width = grid.shape
-        if 0 <= row < height and 0 <= col < width:
-            value = grid[row, col]
-            changed = 0
-            limit = max(height, width)
-            for distance in range(1, limit):
-                points = (
-                    (row - distance, col),
-                    (row + distance, col),
-                    (row, col - distance),
-                    (row, col + distance),
-                )
-                for next_row, next_col in points:
-                    in_bounds = 0 <= next_row < height and 0 <= next_col < width
-                    if in_bounds and grid[next_row, next_col] != value:
-                        grid[next_row, next_col] = value
-                        changed += 1
-                        if changed == 2:
-                            break
-                if changed == 2:
-                    break
-    return {
-        "next_grid": grid,
-        "game_state": history.game_states[-1],
-        "level_delta": 0,
-        "memory": {},
-    }
-
-def goal_value(history):
-    latest = history.actions[-1]
-    if latest is None or int(latest.kind) != 6:
-        return 0.0
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    row = int(latest.row)
-    col = int(latest.col)
-    height, width = grid.shape
-    if not (0 <= row < height and 0 <= col < width):
-        return 0.0
-    value = grid[row, col]
-    row_matches = int(np.count_nonzero(grid[row, :] == value))
-    col_matches = int(np.count_nonzero(grid[:, col] == value))
-    return float(row_matches + col_matches - 1) / float(height + width - 1)
-'''
-
-
-_COMPONENT_HELPER = '''\
-def component_mask(grid, row, col):
-    same = grid == grid[row, col]
-    mask = np.zeros_like(same, dtype=np.bool_)
-    mask[row, col] = True
-    height, width = grid.shape
-    for step in range(height + width):
-        expanded = mask.copy()
-        expanded[1:, :] = np.logical_or(expanded[1:, :], mask[:-1, :])
-        expanded[:-1, :] = np.logical_or(expanded[:-1, :], mask[1:, :])
-        expanded[:, 1:] = np.logical_or(expanded[:, 1:], mask[:, :-1])
-        expanded[:, :-1] = np.logical_or(expanded[:, :-1], mask[:, 1:])
-        expanded = np.logical_and(expanded, same)
-        if np.array_equal(expanded, mask):
-            break
-        mask = expanded
-    return mask
-'''
-
-
-_COMPONENT_SELECTION_SOURCE = (
-    _COMPONENT_HELPER
-    + '''\
-
-def palette_summary(grid):
-    values, counts = np.unique(grid, return_counts=True)
-    background_index = int(np.argmax(counts))
-    background = values[background_index]
-    foreground_values = values[values != background]
-    foreground_counts = counts[values != background]
-    if len(foreground_values) == 0:
-        return background, background, 0
-    target_index = int(np.argmax(foreground_counts))
-    return background, foreground_values[target_index], int(np.sum(foreground_counts))
-
-def predict(history, action):
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    kind = int(action.kind)
-    if kind == 6:
-        row = int(action.row)
-        col = int(action.col)
-        height, width = grid.shape
-        if 0 <= row < height and 0 <= col < width:
-            background, target, foreground_total = palette_summary(grid)
-            if foreground_total > 0 and grid[row, col] != background:
-                selected = component_mask(grid, row, col)
-                grid[selected] = target
-    return {
-        "next_grid": grid,
-        "game_state": history.game_states[-1],
-        "level_delta": 0,
-        "memory": {},
-    }
-
-def goal_value(history):
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    background, target, foreground_total = palette_summary(grid)
-    if foreground_total == 0:
-        return 1.0
-    target_total = int(np.count_nonzero(grid == target))
-    return float(target_total) / float(foreground_total)
-'''
-)
-
-
-_COMPONENT_STATE_SOURCE = (
-    _COMPONENT_HELPER
-    + '''\
-
-def predict(history, action):
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    kind = int(action.kind)
-    if kind == 6:
-        row = int(action.row)
-        col = int(action.col)
-        height, width = grid.shape
-        if 0 <= row < height and 0 <= col < width:
-            values, counts = np.unique(grid, return_counts=True)
-            order = np.argsort(counts)
-            ordered_values = values[order]
-            source = grid[row, col]
-            source_positions = np.nonzero(ordered_values == source)[0]
-            if len(source_positions) > 0:
-                source_index = int(source_positions[0])
-                target_index = min(source_index + 1, len(ordered_values) - 1)
-                selected = component_mask(grid, row, col)
-                grid[selected] = ordered_values[target_index]
-    return {
-        "next_grid": grid,
-        "game_state": history.game_states[-1],
-        "level_delta": 0,
-        "memory": {},
-    }
-
-def goal_value(history):
-    grid = np.array(history.frames[-1], dtype=np.int16)
-    values, counts = np.unique(grid, return_counts=True)
-    if len(values) == 0:
-        return 0.0
-    return float(np.max(counts)) / float(grid.size)
-'''
-)
+    bindings: tuple[tuple[str, BindingValue], ...] = ()
+    evidence: tuple[str, ...] = ()
 
 
 def instantiate_structured_priors(history: History) -> tuple[StructuredPriorSource, ...]:
-    """Return exactly four generic visual priors after validating ``history``.
-
-    The history is only a validity boundary. Every call emits byte-identical sources;
-    the programs derive coordinates and palette values from sanitized runtime inputs.
-    """
+    """Compile exactly four deterministic, scene-conditioned programs."""
 
     if not history.frames:
         raise ValueError("structured-prior instantiation requires a non-empty history")
     if history.latest_grid.ndim != 2 or not history.latest_grid.size:
         raise ValueError("structured-prior instantiation requires a non-empty 2-D grid")
-    return (
-        StructuredPriorSource("conservative_no_effect", _CONSERVATIVE_SOURCE),
-        StructuredPriorSource("local_action6_contact", _LOCAL_CONTACT_SOURCE),
-        StructuredPriorSource("action6_component_selection", _COMPONENT_SELECTION_SOURCE),
-        StructuredPriorSource("action6_component_state", _COMPONENT_STATE_SOURCE),
+    return tuple(
+        StructuredPriorSource(
+            role=program.role,
+            source=program.source,
+            bindings=program.bindings,
+            evidence=program.evidence,
+        )
+        for program in compile_topology_programs(history)
     )
 
 
@@ -239,7 +96,7 @@ def run_structured_prior_audit(
     *,
     require_clean_commit: bool = True,
 ) -> dict[str, Any]:
-    """Run the exact producer-neutral admission path against generic prior sources.
+    """Run producer-neutral admission against compiled topology sources.
 
     This is a capability diagnostic, not an empirical transition-model evaluation.
     The sources still pass through the shared role checks, sandbox, behavioral
@@ -247,12 +104,8 @@ def run_structured_prior_audit(
     """
 
     provenance = inspect_git_provenance()
-    if require_clean_commit and (
-        provenance.commit is None or provenance.dirty is not False
-    ):
-        raise RuntimeError(
-            "structured-prior reports require a clean committed worktree"
-        )
+    if require_clean_commit and (provenance.commit is None or provenance.dirty is not False):
+        raise RuntimeError("structured-prior reports require a clean committed worktree")
     fixture_bytes = fixture_path.read_bytes()
     fixture = json.loads(fixture_bytes)
     if not isinstance(fixture, dict) or fixture.get("schema_version") != 1:
@@ -279,8 +132,13 @@ def run_structured_prior_audit(
         }
         for index, source in enumerate(sources)
     ]
+    compiled_points = cast(
+        tuple[tuple[int, int], ...],
+        dict(sources[0].bindings)["candidate_points"],
+    )
     actions = candidates_from_history(
         history,
+        cached_points=compiled_points,
         max_candidates=config.planning.max_candidates,
     )
     action_rows = [
@@ -303,13 +161,16 @@ def run_structured_prior_audit(
             "template_id": source.role,
             "template_version": 1,
             "source_sha256": program["source_sha256"],
+            "bindings_sha256": _canonical_sha256(dict(source.bindings)),
+            "evidence_sha256": _canonical_sha256(source.evidence),
         }
         for source, program in zip(sources, programs, strict=True)
     ]
-    template_library_sha256 = _canonical_sha256(source_manifest)
-    instantiation_policy_sha256 = hashlib.sha256(
-        _INSTANTIATION_POLICY.encode("utf-8")
-    ).hexdigest()
+    if tuple(source.role for source in sources) != STRUCTURED_PRIOR_ROLES:
+        raise RuntimeError("topology compiler roles do not match its public contract")
+    template_library_sha256 = STRUCTURED_PRIOR_CONTRACT_SHA256
+    instantiation_sha256 = _canonical_sha256(source_manifest)
+    instantiation_policy_sha256 = hashlib.sha256(_INSTANTIATION_POLICY.encode("utf-8")).hexdigest()
     prior_contract_sha256 = _canonical_sha256(
         {
             "admission_contract_version": ADMISSION_CONTRACT_VERSION,
@@ -324,13 +185,17 @@ def run_structured_prior_audit(
     enriched_programs = [
         {
             **report,
-            "source_origin": "generic_structured_prior",
+            "source_origin": "scene_conditioned_topology_compiler",
             "template_id": source.role,
             "template_version": 1,
             "template_family": source.role,
-            "instantiation_bindings": {},
+            "instantiation_bindings": dict(source.bindings),
+            "binding_evidence": list(source.evidence),
             "recorded_transition_count": max(0, len(history.frames) - 1),
             "recorded_transition_scoring_used": False,
+            "recorded_transition_precedence_used": dict(source.bindings)[
+                "recorded_transition_used"
+            ],
         }
         for report, source in zip(batch_programs, sources, strict=True)
     ]
@@ -342,11 +207,14 @@ def run_structured_prior_audit(
         "offline": True,
         "git": asdict(provenance),
         "producer": {
-            "producer_kind": "deterministic_structured_prior_library",
+            "producer_kind": "deterministic_scene_topology_compiler",
             "producer_id": "arc3_voi.structured_templates",
             "producer_version": STRUCTURED_PRIOR_CONTRACT_VERSION,
             "producer_contract_sha256": prior_contract_sha256,
+            "compiler_contract_sha256": STRUCTURED_PRIOR_CONTRACT_SHA256,
+            "compiler_code_sha256": TOPOLOGY_COMPILER_CODE_SHA256,
             "template_library_sha256": template_library_sha256,
+            "instantiation_sha256": instantiation_sha256,
             "instantiation_policy_sha256": instantiation_policy_sha256,
             "instantiation_policy": _INSTANTIATION_POLICY,
             "model_id": None,
@@ -366,28 +234,49 @@ def run_structured_prior_audit(
             "planning_config_sha256": stable_config_hash(config),
             "candidate_set": action_rows,
             "candidate_set_sha256": _canonical_sha256(action_rows),
-            "candidate_policy": "source-neutral candidates_from_history; no cached points",
+            "candidate_policy": (
+                "source-neutral candidates_from_history with scene-compiler points as "
+                "the proposal frontier"
+            ),
         },
         "structured_prior_library": {
             "contract_version": STRUCTURED_PRIOR_CONTRACT_VERSION,
+            "compiler_contract_sha256": STRUCTURED_PRIOR_CONTRACT_SHA256,
             "admission_contract_version": ADMISSION_CONTRACT_VERSION,
             "offline_only": True,
             "source_count": len(sources),
             "roles": [source.role for source in sources],
             "source_manifest": source_manifest,
-            "history_conditioning": "validity check only; emitted source is history-invariant",
-            "coordinate_and_palette_policy": (
-                "derive bounds, coordinates, four-connected components, and palette "
-                "values from sanitized History and ACTION6 inputs"
+            "instantiation_sha256": instantiation_sha256,
+            "history_conditioning": (
+                "bindings compiled from latest scene topology and the most recent "
+                "representable recorded transition"
             ),
-            "simple_action_policy": "opaque simple actions preserve the current grid",
+            "coordinate_and_palette_policy": (
+                "derive all target coordinates and colours from History; no game IDs, "
+                "hand-authored coordinates, or hand-authored palette identities"
+            ),
+            "simple_action_policy": (
+                "opaque simple actions preserve the grid unless directly supported by "
+                "a recorded transition"
+            ),
             "terminal_policy": (
-                "preserve current game state and always predict zero level delta"
+                "preserve current state generically; replay terminal state only when "
+                "direct recorded-transition evidence applies"
             ),
             "empirical_transition_grounding_claimed": False,
+            "tested_properties": [
+                "deterministic same-history compilation",
+                "recorded-transition precedence",
+                "restricted-AST and bounded-grid execution",
+                "visible-palette permutation equivariance on synthetic scenes",
+                "interior translation equivariance without clipping on synthetic scenes",
+                "uniform integer-scale equivariance on synthetic scenes",
+            ],
             "known_unverified_properties": [
-                "palette-permutation equivariance under equal-frequency ties",
-                "scale equivariance",
+                "palette-permutation equivariance under every structural tie",
+                "translation equivariance at frame boundaries",
+                "integer-scale equivariance when topology or clipping changes",
             ],
             "report_requires_clean_commit": require_clean_commit,
         },
@@ -465,7 +354,11 @@ def _fixture_records(fixture: dict[str, Any]) -> tuple[dict[str, Any], ...]:
 
 
 __all__ = [
+    "STRUCTURED_PRIOR_CONTRACT_SHA256",
     "STRUCTURED_PRIOR_CONTRACT_VERSION",
+    "STRUCTURED_PRIOR_ROLES",
+    "TOPOLOGY_COMPILER_ALGORITHM_VERSION",
+    "TOPOLOGY_COMPILER_CODE_SHA256",
     "StructuredPriorSource",
     "instantiate_structured_priors",
     "run_structured_prior_audit",

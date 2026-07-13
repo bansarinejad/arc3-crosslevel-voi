@@ -5,11 +5,16 @@ from __future__ import annotations
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import cast
 
-from .agent import build_agent
+from .agent import (
+    build_agent,
+    qwen_producer_contract_sha256,
+    require_admitted_hypothesis_source,
+)
 from .arc_adapter import ArcCompetitionClient
 from .config import SystemConfig
-from .experiment import stable_config_hash
+from .experiment import Variant, arm_label_for, stable_config_hash
 from .metrics import RunMetrics, load_run, write_run
 from .model import ModelBackend
 from .run_store import (
@@ -41,6 +46,9 @@ def run_scorecard(
 
     if len(game_ids) != len(set(game_id.split("-", 1)[0] for game_id in game_ids)):
         raise ValueError("game manifest contains duplicate stable IDs")
+    require_admitted_hypothesis_source(config)
+    producer_contract_sha256 = qwen_producer_contract_sha256(config)
+    arm_label = arm_label_for(cast(Variant, config.experiment.variant), "qwen")
     arcade = client or ArcCompetitionClient()
     destination = Path(output_directory)
     digest = stable_config_hash(config)
@@ -59,6 +67,10 @@ def run_scorecard(
             "variant": config.experiment.variant,
             "model_profile": model_profile,
             "config_hash": digest,
+            "hypothesis_source": "qwen",
+            "arm_label": arm_label,
+            "identity_version": "source-v2",
+            "producer_contract_sha256": producer_contract_sha256,
         }
         existing = read_complete_run(summary_path)
         if existing is not None:
@@ -97,6 +109,10 @@ def run_scorecard(
                 weight_manifest_sha256=(
                     config.model.expected_weight_manifest_sha256 if config.model else None
                 ),
+                hypothesis_source="qwen",
+                arm_label=arm_label,
+                identity_version="source-v2",
+                producer_contract_sha256=producer_contract_sha256,
                 max_environment_actions=config.experiment.max_environment_actions,
                 max_generated_tokens=config.experiment.max_generated_tokens,
                 max_wall_seconds=per_game_wall,
@@ -116,6 +132,10 @@ def _validate_scorecard_identity(
         "variant": metrics.variant,
         "model_profile": metrics.model_profile,
         "config_hash": metrics.config_hash,
+        "hypothesis_source": metrics.hypothesis_source,
+        "arm_label": metrics.arm_label,
+        "identity_version": metrics.identity_version,
+        "producer_contract_sha256": metrics.producer_contract_sha256,
     }
     conflicts = [key for key, value in expected.items() if actual[key] != value]
     if conflicts:

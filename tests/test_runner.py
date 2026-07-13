@@ -91,6 +91,10 @@ def test_runner_records_levels_actions_tokens_and_rhae() -> None:
         variant="X",
         model_profile="test",
         config_hash="h",
+        hypothesis_source="qwen",
+        arm_label="X-Q",
+        identity_version="legacy-v1",
+        producer_contract_sha256=None,
         baseline_actions=(2, 2),
     )
     assert result.error is None
@@ -101,6 +105,28 @@ def test_runner_records_levels_actions_tokens_and_rhae() -> None:
     assert result.rhae == 1.0
     assert result.steps[-1].observed_state == "WIN"
     assert result.steps[-1].history[-1]["level"] == 2
+
+
+def test_runner_persists_explicit_source_v2_identity() -> None:
+    digest = "a" * 64
+    result = run_game(
+        FakeSession(),
+        FakeController(),
+        run_id="source-aware",
+        seed=1,
+        variant="X",
+        model_profile="test",
+        config_hash="h",
+        hypothesis_source="qwen",
+        arm_label="X-Q",
+        identity_version="source-v2",
+        producer_contract_sha256=digest,
+    )
+
+    assert result.hypothesis_source == "qwen"
+    assert result.arm_label == "X-Q"
+    assert result.identity_version == "source-v2"
+    assert result.producer_contract_sha256 == digest
 
 
 def test_runner_separates_controller_and_environment_latency(
@@ -133,6 +159,10 @@ def test_runner_separates_controller_and_environment_latency(
         variant="D",
         model_profile="test",
         config_hash="h",
+        hypothesis_source="qwen",
+        arm_label="D-Q",
+        identity_version="legacy-v1",
+        producer_contract_sha256=None,
     )
 
     assert result.controller_decision_seconds == pytest.approx(0.5)
@@ -180,6 +210,10 @@ def test_runner_ingests_and_scores_the_final_win_transition() -> None:
         variant="S",
         model_profile="test",
         config_hash="h",
+        hypothesis_source="qwen",
+        arm_label="S-Q",
+        identity_version="legacy-v1",
+        producer_contract_sha256=None,
     )
     assert result.error is None
     assert result.steps[-1].weighted_transition_loss == 0.0
@@ -197,6 +231,10 @@ def test_runner_merges_delta_and_cumulative_controller_telemetry_once() -> None:
         variant="X",
         model_profile="test",
         config_hash="h",
+        hypothesis_source="qwen",
+        arm_label="X-Q",
+        identity_version="legacy-v1",
+        producer_contract_sha256=None,
     )
     assert result.invalid_programs == 2
     assert result.program_prediction_calls == 10

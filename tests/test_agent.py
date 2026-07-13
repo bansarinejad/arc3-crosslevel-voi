@@ -7,7 +7,11 @@ from typing import Any, cast
 import numpy as np
 import pytest
 
-from arc3_voi.agent import build_agent
+from arc3_voi.agent import (
+    HypothesisSourceNotAdmittedError,
+    build_agent,
+    qwen_producer_contract_sha256,
+)
 from arc3_voi.config import ExperimentConfig, SandboxConfig, SystemConfig
 from arc3_voi.hypothesis import Hypothesis, behavioral_deduplicate
 from arc3_voi.model import GenerationResult, ScriptedBackend
@@ -146,6 +150,29 @@ def test_direct_variant_uses_same_backend_without_program_generation() -> None:
         decision = agent.controller.act(_observation(), Budget(max_wall_seconds=10))
         assert decision.action.kind is ActionKind.ACTION2
         assert agent.controller.pool is None
+
+
+def test_build_agent_rejects_registration_only_source_before_backend_use() -> None:
+    backend = ScriptedBackend([PROGRAM_A])
+    config = SystemConfig(
+        experiment=ExperimentConfig(variant="X", hypothesis_source="template_v1")
+    )
+
+    with pytest.raises(
+        HypothesisSourceNotAdmittedError,
+        match="registration-only pending the offline admission gate",
+    ):
+        build_agent(backend, config)
+
+    assert not backend.closed
+
+
+def test_qwen_producer_contract_is_controller_and_seed_independent() -> None:
+    first = SystemConfig(experiment=ExperimentConfig(variant="M", seed=11))
+    second = SystemConfig(experiment=ExperimentConfig(variant="X", seed=23))
+
+    assert qwen_producer_contract_sha256(first) == qwen_producer_contract_sha256(second)
+    assert len(qwen_producer_contract_sha256(first)) == 64
 
 
 def test_live_grounding_rejects_ineligible_smaller_duplicate_before_dedup(

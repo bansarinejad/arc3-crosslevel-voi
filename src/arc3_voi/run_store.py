@@ -27,6 +27,10 @@ RUN_IDENTITY_KEYS = (
     "variant",
     "model_profile",
     "config_hash",
+    "hypothesis_source",
+    "arm_label",
+    "identity_version",
+    "producer_contract_sha256",
 )
 _PORTABLE_RUN_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*\Z")
 _WINDOWS_RESERVED_NAMES = frozenset(
@@ -302,7 +306,7 @@ def ensure_retryable_run_artifacts(
         conflicts = [
             key
             for key in RUN_IDENTITY_KEYS
-            if summary.get(key) != expected_summary.get(key)
+            if key in expected_summary and summary.get(key) != expected_summary.get(key)
         ]
         if conflicts:
             raise FileExistsError(

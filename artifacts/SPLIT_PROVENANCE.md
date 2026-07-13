@@ -21,8 +21,10 @@ embeds every full game version and the immutable metadata snapshot hash.
   `b207c451e81ef6f6b815fbd9dc557a7149d221f8af3f7d4034f6d79325580fc7`
 - Historical evidence-first-v4 matrix `development_matrix_visible_causal_v4.json` SHA-256:
   `6f7f5b9f6748cd06335eb269d6afa1277bb9b5d690feba5c082dc609d7e471d9`
-- Active repair-enabled-v5 matrix `development_matrix.json` SHA-256:
+- Pre-amendment repair-enabled-v5 matrix `development_matrix.json` SHA-256:
   `ea2dbc2eec0159e63452ab805545021d5101a17882402dd3bc9869fc39241147`
+- Registered source-aware template-v1 matrix `development_matrix_template_v1.json` SHA-256:
+  `6878b39d2379d6ffc11d45953db046883a8622ac529e3702efb679b3d9f6978b`
 
 The unchanged split first fed the fair-v2 manifest. Its corrected four-row seed-11
 D/S/M/X pilot is retained as negative engineering evidence; the other 176 fair-v2 rows
@@ -53,12 +55,12 @@ smoke produced no eligible program. The retained artifact also has an invalid co
 throughput measurement and is not gate evidence. Its matrix is preserved at
 `development_matrix_visible_causal_v4.json` without gameplay.
 
-The active matrix freezes prompt contract `evidence-first-visible-causal-alternatives-v5`,
+The pre-amendment matrix freezes prompt contract `evidence-first-visible-causal-alternatives-v5`,
 perception contract `arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
-`crosslevel-voi-runtime-v2`. It contains 180 pending rows: 15 development games, seeds
-`11`, `23`, and `47`, and variants D/S/M/X. No active-matrix gameplay has run. The active
-matrix is locked: repair-enabled v5 grounding rejected both the 4B and serial 9B local
-profiles on program quality, despite both passing their current compute limits. The active
+`crosslevel-voi-runtime-v2`. It contains 180 unexecuted rows: 15 development games, seeds
+`11`, `23`, and `47`, and variants D/S/M/X. No gameplay ran. The matrix was locked:
+repair-enabled v5 grounding rejected both the 4B and serial 9B local profiles on program
+quality, despite both passing their current compute limits. Its
 variant configuration hashes are D
 `e56fe0e2a55e344edc53bd0d5f09c448305da3b07825c8d12798c935e51a68e6`, S
 `e254bbf925180ac197696913250cbbbab1b454a3f163391b470912e270bb0ded`, M
@@ -66,3 +68,11 @@ variant configuration hashes are D
 `6e84fd03aea5012a8360410dc9386913d7767dd71377c2d5bdde6e374aa79c0e`.
 The JSON manifests use explicit LF line endings, so these digests are stable across
 Windows and Linux.
+
+The 13 July proposal-source amendment preserves that matrix byte-for-byte and registers a
+separate 180-row template-v1 development matrix with arms D-Q, S-T, M-T, and X-T. All rows
+are pending and execution is disabled until the compiler and offline admission gates pass.
+Its controlled mechanism contrast is M-T versus X-T; no cross-source same-backbone claim is
+authorized. The pre-amendment matrix is now audit-only because changed implementation code
+cannot execute under its legacy hashes; `run-matrix` requires source-v2 identity. See
+`docs/experiment_amendment_2026-07-13.md`.

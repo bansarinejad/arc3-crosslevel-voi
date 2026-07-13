@@ -10,23 +10,33 @@
 
 ## Variants and budgets
 
+The dated proposal-source amendment is frozen in
+`docs/experiment_amendment_2026-07-13.md`. It introduces explicit Qwen (`-Q`) and
+template-v1 (`-T`) arm identities without modifying the locked Qwen manifest. The clean
+cross-level contrast for the new source is `M-T` versus `X-T`; cross-source comparisons are
+not same-backbone evidence. The separate template manifest is registration-only until its
+offline admission gate passes.
+
 - `D`: direct model policy.
 - `S`: one executable program with contradiction repair.
 - `M`: four-program version space with current-level EVSI.
 - `X`: four-program version space with cross-level EVSI.
 
-All variants share the model, rendered and symbolic observations, context, action cap
-(256), output-token cap (12,288), and 1,200-second per-game wall-time cap. The wall cap
+Qwen arms share one model contract; template S/M/X arms share one scene compiler and
+proposal-source contract. `D-Q` is contextual rather than a same-source template ablation.
+All registered arms share rendered and symbolic observations, context, action cap (256),
+output-token cap (12,288), and 1,200-second per-game wall-time cap. The wall cap
 is the smallest round bound above `12,288 / 12 = 1,024` seconds that leaves planning and
 environment overhead at the minimum accepted decoding rate. Even if every development
 run reaches it, 180 runs consume 60 GPU-hours, below the preregistered 80-hour fallback
 trigger. Kaggle additionally applies its global evaluator deadline and the 20% headroom
 gate.
 
-The active hashed experiment configuration freezes prompt contract
+The registered source-v2 configuration freezes prompt contract
 `evidence-first-visible-causal-alternatives-v5`, perception contract
-`arc-agi-0.9.9-color-map-scale8-grid-v1`, and implementation contract
-`crosslevel-voi-runtime-v2`. The original four-row pilot used a renderer
+`arc-agi-0.9.9-color-map-scale8-grid-v1`, implementation contract
+`crosslevel-voi-runtime-v3`, and content-addressed candidate/compiler contracts. The
+pre-amendment runtime-v2 Qwen matrix is audit-only. The original four-row pilot used a renderer
 whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
 retained only as pre-grounding diagnostics and cannot enter any aggregate or claim gate.
 
@@ -85,12 +95,12 @@ requirements. This invalidates the historical gate as admission evidence for tha
 committee. Its four completed rows and the other 176 abandoned rows are preserved in
 `artifacts/development_matrix_goal_v3_pilot.json`.
 
-The current runtime filters role grounding before worker admission and deduplication,
+The pre-amendment runtime filtered role grounding before worker admission and deduplication,
 clamps EVSI magnitudes at or below `1e-12` to zero, labels mandatory RESET decisions as
-lifecycle, and separates controller-decision latency from environment latency. Its active
+lifecycle, and separates controller-decision latency from environment latency. Its then-active
 `development_matrix.json` has 180 pending rows with new content-addressed IDs under
-implementation contract `crosslevel-voi-runtime-v2`. No row in that active matrix has
-run.
+implementation contract `crosslevel-voi-runtime-v2`. No row ran; the amendment preserves
+that manifest as audit-only.
 
 The deterministic offline runtime-admission audit then re-evaluated both historical
 schema-v4 source batches under the corrected ordering. In both audits every selected
@@ -111,11 +121,12 @@ These are pre-pilot diagnostics, not performance claims. No v5 model-gate pass,
 runtime-admission pass, or gameplay-pilot pass is claimed. Native Windows v5 measurements
 then rejected both local backbones on grounding: 4B retained two safe distinct programs
 but no eligible graded role after repair; serial 9B NF4 passed compute at 14.20 tokens/s
-and 8.58 GiB but retained zero grounded-safe programs. The active matrix remains locked.
+and 8.58 GiB but retained zero grounded-safe programs. That matrix remained locked and is
+now audit-only.
 
 After those failures, one isolated offline capability diagnostic evaluated four fixed,
 history-invariant generic visual priors through a newly extracted producer-neutral source
-batch path. This did not amend the active experiment: it used no model, generated tokens,
+batch path. This did not amend the then-active experiment: it used no model, generated tokens,
 GPU, environment calls, gameplay, recorded-transition scoring, or proposal-budget batch.
 All four sources passed sandbox, role, behavioral-distinctness, and planning checks, but
 agreement was 0.84758, maximum EVSI was 0.00572 actions, maximum X utility was -0.86841,

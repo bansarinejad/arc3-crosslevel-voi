@@ -46,6 +46,10 @@ def test_runner_trace_round_trips_into_deterministic_replay(tmp_path) -> None:
         variant="D",
         model_profile="test",
         config_hash="abc",
+        hypothesis_source="qwen",
+        arm_label="D-Q",
+        identity_version="legacy-v1",
+        producer_contract_sha256=None,
     )
     summary, trace = write_run(metrics, tmp_path)
     transitions = load_transitions(trace)
@@ -68,6 +72,10 @@ def test_load_run_rejects_mismatched_legacy_trace_pair(tmp_path) -> None:
         variant="D",
         model_profile="test",
         config_hash="abc",
+        hypothesis_source="qwen",
+        arm_label="D-Q",
+        identity_version="legacy-v1",
+        producer_contract_sha256=None,
     )
     summary, trace = write_run(metrics, tmp_path)
     payload = json.loads(summary.read_text())

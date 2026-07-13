@@ -9,11 +9,14 @@ from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import asdict, dataclass, is_dataclass
 from pathlib import Path
 from statistics import mean
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
+from .config import HypothesisSource
 from .run_store import read_complete_run
 
 Variant = Literal["D", "S", "M", "X"]
+ArmLabel = Literal["D-Q", "S-Q", "M-Q", "X-Q", "S-T", "M-T", "X-T", "M-H", "X-H"]
+IdentityVersion = Literal["legacy-v1", "source-v2"]
 
 DEVELOPMENT_SEEDS = (11, 23, 47)
 CONFIRMATION_SEEDS = (101, 211, 307, 401, 503)
@@ -34,6 +37,33 @@ class RunSpec:
     config_hash: str
     game_version: str = "unknown"
     snapshot_hash: str = ""
+    hypothesis_source: HypothesisSource = "qwen"
+    arm_label: ArmLabel | None = None
+    identity_version: IdentityVersion = "source-v2"
+
+    def __post_init__(self) -> None:
+        if self.phase not in {"development", "confirmation", "kaggle-transfer"}:
+            raise ValueError("invalid run phase")
+        if self.variant not in {"D", "S", "M", "X"}:
+            raise ValueError("invalid controller variant")
+        if self.hypothesis_source not in {
+            "qwen",
+            "template_v1",
+            "qwen_then_template_v1",
+        }:
+            raise ValueError("invalid hypothesis source")
+        expected = arm_label_for(self.variant, self.hypothesis_source)
+        if self.arm_label is None:
+            object.__setattr__(self, "arm_label", expected)
+        elif self.arm_label != expected:
+            raise ValueError(
+                f"arm {self.arm_label} is inconsistent with variant {self.variant} "
+                f"and source {self.hypothesis_source}"
+            )
+        if self.identity_version not in {"legacy-v1", "source-v2"}:
+            raise ValueError("invalid run identity version")
+        if self.identity_version == "legacy-v1" and self.hypothesis_source != "qwen":
+            raise ValueError("legacy-v1 identity is valid only for implicit Qwen rows")
 
     @property
     def full_game_id(self) -> str:
@@ -43,6 +73,11 @@ class RunSpec:
 
     @property
     def run_id(self) -> str:
+        if self.identity_version == "source-v2":
+            return (
+                f"{self.phase}-{self.full_game_id}-{self.seed}-{self.arm_label}-"
+                f"{self.hypothesis_source}-{self.config_hash[:8]}"
+            )
         return (
             f"{self.phase}-{self.full_game_id}-{self.seed}-{self.variant}-"
             f"{self.config_hash[:8]}"
@@ -51,6 +86,15 @@ class RunSpec:
     @classmethod
     def from_mapping(cls, value: Mapping[str, Any]) -> RunSpec:
         """Load both current manifests and pre-version legacy manifests safely."""
+
+        identity_keys = {"hypothesis_source", "arm_label", "identity_version"}
+        present_identity_keys = identity_keys.intersection(value)
+        if present_identity_keys and present_identity_keys != identity_keys:
+            missing = ", ".join(sorted(identity_keys - present_identity_keys))
+            raise ValueError(f"matrix row has incomplete source identity: {missing}")
+        has_source_identity = bool(present_identity_keys)
+        if has_source_identity and value.get("arm_label") is None:
+            raise ValueError("source-v2 matrix row requires an explicit arm_label")
 
         return cls(
             phase=str(value["phase"]),  # type: ignore[arg-type]
@@ -61,6 +105,14 @@ class RunSpec:
             config_hash=str(value["config_hash"]),
             game_version=str(value.get("game_version", "unknown")),
             snapshot_hash=str(value.get("snapshot_hash", "")),
+            hypothesis_source=str(value.get("hypothesis_source", "qwen")),  # type: ignore[arg-type]
+            arm_label=cast(
+                ArmLabel | None,
+                str(value["arm_label"]) if value.get("arm_label") is not None else None,
+            ),
+            identity_version=str(
+                value.get("identity_version", "source-v2" if has_source_identity else "legacy-v1")
+            ),  # type: ignore[arg-type]
         )
 
 
@@ -102,14 +154,50 @@ class GateResult:
     reasons: tuple[str, ...]
 
 
-def stable_config_hash(config: object) -> str:
+def stable_config_hash(config: object, *, implicit_qwen_legacy: bool = False) -> str:
+    hash_input = _implicit_qwen_projection(config) if implicit_qwen_legacy else config
     payload = json.dumps(
-        config,
+        hash_input,
         separators=(",", ":"),
         sort_keys=True,
         default=_json_default,
     ).encode()
     return hashlib.sha256(payload).hexdigest()
+
+
+def arm_label_for(variant: Variant, source: HypothesisSource) -> ArmLabel:
+    """Return the preregistered label for one controller/source combination."""
+
+    if source == "qwen":
+        return f"{variant}-Q"  # type: ignore[return-value]
+    if source == "template_v1" and variant in {"S", "M", "X"}:
+        return f"{variant}-T"  # type: ignore[return-value]
+    if source == "qwen_then_template_v1" and variant in {"M", "X"}:
+        return f"{variant}-H"  # type: ignore[return-value]
+    raise ValueError(f"variant {variant} is not defined for hypothesis source {source}")
+
+
+def development_arms(
+    source: HypothesisSource,
+) -> tuple[tuple[ArmLabel, Variant, HypothesisSource], ...]:
+    """Return the frozen development arms for one proposal-source experiment."""
+
+    if source == "qwen":
+        return tuple(
+            (arm_label_for(variant, "qwen"), variant, "qwen")
+            for variant in ("D", "S", "M", "X")
+        )
+    if source == "template_v1":
+        return (
+            ("D-Q", "D", "qwen"),
+            ("S-T", "S", "template_v1"),
+            ("M-T", "M", "template_v1"),
+            ("X-T", "X", "template_v1"),
+        )
+    raise ValueError(
+        "qwen_then_template_v1 is a typed reserved source, but hybrid arms are not "
+        "preregistered"
+    )
 
 
 def build_development_matrix(
@@ -121,22 +209,55 @@ def build_development_matrix(
     snapshot_hash: str = "",
     fallback: bool = False,
 ) -> tuple[RunSpec, ...]:
+    arm_hashes: dict[ArmLabel, str] = {
+        arm_label_for(variant, "qwen"): config_hashes[variant]
+        for variant in ("D", "S", "M", "X")
+    }
+    return build_source_development_matrix(
+        games,
+        hypothesis_source="qwen",
+        model_profile=model_profile,
+        config_hashes=arm_hashes,
+        game_versions=game_versions,
+        snapshot_hash=snapshot_hash,
+        fallback=fallback,
+    )
+
+
+def build_source_development_matrix(
+    games: tuple[str, ...],
+    *,
+    hypothesis_source: HypothesisSource,
+    model_profile: str,
+    config_hashes: Mapping[ArmLabel, str],
+    game_versions: Mapping[str, str] | None = None,
+    snapshot_hash: str = "",
+    fallback: bool = False,
+) -> tuple[RunSpec, ...]:
+    """Build a source-aware development manifest without mutating the Qwen manifest."""
+
     seeds = FALLBACK_DEVELOPMENT_SEEDS if fallback else DEVELOPMENT_SEEDS
-    variants: tuple[Variant, ...] = ("D", "S", "M", "X")
+    arms = development_arms(hypothesis_source)
+    expected_labels = {label for label, _variant, _source in arms}
+    if set(config_hashes) != expected_labels:
+        raise ValueError("config hashes must exactly cover the frozen development arms")
     return tuple(
         RunSpec(
-            "development",
-            game,
-            seed,
-            variant,
-            model_profile,
-            config_hashes[variant],
-            _game_version(game, game_versions),
-            snapshot_hash,
+            phase="development",
+            game_id=game,
+            seed=seed,
+            variant=variant,
+            model_profile=model_profile,
+            config_hash=config_hashes[label],
+            game_version=_game_version(game, game_versions),
+            snapshot_hash=snapshot_hash,
+            hypothesis_source=arm_source,
+            arm_label=label,
+            identity_version="source-v2",
         )
         for game in games
         for seed in seeds
-        for variant in variants
+        for label, variant, arm_source in arms
     )
 
 
@@ -156,14 +277,17 @@ def build_confirmation_matrix(
     variants: tuple[Variant, ...] = (comparator, "X")
     return tuple(
         RunSpec(
-            "confirmation",
-            game,
-            seed,
-            variant,
-            model_profile,
-            config_hashes[variant],
-            _game_version(game, game_versions),
-            snapshot_hash,
+            phase="confirmation",
+            game_id=game,
+            seed=seed,
+            variant=variant,
+            model_profile=model_profile,
+            config_hash=config_hashes[variant],
+            game_version=_game_version(game, game_versions),
+            snapshot_hash=snapshot_hash,
+            hypothesis_source="qwen",
+            arm_label=arm_label_for(variant, "qwen"),
+            identity_version="source-v2",
         )
         for game in games
         for seed in seeds
@@ -181,14 +305,17 @@ def build_kaggle_transfer_matrix(
 ) -> tuple[RunSpec, ...]:
     return tuple(
         RunSpec(
-            "kaggle-transfer",
-            game,
-            seed,
-            variant,
-            "kaggle-fp8",
-            config_hashes[variant],
-            _game_version(game, game_versions),
-            snapshot_hash,
+            phase="kaggle-transfer",
+            game_id=game,
+            seed=seed,
+            variant=variant,
+            model_profile="kaggle-fp8",
+            config_hash=config_hashes[variant],
+            game_version=_game_version(game, game_versions),
+            snapshot_hash=snapshot_hash,
+            hypothesis_source="qwen",
+            arm_label=arm_label_for(variant, "qwen"),
+            identity_version="source-v2",
         )
         for game in games
         for seed in KAGGLE_TRANSFER_SEEDS
@@ -269,35 +396,42 @@ def validate_matrix(
         if any(not row.game_version or row.game_version == "unknown" for row in matrix):
             raise ValueError("every matrix row must carry a frozen game version")
 
-    variant_hashes: dict[Variant, set[str]] = defaultdict(set)
-    cells: dict[tuple[str, Variant], set[int]] = defaultdict(set)
-    variants = {row.variant for row in matrix}
-    games_by_variant: dict[Variant, set[str]] = defaultdict(set)
+    identity_versions = {row.identity_version for row in matrix}
+    if len(identity_versions) != 1:
+        raise ValueError("a matrix cannot mix legacy and source-aware identities")
+    arm_hashes: dict[ArmLabel, set[str]] = defaultdict(set)
+    cells: dict[tuple[str, ArmLabel], set[int]] = defaultdict(set)
+    arms = {row.arm_label for row in matrix}
+    if None in arms:
+        raise ValueError("every matrix row must carry a derivable arm label")
+    typed_arms = {arm for arm in arms if arm is not None}
+    games_by_arm: dict[ArmLabel, set[str]] = defaultdict(set)
     for row in matrix:
         if not _is_sha256(row.config_hash):
             raise ValueError(f"invalid config hash for {row.run_id}")
-        variant_hashes[row.variant].add(row.config_hash)
-        cell = (row.full_game_id, row.variant)
+        assert row.arm_label is not None
+        arm_hashes[row.arm_label].add(row.config_hash)
+        cell = (row.full_game_id, row.arm_label)
         if row.seed in cells[cell]:
-            raise ValueError(f"duplicate game/seed/variant cell: {cell}, seed={row.seed}")
+            raise ValueError(f"duplicate game/seed/arm cell: {cell}, seed={row.seed}")
         cells[cell].add(row.seed)
-        games_by_variant[row.variant].add(row.full_game_id)
-    if any(len(hashes) != 1 for hashes in variant_hashes.values()):
-        raise ValueError("each variant must have exactly one config hash")
-    hashes = {next(iter(values)) for values in variant_hashes.values()}
-    if len(hashes) != len(variant_hashes):
-        raise ValueError("variant config hashes must be distinct")
-    reference_games = games_by_variant[next(iter(variants))]
-    if any(games != reference_games for games in games_by_variant.values()):
-        raise ValueError("variants must cover identical game sets")
+        games_by_arm[row.arm_label].add(row.full_game_id)
+    if any(len(hashes) != 1 for hashes in arm_hashes.values()):
+        raise ValueError("each arm must have exactly one config hash")
+    hashes = {next(iter(values)) for values in arm_hashes.values()}
+    if len(hashes) != len(arm_hashes):
+        raise ValueError("arm config hashes must be distinct")
+    reference_games = games_by_arm[next(iter(typed_arms))]
+    if any(games != reference_games for games in games_by_arm.values()):
+        raise ValueError("arms must cover identical game sets")
     expected_seeds: set[int] | None = None
     for game in sorted(reference_games):
-        per_variant = [cells[(game, variant)] for variant in variants]
-        if any(seeds != per_variant[0] for seeds in per_variant[1:]):
-            raise ValueError(f"variants have non-identical paired seed sets for {game}")
+        per_arm = [cells[(game, arm)] for arm in typed_arms]
+        if any(seeds != per_arm[0] for seeds in per_arm[1:]):
+            raise ValueError(f"arms have non-identical paired seed sets for {game}")
         if expected_seeds is None:
-            expected_seeds = per_variant[0]
-        elif per_variant[0] != expected_seeds:
+            expected_seeds = per_arm[0]
+        elif per_arm[0] != expected_seeds:
             raise ValueError("all games must use the same frozen seed set")
 
 
@@ -320,8 +454,18 @@ def completed_run_ids(matrix: Sequence[RunSpec], output: str | Path) -> frozense
             "model_profile": row.model_profile,
             "config_hash": row.config_hash,
         }
+        source_identity_matches = True
+        if row.identity_version == "source-v2":
+            source_identity_matches = (
+                value.get("hypothesis_source") == row.hypothesis_source
+                and value.get("arm_label") == row.arm_label
+                and value.get("identity_version") == row.identity_version
+                and isinstance(value.get("producer_contract_sha256"), str)
+                and _is_sha256(value["producer_contract_sha256"])
+            )
         if (
             all(value.get(key) == expected_value for key, expected_value in expected.items())
+            and source_identity_matches
             and value.get("error") is None
             and value.get("termination_reason") is not None
         ):
@@ -383,6 +527,36 @@ def _json_default(value: object) -> object:
     if is_dataclass(value) and not isinstance(value, type):
         return asdict(value)
     return str(value)
+
+
+def _implicit_qwen_projection(config: object) -> object:
+    """Project a source-aware config onto the pre-amendment implicit-Qwen schema."""
+
+    if is_dataclass(config) and not isinstance(config, type):
+        projected: object = asdict(config)
+    elif isinstance(config, Mapping):
+        projected = dict(config)
+    else:
+        raise ValueError("legacy Qwen projection requires a dataclass or mapping")
+    if not isinstance(projected, dict):  # pragma: no cover - guarded above
+        raise AssertionError("legacy projection must be a mapping")
+    raw_experiment = projected.get("experiment")
+    if not isinstance(raw_experiment, Mapping):
+        raise ValueError("legacy Qwen projection requires an experiment mapping")
+    experiment = dict(raw_experiment)
+    source = experiment.pop("hypothesis_source", "qwen")
+    if source != "qwen":
+        raise ValueError("only Qwen configs have a valid pre-amendment hash projection")
+    experiment["implementation_contract_version"] = "crosslevel-voi-runtime-v2"
+    for key in (
+        "candidate_policy_version",
+        "candidate_policy_sha256",
+        "compiler_contract_version",
+        "compiler_contract_sha256",
+    ):
+        experiment.pop(key, None)
+    projected["experiment"] = experiment
+    return projected
 
 
 def _game_version(game: str, versions: Mapping[str, str] | None) -> str:

@@ -6,7 +6,18 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from math import isfinite
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
+
+HypothesisSource = Literal["qwen", "template_v1", "qwen_then_template_v1"]
+
+SUPPORTED_CANDIDATE_POLICY = (
+    "salience-frontier-v1",
+    "a9220009c5fd4b6da602580db439e25f9acaef74799de050a7a56e6c64bba82c",
+)
+SUPPORTED_COMPILER_CONTRACT = (
+    "scene-topology-compiler-v1",
+    "eeccd86db3346fd15d2e3dbc8e82ee2bb60e23bc30c0490750a7a0fbaa9e14e5",
+)
 
 
 class ConfigError(ValueError):
@@ -29,13 +40,18 @@ def _non_negative_float(name: str, value: float) -> None:
 class ExperimentConfig:
     seed: int = 20_260_712
     variant: str = "X"
-    implementation_contract_version: str = "crosslevel-voi-runtime-v2"
+    hypothesis_source: HypothesisSource = "qwen"
+    implementation_contract_version: str = "crosslevel-voi-runtime-v3"
     prompt_contract_version: str = "evidence-first-visible-causal-alternatives-v5"
     perception_contract_version: str = "arc-agi-0.9.9-color-map-scale8-grid-v1"
     prompt_contract_sha256: str = "960958a041dd5e80c47834dfe5be666e6bae8113b31bdd8b8d0388d65b5e7aa6"
     perception_contract_sha256: str = (
         "fade727568f9a95e45bb2c40e97d3a4ba524b04c4c2645c18bdd911312a494d0"
     )
+    candidate_policy_version: str = SUPPORTED_CANDIDATE_POLICY[0]
+    candidate_policy_sha256: str = SUPPORTED_CANDIDATE_POLICY[1]
+    compiler_contract_version: str = SUPPORTED_COMPILER_CONTRACT[0]
+    compiler_contract_sha256: str = SUPPORTED_COMPILER_CONTRACT[1]
     max_environment_actions: int = 256
     max_generated_tokens: int = 12_288
     max_generation_batches: int = 3
@@ -47,18 +63,49 @@ class ExperimentConfig:
             raise ConfigError("seed must be an integer")
         if self.variant not in {"D", "S", "M", "X"}:
             raise ConfigError("variant must be one of D, S, M, or X")
+        if self.hypothesis_source not in {
+            "qwen",
+            "template_v1",
+            "qwen_then_template_v1",
+        }:
+            raise ConfigError(
+                "hypothesis_source must be qwen, template_v1, or "
+                "qwen_then_template_v1"
+            )
+        if self.hypothesis_source == "template_v1" and self.variant == "D":
+            raise ConfigError("template_v1 is valid only for S, M, or X")
+        if self.hypothesis_source == "qwen_then_template_v1" and self.variant not in {
+            "M",
+            "X",
+        }:
+            raise ConfigError("qwen_then_template_v1 is valid only for M or X")
         if not self.implementation_contract_version.strip():
             raise ConfigError("implementation_contract_version cannot be empty")
         if not self.prompt_contract_version.strip():
             raise ConfigError("prompt_contract_version cannot be empty")
         if not self.perception_contract_version.strip():
             raise ConfigError("perception_contract_version cannot be empty")
-        for name in ("prompt_contract_sha256", "perception_contract_sha256"):
+        for name in (
+            "prompt_contract_sha256",
+            "perception_contract_sha256",
+            "candidate_policy_sha256",
+            "compiler_contract_sha256",
+        ):
             digest = getattr(self, name)
             if len(digest) != 64 or any(
                 character not in "0123456789abcdef" for character in digest
             ):
                 raise ConfigError(f"{name} must be a lowercase SHA-256 digest")
+        if (
+            self.candidate_policy_version,
+            self.candidate_policy_sha256,
+        ) != SUPPORTED_CANDIDATE_POLICY:
+            raise ConfigError("candidate policy identity does not match this runtime")
+        if (
+            self.compiler_contract_version,
+            self.compiler_contract_sha256,
+        ) != SUPPORTED_COMPILER_CONTRACT:
+            raise ConfigError("compiler contract identity does not match this runtime")
         for name in (
             "max_environment_actions",
             "max_generated_tokens",
@@ -271,11 +318,16 @@ def config_from_mapping(raw: Mapping[str, Any]) -> SystemConfig:
                 {
                     "seed",
                     "variant",
+                    "hypothesis_source",
                     "implementation_contract_version",
                     "prompt_contract_version",
                     "perception_contract_version",
                     "prompt_contract_sha256",
                     "perception_contract_sha256",
+                    "candidate_policy_version",
+                    "candidate_policy_sha256",
+                    "compiler_contract_version",
+                    "compiler_contract_sha256",
                     "max_environment_actions",
                     "max_generated_tokens",
                     "max_generation_batches",

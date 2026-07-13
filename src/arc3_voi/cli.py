@@ -7,18 +7,26 @@ import hashlib
 import json
 from dataclasses import asdict, replace
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
-from .agent import build_agent
+from .agent import (
+    build_agent,
+    qwen_producer_contract_sha256,
+    require_admitted_hypothesis_source,
+)
 from .arc_adapter import ArcCompetitionClient
-from .config import SystemConfig, load_config
+from .config import HypothesisSource, SystemConfig, load_config
 from .experiment import (
+    ArmLabel,
     HyperparameterObservation,
     RunSpec,
     Variant,
+    arm_label_for,
     build_confirmation_matrix,
     build_development_matrix,
     build_kaggle_transfer_matrix,
+    build_source_development_matrix,
+    development_arms,
     load_matrix,
     pending_runs,
     save_matrix,
@@ -30,7 +38,7 @@ from .model import TransformersQwenBackend, backend_from_config
 from .preflight import run_model_preflight
 from .provenance import inspect_model_artifact
 from .rendering import PERCEPTION_REFERENCE_RENDER_SHA256
-from .run_store import ensure_retryable_run_artifacts, validate_run_id
+from .run_store import ensure_retryable_run_artifacts, read_complete_run, validate_run_id
 from .runner import run_game
 from .splitting import (
     SplitManifest,
@@ -67,6 +75,11 @@ def build_parser() -> argparse.ArgumentParser:
     matrix_parser.add_argument("--config", type=Path, required=True)
     matrix_parser.add_argument("--out", type=Path, required=True)
     matrix_parser.add_argument("--comparator", choices=("D", "S", "M"), default="M")
+    matrix_parser.add_argument(
+        "--hypothesis-source",
+        choices=("qwen", "template_v1"),
+        help="proposal source; template_v1 is development-only",
+    )
     matrix_parser.add_argument("--fallback", action="store_true")
 
     preflight_parser = subparsers.add_parser("preflight")
@@ -98,8 +111,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     analyze_parser = subparsers.add_parser("analyze")
     analyze_parser.add_argument("--input", type=Path, required=True)
-    analyze_parser.add_argument("--treatment", default="X")
-    analyze_parser.add_argument("--comparator", default="M")
+    analyze_parser.add_argument("--treatment", choices=("D", "S", "M", "X"), default="X")
+    analyze_parser.add_argument("--comparator", choices=("D", "S", "M", "X"), default="M")
+    analyze_parser.add_argument(
+        "--hypothesis-source",
+        choices=("qwen", "template_v1", "qwen_then_template_v1"),
+    )
+    analyze_parser.add_argument("--treatment-arm")
+    analyze_parser.add_argument("--comparator-arm")
     analyze_parser.add_argument("--bootstrap-samples", type=int, default=20_000)
     analyze_parser.add_argument("--out", type=Path)
 
@@ -154,20 +173,40 @@ def _matrix_command(args: argparse.Namespace) -> None:
     split = _load_split(args.split)
     config = load_config(args.config)
     profile = config.model.profile if config.model else "no-model"
+    source: HypothesisSource = args.hypothesis_source or config.experiment.hypothesis_source
     if args.phase == "development":
-        variants: tuple[Variant, ...] = ("D", "S", "M", "X")
-        digests = _variant_hashes(config, variants)
-        matrix = build_development_matrix(
-            split.development,
-            model_profile=profile,
-            config_hashes=digests,
-            game_versions=split.game_versions,
-            snapshot_hash=split.metadata_hash,
-            fallback=args.fallback,
-        )
+        if source == "qwen":
+            variants: tuple[Variant, ...] = ("D", "S", "M", "X")
+            digests: dict[Variant, str] | dict[ArmLabel, str] = _variant_hashes(
+                config, variants, source="qwen"
+            )
+            matrix = build_development_matrix(
+                split.development,
+                model_profile=profile,
+                config_hashes=digests,  # type: ignore[arg-type]
+                game_versions=split.game_versions,
+                snapshot_hash=split.metadata_hash,
+                fallback=args.fallback,
+            )
+        elif source == "template_v1":
+            arms = development_arms("template_v1")
+            digests = _arm_hashes(config, arms)
+            matrix = build_source_development_matrix(
+                split.development,
+                hypothesis_source="template_v1",
+                model_profile=profile,
+                config_hashes=digests,
+                game_versions=split.game_versions,
+                snapshot_hash=split.metadata_hash,
+                fallback=args.fallback,
+            )
+        else:
+            raise ValueError("hybrid development arms are not preregistered")
     elif args.phase == "confirmation":
+        if source != "qwen":
+            raise ValueError("template_v1 is development-only until its score gate passes")
         variants = (args.comparator, "X")
-        digests = _variant_hashes(config, variants)
+        digests = _variant_hashes(config, variants, source="qwen")
         matrix = build_confirmation_matrix(
             split.confirmation,
             comparator=args.comparator,
@@ -178,8 +217,10 @@ def _matrix_command(args: argparse.Namespace) -> None:
             fallback=args.fallback,
         )
     else:
+        if source != "qwen":
+            raise ValueError("template_v1 has no Kaggle-transfer matrix before confirmation")
         variants = (args.comparator, "X")
-        digests = _variant_hashes(config, variants)
+        digests = _variant_hashes(config, variants, source="qwen")
         matrix = build_kaggle_transfer_matrix(
             split.confirmation,
             comparator=args.comparator,
@@ -192,13 +233,42 @@ def _matrix_command(args: argparse.Namespace) -> None:
 
 
 def _variant_hashes(
-    config: SystemConfig, variants: tuple[Variant, ...]
+    config: SystemConfig,
+    variants: tuple[Variant, ...],
+    *,
+    source: HypothesisSource,
 ) -> dict[Variant, str]:
     return {
         variant: stable_config_hash(
-            replace(config, experiment=replace(config.experiment, variant=variant))
+            replace(
+                config,
+                experiment=replace(
+                    config.experiment,
+                    variant=variant,
+                    hypothesis_source=source,
+                ),
+            ),
         )
         for variant in variants
+    }
+
+
+def _arm_hashes(
+    config: SystemConfig,
+    arms: tuple[tuple[ArmLabel, Variant, HypothesisSource], ...],
+) -> dict[ArmLabel, str]:
+    return {
+        label: stable_config_hash(
+            replace(
+                config,
+                experiment=replace(
+                    config.experiment,
+                    variant=variant,
+                    hypothesis_source=source,
+                ),
+            )
+        )
+        for label, variant, source in arms
     }
 
 
@@ -244,6 +314,9 @@ def _run_command(args: argparse.Namespace) -> int:
     if args.variant:
         experiment = replace(experiment, variant=args.variant)
     config = replace(config, experiment=experiment)
+    # This check must precede both model/backend and environment construction.
+    require_admitted_hypothesis_source(config)
+    producer_contract_sha256 = qwen_producer_contract_sha256(config)
     backend = _model_backend(config, args.model_path)
     client = ArcCompetitionClient()
     session = client.make(args.game, seed=args.seed)
@@ -265,6 +338,13 @@ def _run_command(args: argparse.Namespace) -> int:
             weight_manifest_sha256=(
                 config.model.expected_weight_manifest_sha256 if config.model else None
             ),
+            hypothesis_source=config.experiment.hypothesis_source,
+            arm_label=arm_label_for(
+                cast(Variant, config.experiment.variant),
+                config.experiment.hypothesis_source,
+            ),
+            identity_version="source-v2",
+            producer_contract_sha256=producer_contract_sha256,
             max_environment_actions=config.experiment.max_environment_actions,
             max_generated_tokens=config.experiment.max_generated_tokens,
             max_wall_seconds=config.experiment.max_wall_seconds,
@@ -277,7 +357,19 @@ def _run_command(args: argparse.Namespace) -> int:
 
 def _run_matrix_command(args: argparse.Namespace) -> int:
     matrix = load_matrix(args.matrix)
+    if matrix[0].identity_version != "source-v2":
+        raise ValueError(
+            "legacy-v1 matrices are audit-only after the implementation amendment; "
+            "run-matrix requires a new source-v2 manifest"
+        )
+    if any(row.hypothesis_source != "qwen" for row in matrix):
+        raise ValueError(
+            "template_v1 matrices are registration-only until the admission gate passes; "
+            "run-matrix execution is disabled"
+        )
     config = load_config(args.config)
+    require_admitted_hypothesis_source(config)
+    producer_contract_sha256 = qwen_producer_contract_sha256(config)
     metadata = load_metadata(args.metadata)
     actual_snapshot_hash = metadata_hash(metadata)
     manifest_snapshot_hash = matrix[0].snapshot_hash
@@ -289,21 +381,38 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
         if versions.get(row.game_id) != row.game_version:
             raise ValueError(f"frozen version mismatch for {row.game_id}")
 
-    variants: tuple[Variant, ...] = tuple(sorted({row.variant for row in matrix}))
-    expected_hashes = _variant_hashes(config, variants)
     for row in matrix:
-        if row.config_hash != expected_hashes[row.variant]:
+        expected_hash = stable_config_hash(
+            replace(
+                config,
+                experiment=replace(
+                    config.experiment,
+                    variant=row.variant,
+                    hypothesis_source=row.hypothesis_source,
+                ),
+            )
+        )
+        if row.config_hash != expected_hash:
             raise ValueError(f"config hash mismatch for {row.run_id}")
     expected_profile = config.model.profile if config.model else "no-model"
     if any(row.model_profile != expected_profile for row in matrix):
         raise ValueError("matrix model profile does not match the supplied config")
 
+    _validate_existing_manifest_artifacts(
+        matrix,
+        args.output,
+        producer_contract_sha256=producer_contract_sha256,
+    )
     pending = pending_runs(matrix, args.output)
     if args.limit is not None:
         if args.limit < 0:
             raise ValueError("limit must be non-negative")
         pending = pending[: args.limit]
-    _validate_pending_artifacts(pending, args.output)
+    _validate_pending_artifacts(
+        pending,
+        args.output,
+        producer_contract_sha256=producer_contract_sha256,
+    )
     if args.dry_run:
         _emit(
             {
@@ -352,10 +461,19 @@ def _run_matrix_command(args: argparse.Namespace) -> int:
     return 2 if failures else 0
 
 
-def _validate_pending_artifacts(rows: tuple[RunSpec, ...], output: Path) -> None:
+def _validate_pending_artifacts(
+    rows: tuple[RunSpec, ...],
+    output: Path,
+    *,
+    producer_contract_sha256: str | None = None,
+) -> None:
     """Reject conflicting or damaged historical evidence before environment actions."""
 
     for row in rows:
+        if row.identity_version == "source-v2" and producer_contract_sha256 is None:
+            raise ValueError(
+                "source-v2 manifest retry validation requires a producer contract digest"
+            )
         ensure_retryable_run_artifacts(
             output / f"{row.run_id}.json",
             expected_summary={
@@ -365,8 +483,47 @@ def _validate_pending_artifacts(rows: tuple[RunSpec, ...], output: Path) -> None
                 "variant": row.variant,
                 "model_profile": row.model_profile,
                 "config_hash": row.config_hash,
+                "hypothesis_source": row.hypothesis_source,
+                "arm_label": row.arm_label,
+                "identity_version": row.identity_version,
+                "producer_contract_sha256": producer_contract_sha256,
             },
         )
+
+
+def _validate_existing_manifest_artifacts(
+    rows: tuple[RunSpec, ...],
+    output: Path,
+    *,
+    producer_contract_sha256: str,
+) -> None:
+    """Reject complete artifacts whose source identity does not match the manifest."""
+
+    for row in rows:
+        artifacts = read_complete_run(output / f"{row.run_id}.json")
+        if artifacts is None:
+            continue
+        summary, _trace = artifacts
+        expected = {
+            "run_id": row.run_id,
+            "game_id": row.full_game_id,
+            "seed": row.seed,
+            "variant": row.variant,
+            "model_profile": row.model_profile,
+            "config_hash": row.config_hash,
+            "hypothesis_source": row.hypothesis_source,
+            "arm_label": row.arm_label,
+            "identity_version": row.identity_version,
+            "producer_contract_sha256": producer_contract_sha256,
+        }
+        conflicts = [
+            key for key, value in expected.items() if summary.get(key) != value
+        ]
+        if conflicts:
+            raise ValueError(
+                f"completed artifact identity conflicts for {row.run_id}: "
+                f"{', '.join(conflicts)}"
+            )
 
 
 def _archive_resolved_failure(output: Path, run_id: str) -> Path | None:
@@ -399,8 +556,18 @@ def _execute_manifest_row(
 ) -> None:
     config = replace(
         base_config,
-        experiment=replace(base_config.experiment, variant=row.variant, seed=row.seed),
+        experiment=replace(
+            base_config.experiment,
+            variant=row.variant,
+            seed=row.seed,
+            hypothesis_source=row.hypothesis_source,
+        ),
     )
+    # Keep the per-row guard even though run-matrix validates the complete
+    # manifest: this function is also a useful unit boundary and must never
+    # relabel Qwen-generated programs as template/hybrid proposals.
+    require_admitted_hypothesis_source(config)
+    producer_contract_sha256 = qwen_producer_contract_sha256(config)
     backend = _model_backend(config, model_path)
     session = ArcCompetitionClient().make(row.full_game_id, seed=row.seed)
     with build_agent(backend, config) as agent:
@@ -416,6 +583,10 @@ def _execute_manifest_row(
             weight_manifest_sha256=(
                 config.model.expected_weight_manifest_sha256 if config.model else None
             ),
+            hypothesis_source=row.hypothesis_source,
+            arm_label=cast(str, row.arm_label),
+            identity_version=row.identity_version,
+            producer_contract_sha256=producer_contract_sha256,
             max_environment_actions=config.experiment.max_environment_actions,
             max_generated_tokens=config.experiment.max_generated_tokens,
             max_wall_seconds=config.experiment.max_wall_seconds,
@@ -429,24 +600,135 @@ def _execute_manifest_row(
 
 def _analyze_command(args: argparse.Namespace) -> None:
     raw = _load_json_records(args.input)
+    identified = [(*_analysis_identity(item), item) for item in raw]
+    relevant = [
+        row
+        for row in identified
+        if str(row[3].get("variant")) in {args.treatment, args.comparator}
+        and row[3].get("rhae") is not None
+    ]
+    if not relevant:
+        raise ValueError("analysis input has no scored treatment/comparator rows")
+    observed_sources = {row[0] for row in relevant}
+    if args.hypothesis_source is None:
+        if len(observed_sources) != 1:
+            raise ValueError(
+                "analysis input mixes hypothesis sources; select --hypothesis-source "
+                "and exact arm labels"
+            )
+        source = next(iter(observed_sources))
+    else:
+        source = args.hypothesis_source
+    typed_source = cast(HypothesisSource, source)
+    expected_treatment_arm = arm_label_for(cast(Variant, args.treatment), typed_source)
+    expected_comparator_arm = arm_label_for(cast(Variant, args.comparator), typed_source)
+    treatment_arm = args.treatment_arm or expected_treatment_arm
+    comparator_arm = args.comparator_arm or expected_comparator_arm
+    if treatment_arm != expected_treatment_arm:
+        raise ValueError("treatment arm is inconsistent with treatment variant and source")
+    if comparator_arm != expected_comparator_arm:
+        raise ValueError("comparator arm is inconsistent with comparator variant and source")
+    selected = [
+        row
+        for row in relevant
+        if row[0] == source
+        and (
+            (str(row[3]["variant"]) == args.treatment and row[1] == treatment_arm)
+            or (str(row[3]["variant"]) == args.comparator and row[1] == comparator_arm)
+        )
+    ]
+    producer_identities = {
+        (row[2], row[3].get("producer_contract_sha256")) for row in selected
+    }
+    if len(producer_identities) > 1:
+        raise ValueError(
+            "analysis input mixes legacy/current or distinct producer contract identities"
+        )
+    if len({row[3].get("model_profile") for row in selected}) > 1:
+        raise ValueError("analysis input mixes model profiles")
+    config_hashes_by_arm: dict[str, set[str]] = {}
+    for _source, arm, _identity_version, item in selected:
+        config_hash = item.get("config_hash")
+        if not isinstance(config_hash, str) or not config_hash:
+            raise ValueError("analysis row requires a config_hash")
+        config_hashes_by_arm.setdefault(arm, set()).add(config_hash)
+    if any(len(hashes) != 1 for hashes in config_hashes_by_arm.values()):
+        raise ValueError("analysis input mixes config hashes within an arm")
     observations = [
         ScoreObservation(
             str(item["game_id"]),
             int(item["seed"]),
-            str(item["variant"]),
+            treatment_arm if str(item["variant"]) == args.treatment else comparator_arm,
             float(item["rhae"]),
         )
-        for item in raw
-        if item.get("rhae") is not None
+        for _source, _arm, _identity_version, item in selected
     ]
-    deltas = paired_game_deltas(observations, args.treatment, args.comparator)
+    deltas = paired_game_deltas(observations, treatment_arm, comparator_arm)
     summary = summarize_paired_observations(
         observations,
-        args.treatment,
-        args.comparator,
+        treatment_arm,
+        comparator_arm,
         bootstrap_samples=args.bootstrap_samples,
     )
-    _emit({"deltas": deltas, "summary": asdict(summary)}, args.out)
+    _emit(
+        {
+            "comparison_identity": {
+                "hypothesis_source": source,
+                "treatment_arm": treatment_arm,
+                "comparator_arm": comparator_arm,
+            },
+            "deltas": deltas,
+            "summary": asdict(summary),
+        },
+        args.out,
+    )
+
+
+def _analysis_identity(item: dict[str, Any]) -> tuple[str, str, str]:
+    """Normalize all-absent legacy identity; reject partial/current ambiguity."""
+
+    identity_keys = {
+        "hypothesis_source",
+        "arm_label",
+        "identity_version",
+        "producer_contract_sha256",
+    }
+    present = identity_keys.intersection(item)
+    variant = str(item.get("variant"))
+    if variant not in {"D", "S", "M", "X"}:
+        raise ValueError("analysis row has invalid controller variant")
+    typed_variant = cast(Variant, variant)
+    if not present:
+        return "qwen", arm_label_for(typed_variant, "qwen"), "legacy-v1"
+    if present != identity_keys:
+        missing = ", ".join(sorted(identity_keys - present))
+        raise ValueError(f"analysis row has incomplete source identity: {missing}")
+    source = str(item["hypothesis_source"])
+    if source not in {"qwen", "template_v1", "qwen_then_template_v1"}:
+        raise ValueError("analysis row has invalid hypothesis source")
+    arm = str(item["arm_label"])
+    identity_version = str(item["identity_version"])
+    expected_arm = arm_label_for(typed_variant, cast(HypothesisSource, source))
+    if arm != expected_arm:
+        raise ValueError("analysis row arm is inconsistent with its variant and source")
+    if identity_version not in {"legacy-v1", "source-v2"}:
+        raise ValueError("analysis row has invalid identity_version")
+    if identity_version == "legacy-v1" and source != "qwen":
+        raise ValueError("legacy analysis identity is valid only for Qwen")
+    producer_contract = item["producer_contract_sha256"]
+    if identity_version == "legacy-v1" and producer_contract is not None:
+        raise ValueError("legacy analysis identity cannot carry a producer contract")
+    if identity_version == "source-v2" and not _is_sha256(producer_contract):
+        raise ValueError("source-v2 analysis row requires producer_contract_sha256")
+    if producer_contract is not None and not _is_sha256(producer_contract):
+        raise ValueError("analysis row has invalid producer_contract_sha256")
+    return source, arm, identity_version
+
+
+def _is_sha256(value: object) -> bool:
+    return isinstance(value, str) and len(value) == 64 and all(
+        character in "0123456789abcdef" for character in value
+    )
 
 
 def _select_hyperparameters_command(args: argparse.Namespace) -> None:

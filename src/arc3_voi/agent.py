@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import hashlib
+import json
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from typing import Any
 
 from .candidates import candidates_from_history
@@ -25,6 +27,45 @@ from .hypothesis import (
 from .model import ModelBackend
 from .program import ExecutableHypothesis
 from .types import Action, ActionKind, Budget, History
+
+
+class HypothesisSourceNotAdmittedError(ValueError):
+    """Raised before live resources are created for a registration-only source."""
+
+
+def require_admitted_hypothesis_source(config: SystemConfig) -> None:
+    """Fail closed until a non-Qwen producer has passed the offline admission gate."""
+
+    source = config.experiment.hypothesis_source
+    if source != "qwen":
+        raise HypothesisSourceNotAdmittedError(
+            f"hypothesis_source={source!r} is registration-only pending the offline "
+            "admission gate; live execution is disabled and no Qwen backend may execute "
+            "under this source label"
+        )
+
+
+def qwen_producer_contract_sha256(config: SystemConfig) -> str:
+    """Hash the source-producing Qwen contract independently of controller variant/seed."""
+
+    require_admitted_hypothesis_source(config)
+    experiment = config.experiment
+    payload = {
+        "contract_version": "qwen-executable-program-producer-v1",
+        "generation": asdict(config.generation),
+        "implementation_contract_version": experiment.implementation_contract_version,
+        "max_generated_tokens": experiment.max_generated_tokens,
+        "max_generation_batches": experiment.max_generation_batches,
+        "model": None if config.model is None else asdict(config.model),
+        "perception_contract_sha256": experiment.perception_contract_sha256,
+        "perception_contract_version": experiment.perception_contract_version,
+        "prompt_contract_sha256": experiment.prompt_contract_sha256,
+        "prompt_contract_version": experiment.prompt_contract_version,
+        "sandbox": asdict(config.sandbox),
+        "source": "qwen",
+    }
+    canonical = json.dumps(payload, separators=(",", ":"), sort_keys=True).encode("utf-8")
+    return hashlib.sha256(canonical).hexdigest()
 
 
 @dataclass(slots=True)
@@ -267,6 +308,7 @@ class _HypothesisGenerator:
 def build_agent(backend: ModelBackend, config: SystemConfig) -> GeneratedAgent:
     """Build D/S/M/X using the same model and resource contract."""
 
+    require_admitted_hypothesis_source(config)
     generator = _HypothesisGenerator(backend, config)
 
     def direct_policy(

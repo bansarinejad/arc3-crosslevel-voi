@@ -8,9 +8,11 @@ from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from statistics import mean
-from typing import Any
+from typing import Any, cast
 
-from .experiment import GateResult, ScoreGateInput, evaluate_score_gate
+from .config import HypothesisSource
+from .experiment import GateResult, ScoreGateInput, arm_label_for, evaluate_score_gate
+from .experiment import Variant as ExperimentVariant
 from .run_store import TRACE_ARTIFACT_KEY, publish_run_artifacts, read_complete_run
 from .statistics import (
     PairedSummary,
@@ -69,6 +71,10 @@ class RunMetrics:
     variant: str
     model_profile: str
     config_hash: str
+    hypothesis_source: str
+    arm_label: str | None
+    identity_version: str
+    producer_contract_sha256: str | None
     model_revision: str | None = None
     weight_manifest_sha256: str | None = None
     levels_completed: int = 0
@@ -101,6 +107,42 @@ class RunMetrics:
     rhae: float | None = None
     termination_reason: str | None = None
     error: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.variant not in {"D", "S", "M", "X"}:
+            raise ValueError("invalid controller variant in run identity")
+        if self.hypothesis_source not in {
+            "qwen",
+            "template_v1",
+            "qwen_then_template_v1",
+        }:
+            raise ValueError("invalid hypothesis source in run identity")
+        expected_arm = arm_label_for(
+            cast(ExperimentVariant, self.variant),
+            cast(HypothesisSource, self.hypothesis_source),
+        )
+        if self.arm_label is None:
+            if self.identity_version == "source-v2":
+                raise ValueError("source-v2 run identity requires an explicit arm_label")
+            self.arm_label = expected_arm
+        elif self.arm_label != expected_arm:
+            raise ValueError(
+                f"arm {self.arm_label} is inconsistent with variant {self.variant} "
+                f"and source {self.hypothesis_source}"
+            )
+        if self.identity_version not in {"legacy-v1", "source-v2"}:
+            raise ValueError("invalid run identity version")
+        if self.identity_version == "legacy-v1" and self.hypothesis_source != "qwen":
+            raise ValueError("legacy-v1 run identity is valid only for Qwen")
+        if self.identity_version == "legacy-v1" and self.producer_contract_sha256 is not None:
+            raise ValueError("legacy-v1 run identity cannot carry a producer contract")
+        if self.producer_contract_sha256 is None:
+            if self.identity_version != "legacy-v1":
+                raise ValueError(
+                    "producer_contract_sha256 is required for source-v2 run identity"
+                )
+        elif not _is_sha256(self.producer_contract_sha256):
+            raise ValueError("producer_contract_sha256 must be a lowercase SHA-256 digest")
 
     def finalize(self, baseline_actions: list[int] | tuple[int, ...] | None = None) -> None:
         self.decision_points = len(self.steps)
@@ -194,6 +236,27 @@ def load_run(summary_path: str | Path, trace_path: str | Path | None = None) -> 
         if TRACE_ARTIFACT_KEY in payload:
             raise ValueError("run summary and trace are incomplete or inconsistent")
     payload.pop(TRACE_ARTIFACT_KEY, None)
+    source_identity_keys = {
+        "hypothesis_source",
+        "arm_label",
+        "identity_version",
+        "producer_contract_sha256",
+    }
+    present_identity_keys = source_identity_keys.intersection(payload)
+    if not present_identity_keys:
+        # Historical summaries predate explicit producer identity. They are
+        # defensibly interpretable only as implicit-Qwen legacy evidence.
+        payload.update(
+            {
+                "hypothesis_source": "qwen",
+                "arm_label": None,
+                "identity_version": "legacy-v1",
+                "producer_contract_sha256": None,
+            }
+        )
+    elif present_identity_keys != source_identity_keys:
+        missing = ", ".join(sorted(source_identity_keys - present_identity_keys))
+        raise ValueError(f"run summary has incomplete source identity: {missing}")
     metrics = RunMetrics(**payload)
     for record in records:
         value = dict(record)
@@ -240,6 +303,7 @@ def evaluate_mechanism_gate(
 
     committee = tuple(committee_runs)
     single = tuple(single_runs)
+    _validate_analysis_cohort((*committee, *single))
     committee_steps = tuple(step for run in committee for step in run.steps)
     single_steps = tuple(step for run in single for step in run.steps)
     decisions = len(committee_steps)
@@ -319,10 +383,23 @@ class DevelopmentGateAnalysis:
     m_mean_rhae: float
 
 
-def evaluate_development_score_gate(runs: Iterable[RunMetrics]) -> DevelopmentGateAnalysis:
+def evaluate_development_score_gate(
+    runs: Iterable[RunMetrics],
+    *,
+    hypothesis_source: str | None = None,
+    treatment_arm: str | None = None,
+    comparator_arm: str | None = None,
+) -> DevelopmentGateAnalysis:
     """Average seeds within games and evaluate the preregistered X-versus-M gate."""
 
-    rows = tuple(runs)
+    rows = _exact_comparison_runs(
+        tuple(runs),
+        treatment_variant="X",
+        comparator_variant="M",
+        hypothesis_source=hypothesis_source,
+        treatment_arm=treatment_arm,
+        comparator_arm=comparator_arm,
+    )
     paired_seed_deltas(
         (
             ScoreObservation(run.game_id, run.seed, run.variant, float(run.rhae))
@@ -381,14 +458,25 @@ def evaluate_confirmation_gate(
     *,
     comparator: str,
     bootstrap_samples: int = 20_000,
+    hypothesis_source: str | None = None,
+    treatment_arm: str | None = None,
+    comparator_arm: str | None = None,
 ) -> ConfirmationGateAnalysis:
     """Evaluate the locked 10-game claim gate after averaging seeds per game."""
 
     if comparator == "X":
         raise ValueError("confirmation comparator must differ from X")
+    rows = _exact_comparison_runs(
+        tuple(runs),
+        treatment_variant="X",
+        comparator_variant=comparator,
+        hypothesis_source=hypothesis_source,
+        treatment_arm=treatment_arm,
+        comparator_arm=comparator_arm,
+    )
     observations = [
         ScoreObservation(run.game_id, run.seed, run.variant, float(run.rhae))
-        for run in runs
+        for run in rows
         if run.variant in {"X", comparator} and run.rhae is not None
     ]
     summary = summarize_paired_observations(
@@ -420,3 +508,99 @@ def _complete_game_variant_runs(
         if variant == variants[0] and (game, variants[1]) in grouped
     }
     return {key: value for key, value in grouped.items() if key[0] in complete}
+
+
+def _exact_comparison_runs(
+    runs: tuple[RunMetrics, ...],
+    *,
+    treatment_variant: str,
+    comparator_variant: str,
+    hypothesis_source: str | None,
+    treatment_arm: str | None,
+    comparator_arm: str | None,
+) -> tuple[RunMetrics, ...]:
+    """Select one exact arm/source contrast and reject ambiguous mixed-source input."""
+
+    relevant = tuple(
+        run
+        for run in runs
+        if run.variant in {treatment_variant, comparator_variant} and run.rhae is not None
+    )
+    if not relevant:
+        return ()
+    if treatment_variant not in {"D", "S", "M", "X"} or comparator_variant not in {
+        "D",
+        "S",
+        "M",
+        "X",
+    }:
+        raise ValueError("invalid controller variant for analysis")
+    observed_sources = {run.hypothesis_source for run in relevant}
+    if hypothesis_source is None:
+        if len(observed_sources) != 1:
+            raise ValueError(
+                "analysis input mixes hypothesis sources; select one exact source and arm pair"
+            )
+        source = next(iter(observed_sources))
+    else:
+        source = hypothesis_source
+        if source not in {"qwen", "template_v1", "qwen_then_template_v1"}:
+            raise ValueError("invalid hypothesis source for analysis")
+    try:
+        expected_treatment_arm = arm_label_for(
+            cast(ExperimentVariant, treatment_variant), cast(HypothesisSource, source)
+        )
+        expected_comparator_arm = arm_label_for(
+            cast(ExperimentVariant, comparator_variant), cast(HypothesisSource, source)
+        )
+    except ValueError as exc:
+        raise ValueError("controller variants do not define a same-source comparison") from exc
+    selected_treatment_arm = treatment_arm or expected_treatment_arm
+    selected_comparator_arm = comparator_arm or expected_comparator_arm
+    if selected_treatment_arm != expected_treatment_arm:
+        raise ValueError("treatment arm is inconsistent with treatment variant and source")
+    if selected_comparator_arm != expected_comparator_arm:
+        raise ValueError("comparator arm is inconsistent with comparator variant and source")
+    selected = tuple(
+        run
+        for run in relevant
+        if run.hypothesis_source == source
+        and (
+            (run.variant == treatment_variant and run.arm_label == selected_treatment_arm)
+            or (run.variant == comparator_variant and run.arm_label == selected_comparator_arm)
+        )
+    )
+    producer_identities = {
+        (run.identity_version, run.producer_contract_sha256) for run in selected
+    }
+    if len(producer_identities) > 1:
+        raise ValueError(
+            "analysis input mixes legacy/current or distinct producer contract identities"
+        )
+    _validate_analysis_cohort(selected)
+    return selected
+
+
+def _validate_analysis_cohort(runs: tuple[RunMetrics, ...]) -> None:
+    """Reject source, producer, model, or per-arm contract pooling."""
+
+    if not runs:
+        return
+    if len({run.hypothesis_source for run in runs}) != 1:
+        raise ValueError("analysis input mixes hypothesis sources")
+    if len({(run.identity_version, run.producer_contract_sha256) for run in runs}) != 1:
+        raise ValueError(
+            "analysis input mixes legacy/current or distinct producer contract identities"
+        )
+    if len({run.model_profile for run in runs}) != 1:
+        raise ValueError("analysis input mixes model profiles")
+    config_hashes_by_arm: dict[str, set[str]] = defaultdict(set)
+    for run in runs:
+        assert run.arm_label is not None
+        config_hashes_by_arm[run.arm_label].add(run.config_hash)
+    if any(len(hashes) != 1 for hashes in config_hashes_by_arm.values()):
+        raise ValueError("analysis input mixes config hashes within an arm")
+
+
+def _is_sha256(value: str) -> bool:
+    return len(value) == 64 and all(character in "0123456789abcdef" for character in value)

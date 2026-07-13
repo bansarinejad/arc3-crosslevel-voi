@@ -12,6 +12,8 @@ from arc3_voi.runner import run_game
 
 from .test_runner import FakeController, FakeSession
 
+PRODUCER_CONTRACT_SHA256 = "a" * 64
+
 
 def _row() -> RunSpec:
     return RunSpec(
@@ -33,6 +35,10 @@ def _metrics(row: RunSpec) -> RunMetrics:
         variant=row.variant,
         model_profile=row.model_profile,
         config_hash=row.config_hash,
+        hypothesis_source=row.hypothesis_source,
+        arm_label=row.arm_label,
+        identity_version=row.identity_version,
+        producer_contract_sha256=PRODUCER_CONTRACT_SHA256,
     )
 
 
@@ -75,6 +81,10 @@ def test_load_run_accepts_legacy_trace_without_split_latency_fields(tmp_path: Pa
     summary_payload.pop(run_store.TRACE_ARTIFACT_KEY)
     summary_payload.pop("controller_decision_seconds")
     summary_payload.pop("environment_step_seconds")
+    summary_payload.pop("hypothesis_source")
+    summary_payload.pop("arm_label")
+    summary_payload.pop("identity_version")
+    summary_payload.pop("producer_contract_sha256")
     summary.write_text(
         json.dumps(summary_payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -103,6 +113,70 @@ def test_load_run_accepts_legacy_trace_without_split_latency_fields(tmp_path: Pa
     assert all(
         step.environment_step_seconds == step.elapsed_seconds for step in loaded.steps
     )
+    assert loaded.hypothesis_source == "qwen"
+    assert loaded.arm_label == "D-Q"
+    assert loaded.identity_version == "legacy-v1"
+    assert loaded.producer_contract_sha256 is None
+
+
+def test_source_v2_identity_round_trips_through_summary(tmp_path: Path) -> None:
+    row = _row()
+    summary, trace = write_run(_metrics(row), tmp_path)
+
+    loaded = load_run(summary, trace)
+
+    assert loaded.hypothesis_source == row.hypothesis_source
+    assert loaded.arm_label == row.arm_label
+    assert loaded.identity_version == "source-v2"
+    assert loaded.producer_contract_sha256 == PRODUCER_CONTRACT_SHA256
+
+
+def test_source_v2_identity_requires_a_producer_contract_digest() -> None:
+    with pytest.raises(ValueError, match="producer_contract_sha256 is required"):
+        RunMetrics(
+            "missing-producer",
+            "g",
+            1,
+            "X",
+            "test",
+            "h",
+            hypothesis_source="qwen",
+            identity_version="source-v2",
+            arm_label="X-Q",
+            producer_contract_sha256=None,
+        )
+
+
+def test_source_v2_identity_requires_an_explicit_arm() -> None:
+    with pytest.raises(ValueError, match="explicit arm_label"):
+        RunMetrics(
+            "missing-arm",
+            "g",
+            1,
+            "X",
+            "test",
+            "h",
+            hypothesis_source="qwen",
+            arm_label=None,
+            identity_version="source-v2",
+            producer_contract_sha256="a" * 64,
+        )
+
+
+def test_legacy_identity_rejects_a_producer_contract_digest() -> None:
+    with pytest.raises(ValueError, match="cannot carry a producer contract"):
+        RunMetrics(
+            "legacy-with-producer",
+            "g",
+            1,
+            "X",
+            "test",
+            "h",
+            hypothesis_source="qwen",
+            arm_label="X-Q",
+            identity_version="legacy-v1",
+            producer_contract_sha256="a" * 64,
+        )
 
 
 def test_write_refuses_to_replace_clean_claim_with_missing_trace(tmp_path: Path) -> None:
