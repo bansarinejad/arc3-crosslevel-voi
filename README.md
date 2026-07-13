@@ -132,6 +132,12 @@ does not contain code from Duck or other competition entries.
   configuration hashes. The separate
   source-v2 matrix is still registration-only pending a clean-commit admission artifact;
   no template gameplay is authorized.
+- Hardened the canonical scene-topology admission harness to bind the registered `X-T`
+  config, emit portable deterministic schema-v2 evidence through an atomic exclusive write,
+  require two eligible graded roles, and require exact Linux `RLIMIT_DATA` +256 MiB worker
+  allocation headroom. Windows diagnostics cannot satisfy that canonical memory gate. A passing report
+  would authorize only the fixed bp35 seed-11 pilot after a template runtime is wired—not
+  the full development matrix.
 - Completed the corrected fair-v2 seed-11 D/S/M/X pilot from one clean post-fix commit.
   It is valid negative engineering evidence: every variant exhausted 256 actions without
   completing a level. The committee retained at least two programs throughout M/X, but its

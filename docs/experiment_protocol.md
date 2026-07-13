@@ -40,6 +40,25 @@ pre-amendment runtime-v2 Qwen matrix is audit-only. The original four-row pilot 
 whose value-to-color mapping disagreed with the official toolkit; it and its manifest are
 retained only as pre-grounding diagnostics and cannot enter any aggregate or claim gate.
 
+### Canonical template-source admission
+
+The scene-topology compiler is audited only with `configs/template_v1_x.yaml`, whose
+semantic configuration SHA-256 is
+`aa33d464cc7cae07607689e351bcbc9aadba61c9990d5150441dc5f31e367708` and therefore
+matches the registered `X-T` arm. The audit rejects any other proposal source or controller
+variant before constructing a worker. Canonical evidence must be produced from a clean
+commit on Linux using `scripts/audit_scene_topology_admission.py`; every selected worker
+must report an enforced `RLIMIT_DATA` hard allocation ceiling exactly 256 MiB above its
+trusted baseline.
+
+The scene-specific overlay additionally requires at least two eligible graded roles. The
+underlying runtime-admission-v2 decision gate still requires at least one action with
+agreement below `0.8`, EVSI at least `0.05`, positive cross-level utility, and non-positive
+myopic utility. A blocked report is retained as negative mechanism evidence. A pass can
+authorize only the frozen bp35 seed-11 S-T/M-T/X-T pilot after an artifact-pinned live
+template producer exists; it cannot unlock the 180-row matrix, and the Qwen path must never
+execute under a template label.
+
 Development uses seeds `11, 23, 47`. Confirmation uses `101, 211, 307, 401, 503` and
 compares `X` only to the strongest development comparator. If projected local compute
 exceeds 80 GPU-hours, the frozen fallback uses the first two and first three seeds.

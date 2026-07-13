@@ -1,0 +1,5 @@
+extends: local_4b.yaml
+
+experiment:
+  variant: X
+  hypothesis_source: template_v1

@@ -352,6 +352,9 @@ def audit_source_batch(
             x_only_probe_actions=planning["x_only_probe_actions"],
         )
         ineligible_selected = sorted(set(selected_ids) - set(eligible_ids))
+        selected_worker_memory = [
+            _persistent_worker_memory_report(hypothesis) for hypothesis in selected
+        ]
         return {
             "programs": [_program_report(item) for item in evaluated],
             "selection": {
@@ -366,6 +369,7 @@ def audit_source_batch(
                 "behavioral_deduplicated_ids": list(deduplicated_ids),
                 "distinct_selected_behavior_classes": len(selected_behavior_signatures),
                 "filter_precedes_persistent_worker_construction": True,
+                "selected_worker_memory": selected_worker_memory,
             },
             "planning": planning,
             "planner_error": planner_error,
@@ -586,6 +590,12 @@ def _optimal_action_sets(snapshot: PlanningSnapshot) -> dict[str, list[str]]:
 
 def _program_report(item: EvaluatedSource) -> dict[str, Any]:
     result = item.result
+    allocation_headroom_bytes = (
+        result.memory_ceiling_bytes - result.memory_baseline_bytes
+        if result.memory_ceiling_bytes is not None
+        and result.memory_baseline_bytes is not None
+        else None
+    )
     return {
         "candidate_index": item.candidate_index,
         "assigned_role": item.assigned_role,
@@ -604,8 +614,39 @@ def _program_report(item: EvaluatedSource) -> dict[str, Any]:
             "action_sensitive": result.action_sensitive,
             "goal_action_conditioned": result.goal_action_conditioned,
         },
+        "grounding_worker_memory": {
+            "hard_limit_enforced": result.hard_memory_limit_enforced,
+            "limit_kind": result.memory_limit_kind,
+            "allocation_headroom_bytes": allocation_headroom_bytes,
+            "diagnostic": result.memory_limit_diagnostic,
+        },
         "ast_nodes": result.ast_nodes,
         "behavior_signature": result.behavior_signature,
+    }
+
+
+def _persistent_worker_memory_report(hypothesis: ExecutableHypothesis) -> dict[str, Any]:
+    metadata = hypothesis.worker_metadata
+    if metadata is None:
+        return {
+            "hypothesis_id": hypothesis.hypothesis_id,
+            "hard_limit_enforced": None,
+            "limit_kind": None,
+            "allocation_headroom_bytes": None,
+            "diagnostic": "persistent worker did not expose startup metadata",
+        }
+    allocation_headroom_bytes = (
+        metadata.memory_ceiling_bytes - metadata.memory_baseline_bytes
+        if metadata.memory_ceiling_bytes is not None
+        and metadata.memory_baseline_bytes is not None
+        else None
+    )
+    return {
+        "hypothesis_id": hypothesis.hypothesis_id,
+        "hard_limit_enforced": metadata.hard_memory_limit_enforced,
+        "limit_kind": metadata.memory_limit_kind,
+        "allocation_headroom_bytes": allocation_headroom_bytes,
+        "diagnostic": metadata.memory_limit_diagnostic,
     }
 
 
