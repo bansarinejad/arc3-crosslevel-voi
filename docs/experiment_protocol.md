@@ -256,3 +256,57 @@ keep all 120 public evaluation tasks untouched, then evaluate them exactly once.
 `K=4` against `K=1` with paired task outcomes, exact accuracy, and exact McNemar analysis.
 This branch can support only a finite-version-space transfer claim. It cannot support an
 active-exploration or ARC-AGI-3 generalization claim. No ARC-AGI-2 result currently exists.
+
+## Action-conditional QBC data-only lockbox freeze — 13 July 2026
+
+The one authorized payload/transform-manifest freeze for
+`action-conditional-outcome-qbc-v1` completed successfully exactly once. It was not rerun.
+The isolated command, executed from the repository root, was:
+
+```powershell
+.venv\Scripts\python.exe -I -S -B scripts/freeze_action_qbc_lockbox.py --reviewed-head 4aae43d2dda05b2b4b9ef2670ef83e3b6a52eb37 --reviewed-generator-source-sha256 7b27e1d06ae26e354edd41aaa9e9889ea80a28b0d3a206aeb7158282d067e72a
+```
+
+It exited `0` with `generation_status=complete`. No registered seed exhausted the fixed
+4,096-attempt cap, no seed was replaced, and the largest accepted attempt index was `5`.
+The frozen identities are:
+
+- Artifact: `artifacts/action_conditional_qbc_v1_lockbox.json`, 47,241,363 bytes, SHA-256
+  `d2e84af6527b1dfe686d3113000e0e0b72925c0a8735228da0d3f3c094975953`.
+- Manifest content SHA-256:
+  `64ede8fcefaeff061f313d79021ad5188a63170aa63d9d0ab824187860e6760b`.
+- Generator contract SHA-256:
+  `fbaa4663ea3d2b47bc6ec2e2ba1f68b4c717f63f19e6538b270a4c77339a0b74`.
+- Generator source commit: `4aae43d2dda05b2b4b9ef2670ef83e3b6a52eb37`.
+- Generator source SHA-256:
+  `7b27e1d06ae26e354edd41aaa9e9889ea80a28b0d3a206aeb7158282d067e72a`.
+- Freeze-wrapper SHA-256:
+  `48cf89a2ee978a1ccc3100daa5ed9d50fd4e8a5680395b5172ef27c2969a89b0`.
+
+The twelve registered scene identities, in frozen family/index order, are:
+
+| Family/index | Seed | Scene content SHA-256 |
+|---|---|---|
+| homologue/0 | `a6eecedee22d2645` | `26f7cb5b3ce50ab49981455f0f7e45004ceaa463263d09cb0d17df147297cf5c` |
+| homologue/1 | `68620ddc81520133` | `914ce456ce4f071a8650537fe39332fbe17c078006a909cd26360e8069cab596` |
+| homologue/2 | `e98ab12bef9e01ec` | `c53e1f83a31df8506c77a7fd3fcb3014738cdeecbc75d3830ff1596b49904a95` |
+| homologue/3 | `3c03b39042f011e4` | `9bd4d200c2c475ab306b6df86e62255129ca1b85018f2a484c1fae48744561a4` |
+| containment/0 | `550e3657aac91e86` | `8907e639b690a20baabc650ffc2e24e4688fe3e50b418a9d52675673ba4ee702` |
+| containment/1 | `7fd12591ea73ce88` | `101016c2c897873b16cca7069f8453b5630f7ce6a499ae12674b661f133ec6a6` |
+| containment/2 | `a957290ff6df8e67` | `b273835ef0d558099d261462167c26e65d80d5ac84e4032d09d7b9e805161da0` |
+| containment/3 | `9a4897ce5e703365` | `0cc350ac3d0734f52c6b2cf42d760069cfcbfa1192f52c1746c0b27be0a7237c` |
+| reflection/0 | `bb2215d4d6f787ec` | `34d4911cca4bbbbdd16468c8244f6c779e15232aebdc57d2d6ee8d2205f257bd` |
+| reflection/1 | `40e8287ce4331712` | `57cce7ab8c518b70db36369e795333160aee039e2a178562f69ab9848dd9d7b0` |
+| reflection/2 | `ed9659c3935c6429` | `fac77cdd7243537670ab805e4b71ce9a36c69f4bd6552844da0ed12c4fa0c209` |
+| reflection/3 | `343710325836c643` | `1b4b3c20020ffd61a20f592fb4e5c2f4728eb3b275afe1eaf7bc1cc12107b3e3` |
+
+The top-level manifest hash transitively pins all 48 visual transforms, 96 explicit
+cell/action maps, and five order-transform tables. Independent read-only checks verified
+canonical UTF-8/LF JSON, the closed schema, all 174 nested content hashes, transform/map
+semantics, PRNG telemetry, provenance, and exact registered seed derivation.
+
+This data-only stage ran no compiler, candidate builder, planner, controller, hypothesis,
+model, GPU, environment, reward/RHAE observation, EVSI/utility calculation, pass label, or
+other scientific diagnostic. The generator and wrapper are now permanently frozen. This
+record authorizes only runtime-v5 implementation and open-fixture tests at the next stage;
+it does not authorize a sealed audit, model call, gameplay pilot, or matrix row.
