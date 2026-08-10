@@ -1,11 +1,19 @@
 # Preregistered action-QBC v8 bounded-verification replication amendment
 
-Date frozen: 11 August 2026 (Australia/Sydney)
+Original freeze: 11 August 2026 (Australia/Sydney)
 
-Status: protocol written after the canonical v7 administrative terminal and the fully
-disclosed connectivity and line-ending audits below, but before any v8 source, registration,
-payload, scientific result, remote-verification claim or receipt, execution root, or
-scientific process exists.
+Binding correction: 11 August 2026 (Australia/Sydney)
+
+Status: the original protocol was written after the canonical v7 administrative terminal
+and the fully disclosed connectivity and line-ending audits below, but before any v8 source,
+registration, payload, scientific result, remote-verification claim or receipt, execution
+root, or scientific process existed. During pre-O8 implementation, after administrative
+source authoring and static/synthetic checks but before staging, registration generation,
+O8, any v8 claim or receipt, any execution root, or any scientific process, a read-only host
+probe established the exact `uv --version` bytes disclosed in section 2.2. This binding
+correction changes only that administrative expected stdout and the preregistration
+tag/ancestry identities needed to bind the correction. It does not change any scientific
+function, datum, selector, tolerance, dependency, deadline, payload field, or analysis rule.
 
 ## 1. Purpose, identity, and non-repair boundary
 
@@ -62,6 +70,15 @@ replaced, deleted, backfilled, or adopted by v8.
 
 ### 2.1 Immutable anchors
 
+The superseded original v8 preregistration commit `P8v1` is
+`ebf6031a284ecbffb53ba1582124b7e4c9eb3e56`, tagged
+`prereg-action-qbc-v8-open-bounded-remote-verification-v1`. It is a one-file direct child of
+R7. No v8 registration, O8 commit, lifecycle claim, receipt, execution root, payload, or
+scientific process was created under P8v1. The binding corrected preregistration commit
+`P8` is its one-file direct child and is tagged
+`prereg-action-qbc-v8-open-bounded-remote-verification-v2`. P8v1 remains immutable and is
+superseded before execution; all executable v8 identities below bind P8 and the v2 tag.
+
 V8 starts from the canonical v7 result commit:
 
 - v7 result commit `R7`:
@@ -116,6 +133,16 @@ Before this amendment:
    byte count and SHA-256. The Git blobs and v7 registration were correct; the v7 finalizer
    incorrectly treated raw Windows materialization as committed identity and then discarded
    otherwise validated identities.
+6. During the pre-O8 read-only Linux host preflight, the registered
+   `/usr/local/bin/uv` executable matched its frozen SHA-256 but the exact argv
+   `["/usr/local/bin/uv","--version"]` emitted exactly the 38 stdout bytes
+   `uv 0.11.28 (x86_64-unknown-linux-gnu)\n`, whose SHA-256 is
+   `1ae3f57a778978567c8f62ab8cf9c9996827edff4fa7f011148c45af5f4ba2f2`, not the
+   shorter stdout written in P8v1. All other registered Linux tool hashes passed. The
+   mismatch was found before any O8 staging, registration generation, v8 execution root,
+   execution-phase remote-verification query, claim, receipt, or scientific process. P8v1
+   could not pass its registered preparation preflight, so this one-file binding correction
+   was required before O8.
 
 These observations fix only administrative design. No v8 outcome has been observed, no v8
 extension scene has been evaluated, and no result-dependent choice is permitted after P8.
@@ -180,7 +207,7 @@ displayed occurrence counts. No other byte may change.
 
 | Count | Old bytes | New bytes |
 |---:|---|---|
-| 1 | `prereg-action-qbc-v7-open-failure-decomposition-v1` | `prereg-action-qbc-v8-open-bounded-remote-verification-v1` |
+| 1 | `prereg-action-qbc-v7-open-failure-decomposition-v1` | `prereg-action-qbc-v8-open-bounded-remote-verification-v2` |
 | 1 | `action-qbc-v7-open-failure-decomposition-v1` | `action-qbc-v8-open-failure-decomposition-bounded-verification-v1` |
 | 1 | `crosslevel-voi-open-diagnostic-v7` | `crosslevel-voi-open-diagnostic-v8` |
 | 1 | `action-qbc-v7-boundary-compound-selector-decomposition-v1` | `action-qbc-v8-v7-mathematics-identity-replication-v1` |
@@ -276,9 +303,11 @@ permits a second producer call.
 The v8 payload never writes a v7 path and cannot backfill the v7 result. V8 authorization is
 false even if every scientific row completes or reconciles.
 
-## 5. P8-to-O8 source boundary
+## 5. Corrected-P8-to-O8 source boundary
 
-P8 is a direct child of R7 and contains only this document. No other P8 path may differ.
+P8v1 is a direct child of R7 and contains only the original version of this document. The
+binding P8 is a direct child of P8v1 and modifies only this document with the disclosed
+administrative correction. Across both commits, no other preregistration path may differ.
 
 O8 is a direct child of P8. No path present at P8 may be modified, renamed, or deleted. The
 only paths added at O8 are exactly:
@@ -310,7 +339,7 @@ The exact pre-O producer and reconstructor argv arrays are:
 
 ```json
 [
-  ["uv","run","--frozen","--extra","dev","python3","-I","-B","scripts/build_action_qbc_v8_open_registration.py","--repository-root",".","--preregistration-tag","prereg-action-qbc-v8-open-bounded-remote-verification-v1","--output","artifacts/action_qbc_v8_open_registration.json"],
+  ["uv","run","--frozen","--extra","dev","python3","-I","-B","scripts/build_action_qbc_v8_open_registration.py","--repository-root",".","--preregistration-tag","prereg-action-qbc-v8-open-bounded-remote-verification-v2","--output","artifacts/action_qbc_v8_open_registration.json"],
   ["uv","run","--frozen","--extra","dev","python3","-I","-B","scripts/reconstruct_action_qbc_v8_open_registration.py","--repository-root",".","--registration","artifacts/action_qbc_v8_open_registration.json"]
 ]
 ```
@@ -656,7 +685,8 @@ order:
 ```
 
 Expected stdout is respectively empty, `<O8_COMMIT>\n`, `Python 3.12.13\n`,
-`uv 0.11.28\n`, and the reconstructor's registered canonical verification record.
+`uv 0.11.28 (x86_64-unknown-linux-gnu)\n`, and the reconstructor's registered canonical
+verification record.
 
 After the sole preparation process returns and before any supervisor command, authority
 invokes this exact read-only independent gate once:
@@ -1537,8 +1567,11 @@ the Windows lifecycle claim was created and the registered driver reaches bundle
 publication. A preclaim or exogenous driver-process failure explicitly stops at O8 as
 section 7 states and cannot be described as an R8 result.
 
-1. P8 is the direct child of R7 and adds only this document. Its lightweight tag is
-   `prereg-action-qbc-v8-open-bounded-remote-verification-v1`.
+1. P8v1 is the direct child of R7 and adds only the original version of this document. The
+   binding P8 is the direct child of P8v1 and modifies only this document with the disclosed
+   pre-O8 administrative correction. Its lightweight tag is
+   `prereg-action-qbc-v8-open-bounded-remote-verification-v2`; the immutable v1 tag remains
+   solely as the superseded audit trail.
 2. O8 is the direct child of P8 and adds only the fifteen paths in section 5. Its lightweight
    tag is `action-qbc-v8-open-diagnostic-freeze-v1`.
 3. R8 is the direct child of O8 and adds only one path set from section 9. Its lightweight
