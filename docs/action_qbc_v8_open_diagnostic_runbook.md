@@ -1,0 +1,517 @@
+# Action-QBC v8 open diagnostic runbook
+
+This runbook operationalizes the frozen v8 amendment through its P8v7
+consumed-lifecycle recovery. The preregistration documents are authoritative when this
+summary and the protocol differ. Historical O8v1 stopped before bootstrap after its sole
+anonymous check failed because the repository was PRIVATE. Historical O8v2 was constructed,
+published, made PUBLIC, and successfully verified by its sole anonymous check, then stopped
+before bootstrap when a read-only audit found the runner's non-schema manifest-key lookup.
+O8v3 was published and anonymously verified, then consumed its lifecycle before science;
+its immutable evidence and three administrative contradictions are recorded below. O8v1,
+O8v2, O8v3, and every historical freeze remain immutable and may not be retried or executed.
+V8 is an open public-fixture replication, not a lockbox, runtime-admission, leaderboard, or
+positive-mechanism experiment.
+
+## Immutable identities
+
+- Binding preregistration commit: `15059c482d9e463f01cb31fdfd33c96d1f60db0a`
+- Binding preregistration tree: `96469ca9ee018cd32f99955df1ded57af12a8abc`
+- Preregistration tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v7`
+- Preregistration document SHA-256:
+  `f729904367dd7a2664ecd3fdfe4893841326668fbe892b3b733926ad7840745d`
+- Preregistration document:
+  `docs/experiment_amendment_2026-08-18_action_qbc_v8_open_bounded_remote_verification_v7_consumed_lifecycle_recovery.md`
+- Preregistration document Git blob: `c0cda2417bd98a42b76e8e1bbdee4cec01dd68f9`
+- Preregistration document byte count: `37552`
+- P8v6 lineage anchor: `61cebe90a2f4f7c78ec45119de53a482ed13a655`
+- P8v6 tree: `65695876c44eeb8cac5437149384071f88ff6018`
+- P8v6 lightweight tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v6`
+- Historical O8v3 commit: `5725395a850627fae10e8bb8b27083ccf63b6ec7`
+- Historical O8v3 tree: `7d38de8f5cec16cab92c9d3b757a218e8e490272`
+- Immutable historical O8v3 tag: `action-qbc-v8-open-diagnostic-freeze-v3`
+- P8v5 lineage anchor: `09f9caea346866a1acf35c20e0c9d937096b5ce3`
+- P8v5 tree: `47a978cdd887fd6dc1cb5e80e36aa3e0a5a29253`
+- P8v5 lightweight tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v5`
+- Historical O8v2 commit: `8da637a47de0c88f917f222e52e54b342d729be9`
+- Historical O8v2 tree: `247eba59e1e2ac9b0611c0e361de945dae0f2dc8`
+- Immutable historical O8v2 tag: `action-qbc-v8-open-diagnostic-freeze-v2`
+- P8v4 lineage anchor: `e0bff9ffc185196cafa938c8f7c9a7186366258b`
+- P8v4 lightweight tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v4`
+- Historical O8v1 commit: `7685fbdccd41702216b3a3f06d2a0ac699aca7ec`
+- Historical O8v1 tree: `9b9ad5ba986afacbcdb1fde3cd69e0f1c94efdf2`
+- Immutable historical O8v1 tag: `action-qbc-v8-open-diagnostic-freeze-v1`
+- P8v3 direct parent: `996ab2bb5a24143a110673977f63e7d111cf2060`
+- P8v3 lightweight tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v3`
+- P8v2 direct parent: `91c5ba1862fc7701ed2276ddd64b99fdb8b7ad1d`
+- P8v2 lightweight tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v2`
+- Original P8v1 ancestry anchor: `ebf6031a284ecbffb53ba1582124b7e4c9eb3e56`
+- Original P8v1 lightweight tag:
+  `prereg-action-qbc-v8-open-bounded-remote-verification-v1`
+- Frozen R7 parent of P8v1: `6f918e098a9ea97cadbb377027a8eb5caeb9589b`
+- Open-freeze tag: `action-qbc-v8-open-diagnostic-freeze-v4`
+- Result branch: `action-qbc-v8-open-diagnostic-result`
+- Result tag: `action-qbc-v8-open-diagnostic-result-v4`
+- Original Windows checkout: `D:\kaggle competitions\arc3-crosslevel-voi`
+- Explicit WSL distribution: `Ubuntu`
+- Linux execution root: `/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4`
+
+Record the eventual O8v4 commit before any execution command. Every command below is a
+single-use command unless the text explicitly calls it publication-only recovery.
+
+The historical O8v1 atomic publication succeeded, then its one credential-disabled
+anonymous command was invoked once and failed solely because the repository was PRIVATE.
+That invocation returned exit code 128, zero stdout bytes (SHA-256
+`e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`), and exactly 83
+ASCII stderr bytes with a final LF (SHA-256
+`2e554a39e2bb4414b5e2c3f5a90ebc87b405b5b8231d692704ec6df4580e8f60`):
+`fatal: could not read Username for 'https://github.com': terminal prompts disabled\n`.
+No O8v1 bootstrap, execution root, claim, receipt, science, result object, or result ref
+exists. This disclosure neither repairs nor authorizes a second check of O8v1.
+
+Historical O8v2's one-shot atomic publication and sole PRIVATE-to-PUBLIC transition both
+succeeded. Its sole credential-disabled anonymous check then returned exit code 0, empty
+stderr, and exactly two LF-terminated ASCII records (164 bytes; SHA-256
+`f83b6bd5dfe2dd611a8150559700dd34a3e492c34e14e119d155810c00bdd568`): the branch and
+freeze-v2 tag, each once at `8da637a47de0c88f917f222e52e54b342d729be9`. No O8v2
+bootstrap command, execution root, claim, receipt, preparation, lifecycle, science, result
+object, or result ref exists. The repository has remained PUBLIC. This disclosure neither
+repairs nor authorizes a second check of O8v2.
+
+Historical O8v3 was constructed from P8v6 as exact A15, published to the already-PUBLIC
+repository, and successfully verified by its sole credential-disabled anonymous check. The
+check returned two 164-byte LF-terminated records at
+`5725395a850627fae10e8bb8b27083ccf63b6ec7`, empty stderr, and stdout SHA-256
+`a64dec2a14b7be5d8da218f86a4c438fbbbc0273f8d9979f9c38b2ade6e1cdbf`. It is consumed.
+
+O8v3 then used the old unsuffixed execution and Windows namespaces. Its preparation and
+verification succeeded. The Windows verifier produced a canonical failed receipt with zero
+attempts. The mandatory Linux lifecycle stopped before science, retained a canonical
+emergency bundle, and could not publish because the registered timeout wrapper could not
+equal the child-visible argv. A later publication-only invocation reproduced that refusal.
+No scientific start/import, payload, normal bundle, result Git owner/work root, R8 object,
+result branch, or action-QBC v8 result-v3 tag exists.
+
+The old Linux evidence remains immutable at these exact mode/SHA-256 pairs:
+
+```text
+0444 b3540fa1bf09dd6303bdef36001faa475002b9a03128a3602b19535689de026b preparation-receipt.json
+0600 6173dc587efc3d0a1137920ef49885a2b7c4b7cac81288f3c879c4074bda2ff3 preparation-verification.json
+0444 2987fbf1ddc5cbf2627cfade7aafea2251469795be0e2ff525da8ddc8758c253 remote-verification-claim.json
+0444 6fbdfd70d415054bae9f67272f2f0b65dd4ce5873efef5dee46b2e541f098755 remote-verifier-start-claim.json
+0444 2f0098f7c85329aad149bdb99293f975e85ee35a8e45aab46d6dcf60072fa862 remote-verification.json
+0444 6d14c0fe64a7fa7657060abc769c0f272d7b5f03b54338459aa97d3a0b6bacb5 remote-verification-supervisor.json
+0444 0e34660892ac03f8bd52fe6713ea5e737731559fdaf2533684aac20822e32544 arm-receipt.json
+0600 5d8b75eb28d0bf2397c1a8a8504999da6fb43a1ea2b94ed9468d233d986b94d4 lifecycle-driver-claim.json
+0600 87d89b6371cc3dc7736c469632010ed1f4051e165ae0dc88165ca842491711f0 lifecycle-ledger.json
+0600 097c92383e19a91cc2447afbcca3946cae16690743783863b29eb4a2aa21584c emergency-result-bundle.json
+```
+
+The four original Windows artifacts are the matching claim/start/remote/supervisor bytes,
+with sizes 804/488/2419/1091. No old file is an O8v4 input and no old path may be chmodded,
+copied as a substitute, deleted, or retried.
+
+O8v4 freezes exactly three administrative fixes. First, the verifier publishes and
+validates its exclusive start claim before taking the repository/ancestor snapshot; every
+mutation after that snapshot still fails closed. Second, one exhaustive expected-mode map
+requires exact `0444` for the preparation receipt, four copied remote artifacts, and arm
+receipt, and exact `0600` for the fourteen private local roles. Unknown roles, aliases,
+wrong modes, links, wrong owners, multiple links, changing files, or oversized evidence
+fail closed. Third, the publisher's one registered 23-token argv retains the exact
+four-token GNU-timeout prefix, while publisher `main()` compares only its derived 19-token
+child-visible suffix. Unwrapped publication remains forbidden.
+
+The registration schema, its exact 70-key execution contract, all receipt/claim/payload/
+bundle schemas, 140 scientific rows, scenes, transforms, resources, limits, and all five
+false authorization Booleans remain unchanged. P8v7 has exactly 233 recursive tree entries;
+O8v4 must have 248. The authority plan is exactly 54 rows and every preparation attempt plan
+is exactly 54 rows, so one successful first attempt has 108 ledger rows.
+
+## Threat model and timing
+
+The protocol detects accidental, partial, stale, cross-run, symlink/path-replacement,
+inherited-configuration, duplicate-start, timeout, and crash-residue failures at its stated
+check points. It does not claim protection from root/admin, a malicious process with the
+same UID that coherently rewrites bytes and hashes between checks, kernel/tool compromise,
+SHA collision, malicious clocks, power loss beyond documented fsync semantics, or remote
+service compromise. Independent verification means a separate standard-library
+implementation recomputes current bytes; it is not a separate trust principal or proof of
+historical execution.
+
+All recorded durations are actual, unclamped monotonic intervals. Windows verifier live
+admission ends at `V+390s`, its forced cleanup at `V+420s`, and receipt work targets
+`V+430s`. The supervisor's immutable main-entry epoch dominates child control at `S+430s`,
+cleanup at `S+460s`, and receipt work at `S+480s`. The Linux driver uses one immutable
+main-entry epoch, stops new science at `D0+7200s`, and ends at `D0+8400s`. These are
+admission/cleanup targets, not claims that blocking filesystem operations can be
+interrupted at an exact nanosecond. For `n` persisted remote attempts, validation requires
+exactly `total_duration_milliseconds >= sum(attempt.duration_milliseconds) +
+15000*max(0,n-1)`; there is no per-attempt flooring addition, clamp, or upper bound.
+
+## 1. Build and freeze O8v4
+
+Perform all pre-O8v4 construction and gates in Ubuntu against the original checkout. The
+launcher is `wsl.exe -d Ubuntu --cd 'D:\kaggle competitions\arc3-crosslevel-voi'` and its
+resulting WSL cwd must be exactly
+`/mnt/d/kaggle competitions/arc3-crosslevel-voi`. Do not run the producer, reconstructor,
+tests, Ruff, or mypy as PowerShell-native or Windows-native processes, and do not place an
+inner command in a PowerShell command string. Pass every member as a distinct argv token.
+
+The exact outer prefix for each of the five inner argv arrays below is:
+
+```json
+["C:\\Windows\\System32\\wsl.exe","-d","Ubuntu","--cd","D:\\kaggle competitions\\arc3-crosslevel-voi","--","/usr/bin/env","-i","GIT_CONFIG_COUNT=0","GIT_CONFIG_GLOBAL=/dev/null","GIT_CONFIG_NOSYSTEM=1","GIT_NO_REPLACE_OBJECTS=1","GIT_TERMINAL_PROMPT=0","HOME=/home/bansarinejad","LANG=C","LC_ALL=C","PATH=/usr/local/bin:/usr/bin:/bin","PYTHONDONTWRITEBYTECODE=1","PYTHONHASHSEED=0","PYTHONNOUSERSITE=1","TZ=UTC","UV_CACHE_DIR=/home/bansarinejad/.cache/uv","UV_NO_PROGRESS=1","UV_OFFLINE=1","UV_PROJECT_ENVIRONMENT=.venv-wsl","UV_PYTHON_DOWNLOADS=never","XDG_CONFIG_HOME=/nonexistent","<INNER_ARGV...>"]
+```
+
+Replace only the final placeholder by appending the members of one inner array; the array
+is not embedded as one string. The operational pre-O8v4 environment is constructed from an
+empty mapping and has exactly this nineteen-member object:
+
+```json
+{"GIT_CONFIG_COUNT":"0","GIT_CONFIG_GLOBAL":"/dev/null","GIT_CONFIG_NOSYSTEM":"1","GIT_NO_REPLACE_OBJECTS":"1","GIT_TERMINAL_PROMPT":"0","HOME":"/home/bansarinejad","LANG":"C","LC_ALL":"C","PATH":"/usr/local/bin:/usr/bin:/bin","PYTHONDONTWRITEBYTECODE":"1","PYTHONHASHSEED":"0","PYTHONNOUSERSITE":"1","TZ":"UTC","UV_CACHE_DIR":"/home/bansarinejad/.cache/uv","UV_NO_PROGRESS":"1","UV_OFFLINE":"1","UV_PROJECT_ENVIRONMENT":".venv-wsl","UV_PYTHON_DOWNLOADS":"never","XDG_CONFIG_HOME":"/nonexistent"}
+```
+
+This is an operational build/gate environment, not the registered seventeen-key
+`preparation_command_environment`. In particular, `PATH`, `UV_OFFLINE`, and
+`UV_PROJECT_ENVIRONMENT` distinguish it from preparation. The real DrvFS checkout must use
+`.venv-wsl`; it must not let `uv run` discover, reinterpret, or replace the Windows `.venv`.
+A disposable ext4 rehearsal clone may use its own `.venv` instead. In both cases the
+environment directory is ignored, untracked operator tooling: neither rehearsal nor real
+O8v4 tree, index, manifest, registration, or commit identity may depend on its bytes.
+
+When a disposable ext4 rehearsal is populated from a raw DrvFS snapshot, first copy the
+exact bytes and record every source file's SHA-256 and byte count. Before `git add`, normalize
+every one of the fourteen ordinary source files to filesystem mode `0644`; equivalently, the
+rehearsal may stage each already verified exact blob with cacheinfo mode `100644`. Reopen all
+fourteen files after normalization, recompute SHA-256 and byte count, and require exact
+equality with the pre-normalization records before continuing. The rehearsal index must then
+report mode `100644` for all fourteen staged entries.
+
+This mode normalization applies only to the disposable ext4 materialization. It must not
+change the authoritative DrvFS checkout: its raw source bytes remain untouched. The real
+DrvFS index must independently report mode `100644` for each of the same fourteen paths;
+rehearsal normalization is not evidence for, or a repair of, the real index.
+
+Before producing the registration, stage all and only these exact fourteen
+non-registration additions:
+
+```text
+docs/action_qbc_v8_open_diagnostic_runbook.md
+scripts/build_action_qbc_v8_open_registration.py
+scripts/execute_action_qbc_v8_open_lifecycle.py
+scripts/finalize_action_qbc_v8_open_diagnostic.py
+scripts/prepare_action_qbc_v8_open.py
+scripts/reconstruct_action_qbc_v8_open_registration.py
+scripts/run_action_qbc_v8_open_diagnostic.py
+scripts/supervise_action_qbc_v8_remote_tag.py
+scripts/validate_action_qbc_v8_open_payload.py
+scripts/verify_action_qbc_v8_remote_tag.py
+src/arc3_voi/action_qbc_v8_audit.py
+tests/test_action_qbc_v8_audit.py
+tests/test_action_qbc_v8_lifecycle.py
+tests/test_action_qbc_v8_registration.py
+```
+
+The producer then generates the sole fifteenth addition:
+
+```text
+artifacts/action_qbc_v8_open_registration.json
+```
+
+Before the producer, the index must contain exactly the fourteen listed paths as additions;
+after generation and staging it must contain exactly the fifteen listed paths as additions.
+At both points every entry must be an ordinary stage-zero entry with the expected path,
+mode, and blob ID. Reject unmerged stages, split-index/link extensions, every
+`.git/sharedindex.*` entry, sparse-index directory entries, sparse-checkout state,
+`skip-worktree`, `assume-unchanged`, and every other nonordinary cache-entry flag. The
+worktree may have no filtered tracked-byte change and no untracked path other than the
+ignored environment directory appropriate to the checkout.
+
+Invoke the exact producer once:
+
+```json
+["uv","run","--frozen","--extra","dev","python3","-I","-B","scripts/build_action_qbc_v8_open_registration.py","--repository-root",".","--preregistration-tag","prereg-action-qbc-v8-open-bounded-remote-verification-v7","--output","artifacts/action_qbc_v8_open_registration.json"]
+```
+
+Stage the generated registration, then invoke the exact reconstructor once:
+
+```json
+["uv","run","--frozen","--extra","dev","python3","-I","-B","scripts/reconstruct_action_qbc_v8_open_registration.py","--repository-root",".","--registration","artifacts/action_qbc_v8_open_registration.json"]
+```
+
+Run the exact three frozen gate arrays once each, in this order:
+
+```json
+["uv","run","--frozen","--extra","dev","pytest","-q","tests/test_action_qbc_v7_audit.py","tests/test_action_qbc_v8_audit.py","tests/test_action_qbc_v8_lifecycle.py","tests/test_action_qbc_v8_registration.py"]
+["uv","run","--frozen","--extra","dev","ruff","check","src/arc3_voi/action_qbc_v8_audit.py","scripts/build_action_qbc_v8_open_registration.py","scripts/execute_action_qbc_v8_open_lifecycle.py","scripts/finalize_action_qbc_v8_open_diagnostic.py","scripts/prepare_action_qbc_v8_open.py","scripts/reconstruct_action_qbc_v8_open_registration.py","scripts/run_action_qbc_v8_open_diagnostic.py","scripts/supervise_action_qbc_v8_remote_tag.py","scripts/validate_action_qbc_v8_open_payload.py","scripts/verify_action_qbc_v8_remote_tag.py","tests/test_action_qbc_v8_audit.py","tests/test_action_qbc_v8_lifecycle.py","tests/test_action_qbc_v8_registration.py"]
+["uv","run","--frozen","--extra","dev","mypy","--strict","src/arc3_voi/action_qbc_v8_audit.py"]
+```
+
+Do not run `--verify-open-freeze` during this construction sequence. Its placement remains
+unchanged in section 3: it runs from the detached authority clone only after the one-shot
+authority bootstrap.
+
+If the producer, reconstructor, an index/flag check, or any frozen gate fails, times out, or
+observes unexpected bytes, stop the one-shot freeze immediately. Do not run a later array,
+regenerate the registration, rerun a failed array, commit O8v4, create its tag, publish refs,
+bootstrap, or start any v8 process. Preserve the evidence and preregister any corrected
+attempt; a partial or failed sequence is not O8v4.
+
+Only after every check passes, commit all and only the fifteen additions as the direct child
+of P8v7 and create the new lightweight
+`action-qbc-v8-open-diagnostic-freeze-v4` tag at that exact O8v4 commit. The immutable
+freeze-v1, freeze-v2, and freeze-v3 tags remain at O8v1, O8v2, and O8v3; action-QBC v8
+result-v1, result-v2, and result-v3 remain absent. The repository is already PUBLIC and must remain PUBLIC. No visibility invocation,
+visibility query, or visibility mutation is authorized by this runbook.
+
+P8v7 was published first, after its local commit audit, by this exact one-shot non-force
+atomic Windows Git invocation:
+
+```json
+["C:\\Users\\User\\anaconda3\\Library\\bin\\git.exe","--no-replace-objects","--no-optional-locks","-C","D:\\kaggle competitions\\arc3-crosslevel-voi","push","--atomic","origin","refs/heads/action-qbc-v8-prereg:refs/heads/action-qbc-v8-prereg","refs/tags/prereg-action-qbc-v8-open-bounded-remote-verification-v7:refs/tags/prereg-action-qbc-v8-open-bounded-remote-verification-v7"]
+```
+
+After the exact O8v4 post-commit audit passes, use one non-force atomic push of the existing
+branch and new freeze-v4 tag from the original Windows checkout:
+
+```json
+["C:\\Users\\User\\anaconda3\\Library\\bin\\git.exe","--no-replace-objects","--no-optional-locks","-C","D:\\kaggle competitions\\arc3-crosslevel-voi","push","--atomic","origin","refs/heads/action-qbc-v8-prereg:refs/heads/action-qbc-v8-prereg","refs/tags/action-qbc-v8-open-diagnostic-freeze-v4:refs/tags/action-qbc-v8-open-diagnostic-freeze-v4"]
+```
+
+Each push is single-use and is never retried under this preregistration. A failed,
+non-atomic, ambiguous, or unexpected result stops the sequence. No visibility operation,
+connectivity probe, browser action, API query, authenticated-ref query, SSH query, anonymous
+ref query, or other network action may occur between the P8v7 push and O8v4 push or between
+the O8v4 push and the following sole check. Necessary transport interaction by the two
+registered pushes is not a separate query.
+
+After successful O8v4 atomic publication, the next protocol network action is one
+independent, credential-disabled read of the literal public HTTPS URL from neutral WSL cwd
+`/mnt/d/kaggle competitions` using an empty environment:
+
+```json
+["C:\\Windows\\System32\\wsl.exe","-d","Ubuntu","--cd","D:\\kaggle competitions","--","/usr/bin/env","-i","GIT_CONFIG_COUNT=0","GIT_CONFIG_GLOBAL=/dev/null","GIT_CONFIG_NOSYSTEM=1","GIT_NO_REPLACE_OBJECTS=1","GIT_TERMINAL_PROMPT=0","HOME=/home/bansarinejad","LANG=C","LC_ALL=C","PATH=/usr/local/bin:/usr/bin:/bin","XDG_CONFIG_HOME=/nonexistent","/usr/bin/git","--no-replace-objects","-c","credential.interactive=never","-c","core.askPass=","-c","credential.helper=","ls-remote","--refs","https://github.com/bansarinejad/arc3-crosslevel-voi.git","refs/heads/action-qbc-v8-prereg","refs/tags/action-qbc-v8-open-diagnostic-freeze-v4"]
+```
+
+Parse stdout as records, not presentation order. Its exact set must be the two requested
+refs, each once at the same recorded lowercase 40-hex O8v4 commit; stderr must be empty and no
+peeled or additional record is accepted. Neither atomic push nor this independent read-only
+check is a frozen scientific command, a remote-rehearsal query, or authorization to embed an
+authentication token, password, askpass program, or other secret. Failure stops before
+bootstrap and consumes the sole O8v4 check; it is never retried. Do not execute a v8
+supervisor, verifier, lifecycle driver, runner, validator, or finalizer until the exact
+two-ref check passes.
+
+## 2. Read-only host preflight
+
+Use only the interactive Windows user context. Verify the registered raw hashes and
+versions for `wsl.exe`, Windows Python, Windows Git, `taskkill.exe`, Ubuntu, the kernel, and
+all seven Linux tools. Every Windows-to-Linux command must have this outer form:
+
+```json
+["C:\\Windows\\System32\\wsl.exe","-d","Ubuntu","--cd","<REGISTERED_LINUX_CWD>","--","<INNER_ARGV...>"]
+```
+
+The observed default WSL distribution is not an authorization. Bare `wsl.exe` is
+forbidden. Any mismatch stops v8 before bootstrap and requires a new preregistration.
+The exact registered `uv --version` stdout is
+`uv 0.11.28 (x86_64-unknown-linux-gnu)\n`; the platform suffix and final LF are binding.
+The exact registered Linux Git identity is `/usr/bin/git`, SHA-256
+`2a8c18fbf43da9f692d75474c72bea9dfd796c260b0f3dfe456376abc3bbd668`, with version
+stdout `git version 2.43.0\n`. Its realpath remains `/usr/bin/git`; the corrected hash is an
+observed administrative identity correction and does not expand the registration schema.
+
+## 3. One-shot authority bootstrap
+
+From explicit Ubuntu with cwd `/var/tmp`, execute the registered bootstrap argv arrays in
+order. They require the fresh v4 execution root to be absent, create it and the authority destination
+mode 0700, clone the O8v4 tag from the fixed local `file:///mnt/d/...` URL, check out detached
+O8v4 as untrusted materialization, remove `origin`, install the exact closed seven-key local
+Git mapping, rerun raw validation with replacement objects disabled, and print only the
+expected O8v4 SHA.
+
+Pass these arrays directly, in order, without shell retokenization; replace only the
+registered `<O8_COMMIT>` placeholder with the recorded O8v4 SHA:
+
+```json
+["/usr/bin/test","!","-e","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4"]
+["/usr/bin/install","-d","-m","700","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4"]
+["/usr/bin/install","-d","-m","700","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority"]
+["/usr/bin/git","--no-replace-objects","clone","--no-local","--no-checkout","--branch","action-qbc-v8-open-diagnostic-freeze-v4","--single-branch","file:///mnt/d/kaggle%20competitions/arc3-crosslevel-voi","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority"]
+["/usr/bin/git","--no-replace-objects","-C","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","config","--local","core.autocrlf","false"]
+["/usr/bin/git","--no-replace-objects","-C","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","config","--local","core.eol","lf"]
+["/usr/bin/git","--no-replace-objects","-C","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","config","--local","core.safecrlf","true"]
+["/usr/bin/git","--no-replace-objects","-C","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","checkout","--detach","<O8_COMMIT>"]
+["/usr/bin/git","--no-replace-objects","-C","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","remote","remove","origin"]
+["/usr/bin/git","--no-replace-objects","-C","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","rev-parse","HEAD"]
+```
+
+There is no bootstrap cleanup or retry. A partial root, unexpected stdout, nonzero exit,
+wrong mode, wrong owner, symlink ancestor, or wrong HEAD leaves v8 unarmed and requires a
+new preregistration.
+
+Before preparation, from the authority clone run exactly:
+
+```text
+/usr/bin/python3 -I -B scripts/reconstruct_action_qbc_v8_open_registration.py --repository-root . --registration artifacts/action_qbc_v8_open_registration.json --verify-open-freeze
+```
+
+## 4. One-shot preparation and independent gate
+
+From the authority clone invoke preparation once:
+
+```json
+["/usr/bin/python3","-I","-B","scripts/prepare_action_qbc_v8_open.py","prepare","--repository-root",".","--registration","artifacts/action_qbc_v8_open_registration.json","--execution-root","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4","--receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/preparation-receipt.json"]
+```
+
+The program owns at most two internal attempts. It must atomically promote both fresh
+process clones and both empty output parents together. Do not manually clean, repair, or
+repeat preparation. Every child uses the registered empty-built environment and command
+policy. The preparation receipt embeds the exact nineteen-key actual command ledger,
+compact distribution inventories, complete `.venv` materialization hashes, resolved Python
+hashes, and root identities; a digest without its registered preimage is not sufficient.
+
+After a zero exit, authority invokes the independent post-preparation gate once:
+
+```json
+["/usr/bin/python3","-I","-B","scripts/reconstruct_action_qbc_v8_open_registration.py","--repository-root",".","--registration","artifacts/action_qbc_v8_open_registration.json","--verify-preparation","--preparation-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/preparation-receipt.json","--verification-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/preparation-verification.json"]
+```
+
+The Windows supervisor is forbidden unless both commands exit zero and the canonical
+preparation-v2 and success-only preparation-verification receipts reopen and validate.
+A complete canonical `status=failed` preparation receipt remains retained preclaim evidence
+but is not lifecycle-eligible and cannot authorize verification, arming, science, or a
+result. If encountered after an already irreversible Windows claim, finalization embeds its
+exact readable/hash triple and maps it to `preparation_receipt_invalid`; it is never replaced
+with null merely because its status is failed.
+
+## 5. Sole Windows supervisor
+
+Return to the original clean O8v4 Windows checkout. Confirm that all four fresh external Windows
+claim/receipt paths are absent. Invoke the exact registered supervisor argv once from
+`D:\kaggle competitions\arc3-crosslevel-voi`.
+
+Before accepting any original-checkout Git evidence, both Windows processes independently
+enforce the registered fifteen-key `windows_repository_contract`: the exact ancestor/root,
+Git/common/index paths, exact 846-byte config and 240-byte info/exclude hashes, exact
+nineteen-key normalized local config, ordinary stage-zero O8v4 index, plain non-reparse admin
+directories, inactive hooks, and absence of every registered alternate, graft, shallow,
+replacement, sparse/worktree/common-dir, lock, or promisor source. Every Windows
+original-checkout/local-identity Git argv begins with the frozen executable followed
+immediately by `--no-replace-objects --no-optional-locks`. The neutral-cwd online
+`ls-remote` attempt retains its separately registered credential-hardened argv and does not
+carry `--no-optional-locks`.
+
+```json
+["C:\\Users\\User\\anaconda3\\python.exe","-I","-B","scripts\\supervise_action_qbc_v8_remote_tag.py","--repository-root",".","--registration","artifacts\\action_qbc_v8_open_registration.json","--claim","D:\\kaggle competitions\\arc3-crosslevel-voi-action-qbc-v8-remote-verification-claim-v4.json","--verifier-start-claim","D:\\kaggle competitions\\arc3-crosslevel-voi-action-qbc-v8-remote-verifier-start-claim-v4.json","--remote-receipt","D:\\kaggle competitions\\arc3-crosslevel-voi-action-qbc-v8-remote-verification-v4.json","--supervisor-receipt","D:\\kaggle competitions\\arc3-crosslevel-voi-action-qbc-v8-remote-verification-supervisor-v4.json","--verifier-python","C:\\Users\\User\\anaconda3\\python.exe","--git-executable","C:\\Users\\User\\anaconda3\\Library\\bin\\git.exe","--taskkill-executable","C:\\Windows\\System32\\taskkill.exe","--verifier-child-deadline-seconds","430","--supervisor-deadline-seconds","480","--child-cleanup-timeout-seconds","30"]
+```
+
+The verifier must publish and validate the exclusive verifier-start claim before capturing
+the repository/ancestor snapshot. The subsequent read-only identity commands and final
+snapshot comparison cover the same registered paths and require exact equality. No ancestor
+mutation after this new capture is ignored or tolerated.
+
+Claim creation is the irreversible v8 lifecycle boundary. The supervisor starts at most one
+verifier child. Do not invoke the verifier directly, repeat the supervisor, remove a claim,
+or perform another online rehearsal. If the lifecycle claim was not created, stop at O8v4 and
+preregister any later attempt. If it exists after the supervisor returns, continue exactly
+once with the Linux driver even when verification failed. A child created before Job
+assignment/resume failure is recorded as `post_spawn_initialization_failed` after passed
+cleanup, while bounded capture failure after passed cleanup is `stream_capture_failed`;
+failed required cleanup takes precedence as `child_cleanup_failed`. Neither new terminal
+classification is retryable.
+
+An `overall_deadline` remote attempt records the actual unclamped interval through cleanup
+and is canonical only when its nonnegative duration is at least 120,000 milliseconds.
+Exactly 120,000 milliseconds and arbitrarily larger cleanup-overrun durations are valid;
+there is no configured-deadline addition, clamp, or upper bound.
+
+## 6. Sole Linux lifecycle driver
+
+From Windows, use the explicit Ubuntu launcher and authority cwd to invoke the registered
+`execute` argv for `scripts/execute_action_qbc_v8_open_lifecycle.py` once. The driver owns:
+
+```json
+["/usr/bin/python3","-I","-B","scripts/execute_action_qbc_v8_open_lifecycle.py","execute","--repository-root",".","--registration","artifacts/action_qbc_v8_open_registration.json","--execution-root","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4","--preparation-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/preparation-receipt.json","--preparation-verification-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/preparation-verification.json","--windows-claim","/mnt/d/kaggle competitions/arc3-crosslevel-voi-action-qbc-v8-remote-verification-claim-v4.json","--remote-claim","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/remote-verification-claim.json","--remote-verifier-claim","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/remote-verifier-start-claim.json","--remote-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/remote-verification.json","--remote-supervisor-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/remote-verification-supervisor.json","--arm-receipt","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/arm-receipt.json","--driver-claim","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/lifecycle-driver-claim.json","--ledger","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/lifecycle-ledger.json"]
+```
+
+The exact outer launcher is
+`["C:\\Windows\\System32\\wsl.exe","-d","Ubuntu","--cd","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","--",<the inner array above>]`;
+the inner tokens are appended as separate argv members, not embedded as one string.
+
+```text
+arm -> A -> validate A -> B -> validate B -> ledger -> one finalizer attempt -> bundle -> first publication attempt
+```
+
+It skips dependent children after the first failure and never retries a child. Operators do
+not supply exit codes, stages, or sequence facts. After arm, no tests, environment build,
+checkout, network request, remote Git operation, source mutation, or manual result edit is
+allowed before finalization finishes.
+
+Preparation, arm, lifecycle, finalizer, renderer, bundle validation, and publisher use the
+same exhaustive expected-mode partition. The preparation receipt, four copied remote
+artifacts, and arm receipt reopen only at `0444`; the preparation-verification receipt,
+driver/ledger, both process start and validator claims, both validation receipts and
+payloads, both bundle forms, and result-owner claim reopen only at `0600`. There is no
+cross-role fallback.
+
+Every driver-owned GNU-timeout wrapper omits `--foreground`. The driver creates and owns a
+fresh session/process group for each child class, requires every Python/scientific/Git
+descendant to remain in that group, and confirms the group empty—using its bounded
+TERM/KILL cleanup when needed—before advancing. A cleanup failure is terminal.
+Finalizer return zero or nonzero may truthfully retain `finalizer_child_cleanup_passes=true`
+when a lingering same-PGID descendant was conclusively removed. The sole normal/emergency
+coexistence override is return zero with a canonical normal bundle and failed outer cleanup:
+the driver preserves the normal bytes, creates and selects only a
+`child_cleanup_failed` emergency bundle, and starts no publisher or later child.
+
+An exogenous kill, host shutdown, hardware failure, or corruption of the driver itself can
+strand v8 after claim creation. That is not recoverable by another driver or scientific
+start and requires a separately preregistered disclosure.
+
+## 7. Publication-only recovery
+
+If the driver returned after producing an immutable normal or emergency bundle but did not
+finish the authoritative result tag, the only permitted recovery is the registered
+`publish` subcommand. It may be repeated. It cannot invoke arm, science, validation,
+finalization, rendering, or any network command. It validates owner state, cleans only
+verified-owned scratch, reconstructs the exact R8 object, and atomically creates or accepts
+the exact lightweight result tag.
+
+From the authority cwd, use this exact inner argv under the explicit Ubuntu launcher:
+
+```json
+["/usr/bin/timeout","--signal=TERM","--kill-after=5s","600s","/usr/bin/python3","-I","-B","scripts/execute_action_qbc_v8_open_lifecycle.py","publish","--repository-root",".","--registration","artifacts/action_qbc_v8_open_registration.json","--driver-claim","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/lifecycle-driver-claim.json","--lifecycle-ledger","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/lifecycle-ledger.json","--finalization-bundle","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/finalization-bundle.json","--emergency-bundle","/var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/emergency-result-bundle.json","--control-time-seconds","570"]
+```
+
+The registered publisher array has exactly 23 tokens. Its prefix is exactly
+`["/usr/bin/timeout","--signal=TERM","--kill-after=5s","600s"]`; publisher `main()`
+must compare only the exact derived 19-token child-visible suffix. Parent/operator launchers
+continue to validate and execute the complete wrapper. Never invoke an unwrapped publisher.
+
+Never move, replace, or delete P8, O8v1, O8v2, O8v3, O8v4, R8v4, any claim, any receipt, a bundle,
+a ledger, or a tag.
+
+## 8. Transfer and online publication
+
+Only after the authority result tag resolves to the independently reconstructed R8, use the
+two registered explicit-Ubuntu local fetch commands to transfer the result branch alias and
+tag into the original checkout. Verify both local refs equal R8. Then use Windows Git for
+the two registered pushes and the final `ls-remote --refs` check.
+
+```json
+["/usr/bin/git","--no-replace-objects","-C","/mnt/d/kaggle competitions/arc3-crosslevel-voi","fetch","--no-tags","file:///var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","refs/tags/action-qbc-v8-open-diagnostic-result-v4:refs/heads/action-qbc-v8-open-diagnostic-result"]
+["/usr/bin/git","--no-replace-objects","-C","/mnt/d/kaggle competitions/arc3-crosslevel-voi","fetch","--no-tags","file:///var/tmp/arc3-crosslevel-voi-action-qbc-v8-open-v4/authority","refs/tags/action-qbc-v8-open-diagnostic-result-v4:refs/tags/action-qbc-v8-open-diagnostic-result-v4"]
+["C:\\Users\\User\\anaconda3\\Library\\bin\\git.exe","--no-replace-objects","--no-optional-locks","push","origin","refs/heads/action-qbc-v8-open-diagnostic-result:refs/heads/action-qbc-v8-open-diagnostic-result"]
+["C:\\Users\\User\\anaconda3\\Library\\bin\\git.exe","--no-replace-objects","--no-optional-locks","push","origin","refs/tags/action-qbc-v8-open-diagnostic-result-v4:refs/tags/action-qbc-v8-open-diagnostic-result-v4"]
+["C:\\Users\\User\\anaconda3\\Library\\bin\\git.exe","--no-replace-objects","--no-optional-locks","-c","credential.interactive=never","ls-remote","--refs","origin","refs/heads/action-qbc-v8-open-diagnostic-result","refs/tags/action-qbc-v8-open-diagnostic-result-v4"]
+```
+
+The expected final remote output has exactly two records—the result branch and result tag—at
+the same lowercase 40-hex R8 commit. No result file is copied into a worktree, no checked-out
+branch is updated, and no second finalizer or scientific command is permitted.
